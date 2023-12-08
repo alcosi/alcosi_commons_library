@@ -1,0 +1,88 @@
+
+
+plugins {
+    id 'java'
+    id("maven-publish")
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.9.0"
+    id("com.github.jk1.dependency-license-report") version "2.5"
+}
+
+group = 'com.alcosi'
+version = '1.4.1'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+def licenceReportVersion = "2.5"
+def groovyVersion = "4.0.13"
+dependencies {
+    compileOnly("com.github.jk1:gradle-license-report:$licenceReportVersion")
+    compileOnly("org.apache.groovy:groovy:$groovyVersion")
+}
+
+def appName = 'commons-library'
+
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    repositories {
+
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/alcosi/alcosi_commons_library")
+            credentials {
+                username = "$System.env.GIHUB_PACKAGE_USERNAME"
+                password = "$System.env.GIHUB_PACKAGE_TOKEN"
+            }
+        }
+
+    }
+    publications {
+        myLib(MavenPublication) {
+            from components.java
+            pom {
+                licenses {
+                    license {
+                        name = "The MIT License"
+                        url = "http://opensource.org/licenses/MIT"
+                    }
+                }
+            }
+        }
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+compileKotlin {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "GradlePlugins"
+        url = uri("https://plugins.gradle.org/m2/")
+    }
+}
+
