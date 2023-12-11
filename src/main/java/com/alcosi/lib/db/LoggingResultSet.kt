@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -32,20 +32,20 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 data class LoggingResultSet(val callbacks: List<RowCallbackHandler>, val original: ResultSet) : ResultSet by original {
-
     override fun next(): Boolean {
         try {
-            val rs = original.next();
+            val rs = original.next()
             if (rs) {
                 callbacks.forEach { it.processRow(original) }
             }
-            return rs;
+            return rs
         } catch (t: Throwable) {
-            logger.log(Level.SEVERE,"Error! ", t)
-            return false;
+            logger.log(Level.SEVERE, "Error! ", t)
+            return false
         }
     }
-    companion object{
-        val logger= Logger.getLogger(this::class.java.name)
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }

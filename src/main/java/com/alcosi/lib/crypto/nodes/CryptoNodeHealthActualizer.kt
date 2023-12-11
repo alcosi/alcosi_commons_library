@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,9 +26,7 @@
 
 package com.alcosi.lib.crypto.nodes
 
-import jakarta.annotation.PostConstruct
-import org.springframework.scheduling.annotation.Scheduled
-import com.alcosi.lib.executors.NormalThreadPoolExecutor
+import com.alcosi.lib.executors.SchedulerTimer
 import java.net.URL
 import java.time.Duration
 import java.time.LocalDateTime
@@ -43,12 +41,13 @@ open class CryptoNodeHealthActualizer(
     val cryptoNodeProperties: CryptoNodeProperties,
     val executor: ThreadPoolExecutor,
     val cryptoNodeHealthChecker: CryptoNodeHealthChecker,
-    val maxRefreshTimeout: Duration
+    val maxRefreshTimeout: Duration,
 ) {
-    val logger= Logger.getLogger(this.javaClass.name)
+    val logger = Logger.getLogger(this.javaClass.name)
 
-    protected val serviceListRaw = getServiceList();
-    private fun getServiceList(): List<Service> {
+    protected val serviceListRaw by lazy { getServiceList() }
+
+    protected open fun getServiceList(): List<Service> {
         return cryptoNodeProperties.url.entries.asSequence()
             .filter { it.value != null }
             .flatMap { e ->
@@ -57,8 +56,6 @@ open class CryptoNodeHealthActualizer(
     }
 
     val serviceStatuses = HashMap<Int, List<ServiceStatus>>()
-    val scheduledExecutor =
-        NormalThreadPoolExecutor.build(1, "scheduledExecutorCryptoNodeHealthActualizer", Duration.ofDays(100))
 
     @JvmRecord
     data class Service(val chainId: Int, val url: URL)
@@ -69,37 +66,37 @@ open class CryptoNodeHealthActualizer(
         val url: URL,
         val status: Boolean,
         val timeout: Long,
-        val checkedTime: LocalDateTime = LocalDateTime.now()
+        val checkedTime: LocalDateTime = LocalDateTime.now(),
     )
 
-    @Scheduled(initialDelay = 2000, fixedDelayString = "\${common-lib.health_check.delay.crypto_nodes:PT1M}")
-    @PostConstruct
-    fun checkNodesHealth() {
-        scheduledExecutor.execute {
-            val list = serviceListRaw
-                .asSequence()
-                .map { it to executor.submit(Callable { return@Callable cryptoNodeHealthChecker.check(it.url) }) }
-                .map {
-                    try {
-                        val heathStatus = it.second.get(
-                            maxRefreshTimeout.toMillis(),
-                            TimeUnit.MILLISECONDS
-                        )
-                        if (loggingLevel!= Level.OFF) {
-                            logger.log(loggingLevel,"Health ${it.first.url}:${heathStatus}")
+    protected open val scheduler =
+        object : SchedulerTimer(cryptoNodeProperties.health.checkDelay, "CheckNodes", loggingLevel) {
+            override fun startBatch() {
+                val list =
+                    serviceListRaw
+                        .asSequence()
+                        .map { it to executor.submit(Callable { return@Callable cryptoNodeHealthChecker.check(it.url) }) }
+                        .map {
+                            try {
+                                val heathStatus =
+                                    it.second.get(
+                                        maxRefreshTimeout.toMillis(),
+                                        TimeUnit.MILLISECONDS,
+                                    )
+                                if (loggingLevel != Level.OFF) {
+                                    logger.log(loggingLevel, "Health ${it.first.url}:$heathStatus")
+                                }
+                                it.first to heathStatus
+                            } catch (t: Throwable) {
+                                logger.log(Level.SEVERE, "Error actualize health ${it.first.url}", t)
+                                return@map null
+                            }
                         }
-                        it.first to heathStatus
-                    } catch (t: Throwable) {
-                        logger.log(Level.SEVERE,"Error actualize health ${it.first.url}", t)
-                        return@map null
-                    }
-                }
-                .filterNotNull()
-                .filter { it.second?.status ?: false }
-                .map { ServiceStatus(it.first.chainId, it.first.url, it.second!!.status, it.second!!.timeout) }
-                .toList()
-            list.groupBy { it.chainId }.forEach { serviceStatuses[it.key] = it.value }
+                        .filterNotNull()
+                        .filter { it.second?.status ?: false }
+                        .map { ServiceStatus(it.first.chainId, it.first.url, it.second!!.status, it.second!!.timeout) }
+                        .toList()
+                list.groupBy { it.chainId }.forEach { serviceStatuses[it.key] = it.value }
+            }
         }
-    }
-
 }

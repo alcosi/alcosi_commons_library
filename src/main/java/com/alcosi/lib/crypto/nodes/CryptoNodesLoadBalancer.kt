@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -24,14 +24,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+@file:Suppress("ktlint:standard:no-wildcard-imports")
+
 package com.alcosi.lib.crypto.nodes
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Service
-import org.web3j.protocol.admin.Admin
 import com.alcosi.lib.logging.annotations.LogTime
 import java.net.URL
 import java.time.Duration
@@ -42,36 +38,36 @@ import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Logger
-import kotlin.concurrent.schedule
 
-@Service
-@ConditionalOnClass(Scheduled::class,Admin::class)
-@ConditionalOnProperty(
-    prefix = "common-lib.crypto.admins",
-    name = arrayOf("disabled"),
-    matchIfMissing = true,
-    havingValue = "false"
-)
-open class CryptoNodesLoadBalancer(val cryptoNodesHealthActualizer:CryptoNodeHealthActualizer,
-                                    @Value("\${common-lib.crypto.node.timeout.balancer:10s}") val balancerTimeout: Duration) {
-    val logger= Logger.getLogger(this.javaClass.name)
+open class CryptoNodesLoadBalancer(
+    val cryptoNodesHealthActualizer: CryptoNodeHealthActualizer,
+    val balancerTimeout: Duration,
+) {
+    val logger = Logger.getLogger(this.javaClass.name)
 
     val random = Random()
     val sleepTime = Duration.ofMillis(3000)
-    protected val executor=Executors.newSingleThreadExecutor()
+    protected val executor = Executors.newSingleThreadExecutor()
+
     @JvmRecord
     data class ServiceChance(
         val url: URL,
         val chance: Long,
-        val range: LongRange
+        val range: LongRange,
     )
 
     @LogTime
-    fun getActualUrl(chainId: Int, timeout: Long = 0): Future<URL> {
-        return executor.submit(Callable {  internal(chainId, timeout)})
+    fun getActualUrl(
+        chainId: Int,
+        timeout: Long = 0,
+    ): Future<URL> {
+        return executor.submit(Callable { internal(chainId, timeout) })
     }
 
-    private fun internal(chainId: Int, timeout: Long = 0): URL {
+    private fun internal(
+        chainId: Int,
+        timeout: Long = 0,
+    ): URL {
         val time = System.currentTimeMillis()
         val list = cryptoNodesHealthActualizer.serviceStatuses[chainId]?.filter { it.status }.orEmpty()
         if (list.isEmpty()) {
@@ -89,12 +85,13 @@ open class CryptoNodesLoadBalancer(val cryptoNodesHealthActualizer:CryptoNodeHea
         }
         val timeoutMax = list.maxOf { it.timeout }
         val atomicPrevRange = AtomicLong(0)
-        val prepared = list.map {
-            val chance = timeoutMax * 2 - it.timeout
-            val downRange = atomicPrevRange.getAndAdd(chance)
-            val range = downRange.rangeTo(downRange + chance)
-            return@map ServiceChance(it.url, chance, range)
-        }
+        val prepared =
+            list.map {
+                val chance = timeoutMax * 2 - it.timeout
+                val downRange = atomicPrevRange.getAndAdd(chance)
+                val range = downRange.rangeTo(downRange + chance)
+                return@map ServiceChance(it.url, chance, range)
+            }
         val picked = random.nextLong(atomicPrevRange.get() - 1)
         return prepared.first { it.range.contains(picked) }.url
     }

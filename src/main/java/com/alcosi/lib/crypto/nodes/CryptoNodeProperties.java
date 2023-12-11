@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,11 +27,10 @@
 package com.alcosi.lib.crypto.nodes;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.Map;
 
-@Configuration
 @ConfigurationProperties("common-lib.crypto.node")
 public class CryptoNodeProperties {
     public Map<Integer, String> getUrl() {
@@ -42,5 +41,120 @@ public class CryptoNodeProperties {
         this.url = url;
     }
 
+    public Duration getPoolingInterval() {
+        return poolingInterval;
+    }
+
+    public void setPoolingInterval(Duration poolingInterval) {
+        this.poolingInterval = poolingInterval;
+    }
+
+    public Duration getBalancerTimeout() {
+        return balancerTimeout;
+    }
+
+    public void setBalancerTimeout(Duration balancerTimeout) {
+        this.balancerTimeout = balancerTimeout;
+    }
+
+    public Integer getThreads() {
+        return threads;
+    }
+
+    public void setThreads(Integer threads) {
+        this.threads = threads;
+    }
+
+    public String getNodesLoggingLevel() {
+        return nodesLoggingLevel;
+    }
+
+    public void setNodesLoggingLevel(String nodesLoggingLevel) {
+        this.nodesLoggingLevel = nodesLoggingLevel;
+    }
+
+    public Integer getNodesLoggingMaxBody() {
+        return nodesLoggingMaxBody;
+    }
+
+    public void setNodesLoggingMaxBody(Integer nodesLoggingMaxBody) {
+        this.nodesLoggingMaxBody = nodesLoggingMaxBody;
+    }
+
+    public Duration getNodesTimeout() {
+        return nodesTimeout;
+    }
+
+    public void setNodesTimeout(Duration nodesTimeout) {
+        this.nodesTimeout = nodesTimeout;
+    }
+
+    public Health getHealth() {
+        return health;
+    }
+
+    public void setHealth(Health health) {
+        this.health = health;
+    }
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
     private Map<Integer, String> url;
+    private Duration poolingInterval = Duration.ofSeconds(15);
+    private Duration balancerTimeout = Duration.ofSeconds(10);
+    private Integer threads = 20;
+    private String nodesLoggingLevel = "INFO";
+    private Integer nodesLoggingMaxBody = 10000;
+
+    private Duration nodesTimeout = Duration.ofSeconds(15);
+    private Health health = new Health();
+    private Boolean disabled =false;
+
+    public static class Health{
+        private String nodesLoggingLevel = "FINEST";
+        private Duration refreshTimeout = Duration.ofSeconds(10);
+        private Duration checkDelay = Duration.ofSeconds(60);
+
+        private Integer threads =20;
+
+        public Duration getCheckDelay() {
+            return checkDelay;
+        }
+
+        public void setCheckDelay(Duration checkDelay) {
+            this.checkDelay = checkDelay;
+        }
+
+        public Duration getRefreshTimeout() {
+            return refreshTimeout;
+        }
+
+        public void setRefreshTimeout(Duration refreshTimeout) {
+            this.refreshTimeout = refreshTimeout;
+        }
+
+        public Integer getThreads() {
+            return threads;
+        }
+
+        public void setThreads(Integer threads) {
+            this.threads = threads;
+        }
+
+        public String getNodesLoggingLevel() {
+            return nodesLoggingLevel;
+        }
+
+        public void setNodesLoggingLevel(String nodesLoggingLevel) {
+            this.nodesLoggingLevel = nodesLoggingLevel;
+        }
+
+
+    }
 }
+
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,40 +26,99 @@
 
 package com.alcosi.lib.logging.http.resttemplate
 
-import org.springframework.beans.factory.annotation.Value
+import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.filters.servlet.ThreadContext
+import org.springframework.beans.factory.ObjectProvider
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.AutoConfigureBefore
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestTemplateBuilderConfigurer
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.BufferingClientHttpRequestFactory
+import org.springframework.http.client.ClientHttpRequestFactory
+import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.SimpleClientHttpRequestFactory
+import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
-import java.time.Duration
 import java.util.logging.Level
 
-@Configuration
-@ConditionalOnClass(RestTemplate::class)
-@ConditionalOnProperty(prefix = "common-lib.rest_template",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-open class RestTemplateConfig {
+@AutoConfiguration
+@AutoConfigureBefore(RestClientAutoConfiguration::class, RestTemplateAutoConfiguration::class)
+@EnableConfigurationProperties(RestTemplateProperties::class)
+@ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+class RestTemplateConfig {
     @Bean
-    fun getLogRequestResponseFilter(@Value("\${common-lib.request_body_log.max.rest_template:10000}") maxBodySize: Int,@Value("\${common-lib.logging.level.rest_template:INFO}")  loggingLevel: String): LogRequestResponseFilter {
-        return LogRequestResponseFilter(maxBodySize, Level.parse(loggingLevel))
+    @ConditionalOnClass(RestTemplate::class)
+    @ConditionalOnMissingBean(LogRequestResponseFilter::class)
+    @ConditionalOnBean(HeaderHelper::class, ThreadContext::class)
+    fun getLogRequestResponseFilter(
+        properties: RestTemplateProperties,
+        headerHelper: HeaderHelper,
+        threadContext: ThreadContext,
+    ): LogRequestResponseFilter {
+        return LogRequestResponseFilter(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper)
+    }
+
+    @Bean("clientHttpRequestFactory")
+    @ConditionalOnClass(RestTemplate::class)
+    @ConditionalOnMissingBean(ClientHttpRequestFactory::class)
+    fun getSimpleClientHttpRequestFactory(properties: RestTemplateProperties): ClientHttpRequestFactory {
+        val simpleClientHttpRequestFactory = SimpleClientHttpRequestFactory()
+        simpleClientHttpRequestFactory.setConnectTimeout(properties.connectionTimeout.toMillis().toInt())
+        simpleClientHttpRequestFactory.setReadTimeout(properties.readTimeout.toMillis().toInt())
+        val factory = BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory)
+        return factory
+    }
+
+    @Bean("restTemplateBuilder")
+    @ConditionalOnClass(RestTemplate::class)
+    @ConditionalOnMissingBean(RestTemplate::class)
+    fun getRestTemplateBuilder(
+        filters: ObjectProvider<ClientHttpRequestInterceptor>,
+        factory: ClientHttpRequestFactory,
+        configurer: ObjectProvider<RestTemplateBuilderConfigurer>,
+    ): RestTemplateBuilder {
+        val builder = RestTemplateBuilder().requestFactory { -> factory }
+        val filtersList = filters.toList()
+        builder.interceptors(filtersList)
+        configurer.stream().forEach { it.configure(builder) }
+        return builder
     }
 
     @Bean("restTemplate")
-    fun getRestTemplate(
-        logRequestResponseFilter: LogRequestResponseFilter,
-        @Value("\${common-lib.rest_template.timeout.connection:6s}") connectionTimeout: Duration,
-        @Value("\${common-lib.rest_template.timeout.read:60s}") readTimeout: Duration,
-    ): RestTemplate? {
-        val simpleClientHttpRequestFactory = SimpleClientHttpRequestFactory()
-        simpleClientHttpRequestFactory.setConnectTimeout(connectionTimeout.toMillis().toInt())
-        simpleClientHttpRequestFactory.setReadTimeout(readTimeout.toMillis().toInt())
-        val factory=BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory)
-        val restTemplate =RestTemplate(factory)
-        restTemplate.interceptors.add(logRequestResponseFilter)
-//        restTemplate.requestFactory=factory
-        return restTemplate
+    @ConditionalOnClass(RestTemplate::class)
+    @ConditionalOnMissingBean(RestTemplate::class)
+    fun getRestTemplate(builder: RestTemplateBuilder): RestTemplate {
+        return builder.build()
     }
 
+    @Bean("restClient")
+    @ConditionalOnClass(RestClient::class)
+    @ConditionalOnMissingBean(RestClient::class)
+    fun getRestClient(
+        filters: ObjectProvider<ClientHttpRequestInterceptor>,
+        configurer: ObjectProvider<RestClientBuilderConfigurer>,
+        factory: ClientHttpRequestFactory,
+    ): RestClient {
+        val builder = RestClient.builder()
+        builder.requestFactory(factory)
+        val filtersList = filters.toList()
+        filtersList.forEach {
+            builder.requestInterceptor(it)
+        }
+        val configurers = configurer.toList()
+        configurers.forEach { it.configure(builder) }
+        val client =
+            builder
+                .build()
+        return client
+    }
 }

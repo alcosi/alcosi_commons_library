@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -24,7 +24,7 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.serializers;
+package com.alcosi.lib.serializers
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
@@ -32,7 +32,11 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import java.math.BigInteger
 
 class HexBigIntSerializer : StdSerializer<BigInteger>(BigInteger::class.java) {
-    override fun serialize(value: BigInteger?, gen: JsonGenerator, provider: SerializerProvider) {
+    override fun serialize(
+        value: BigInteger?,
+        gen: JsonGenerator,
+        provider: SerializerProvider,
+    ) {
         if (value == null) {
             gen.writeNull()
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,80 +26,130 @@
 
 package com.alcosi.lib.logging.http.okhttp
 
+import com.alcosi.lib.filters.servlet.HeaderHelper
 import okhttp3.*
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
-open class OKLoggingInterceptor( val maxBodySize: Int,val loggingLevel: Level) : Interceptor{
-    val logger= Logger.getLogger(this.javaClass.name)
-
+open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, val headerHelper: HeaderHelper) : Interceptor {
+    val logger = Logger.getLogger(this.javaClass.name)
 
     override fun intercept(chain: Interceptor.Chain): Response {
         return try {
             val t1 = System.currentTimeMillis()
             val rqId = getIdString()
-            logRq(rqId, chain.request())
-            logRs(rqId, chain.proceed(chain.request()), chain.request(), t1)
+            val httpRequest = addRequestHeaders(chain)
+            logRq(rqId, httpRequest)
+            logRs(rqId, chain.proceed(httpRequest), httpRequest, t1)
         } catch (e: Exception) {
-            logger.log(Level.SEVERE,"interceptor error ", e)
+            logger.log(Level.SEVERE, "interceptor error ", e)
             throw e
         }
     }
 
-    private fun logRs(rqId: String, response: Response, request: Request, time: Long): Response {
-        if ( loggingLevel == Level.OFF){
-            return response;
+    private fun addRequestHeaders(chain: Interceptor.Chain): Request {
+        val httpRequestBuilder = chain.request().newBuilder()
+        headerHelper.createRequestHeadersMap().forEach {
+            httpRequestBuilder.addHeader(it.key, it.value)
+        }
+        val httpRequest = httpRequestBuilder.build()
+        return httpRequest
+    }
+
+    protected open fun logRs(
+        rqId: String,
+        response: Response,
+        request: Request,
+        time: Long,
+    ): Response {
+        if (loggingLevel == Level.OFF) {
+            return response
         }
         val t2 = System.currentTimeMillis()
         val contentType = response.body?.contentType()
         val contentLength = response.body?.contentLength() ?: 0
-        val content =if (contentLength >maxBodySize) "<TOO BIG ${contentLength} bytes>" else response.body?.string()
-        val wrappedBody = ResponseBody.create(contentType, content ?: "")
-        val logBody = """
-
-===========================CLIENT OKHttp response begin===========================
-=ID           : ${rqId}
-=URI          : ${response.code} ${request.method} ${request.url}
-=Took         : ${System.currentTimeMillis() - time} ms
-=Headers      : ${getHeaders(response.headers)}    
-=Body         : ${content}
-===========================CLIENT OKHttp response end   ==========================""".trimIndent();
+        val content = if (contentLength > maxBodySize) "<TOO BIG $contentLength bytes>" else response.body?.string()
+        val wrappedBody = (content ?: "").toResponseBody(contentType)
+        val logBody = constructRsBody(rqId, response, request, time, content)
         logger.log(loggingLevel, logBody)
         return response.newBuilder().body(wrappedBody).build()
     }
 
-    private fun getHeaders(headers: Headers) = (headers.toMultimap().map { "${it.key}:${it.value.joinToString(",")}" }.joinToString(";"))
+    protected open fun constructRsBody(
+        rqId: String,
+        response: Response,
+        request: Request,
+        time: Long,
+        content: String?,
+    ): String {
+        val logBody =
+            """
+            
+            ===========================CLIENT OKHttp response begin===========================
+            =ID           : $rqId
+            =URI          : ${response.code} ${request.method} ${request.url}
+            =Took         : ${System.currentTimeMillis() - time} ms
+            =Headers      : ${getHeaders(response.headers)}    
+            =Body         : $content
+            ===========================CLIENT OKHttp response end   ==========================
+            """.trimIndent()
+        return logBody
+    }
 
-    private fun logRq(rqId: String, request: Request) {
-        if ( loggingLevel == Level.OFF){
+    protected open fun getHeaders(headers: Headers) =
+        (
+            headers.toMultimap().map {
+                "${it.key}:${it.value.joinToString(
+                    ",",
+                )}"
+            }.joinToString(";")
+        )
+
+    protected open fun logRq(
+        rqId: String,
+        request: Request,
+    ) {
+        if (loggingLevel == Level.OFF) {
             return
         }
         val sb = StringBuilder()
         val requestBuffer = Buffer()
 
-        val contentLength = request.body?.contentLength()?:0L;
-        val emptyBody = ((contentLength==0L)||request.body == null)
+        val contentLength = request.body?.contentLength() ?: 0L
+        val emptyBody = ((contentLength == 0L) || request.body == null)
         if (!emptyBody) {
             request.body!!.writeTo(requestBuffer)
         }
-        val body =if (contentLength >maxBodySize) "<TOO BIG ${contentLength} bytes>" else requestBuffer.readUtf8()
-        val logString = """
-
-===========================CLIENT OKHttp request begin===========================
-=ID           : ${rqId}
-=URI          : ${request.method} ${request.url}
-=Headers      : ${getHeaders(request.headers)}    
-=Body         : ${body}
-===========================CLIENT OKHttp request end   ==========================
-        """.trimIndent()
+        val body = if (contentLength > maxBodySize) "<TOO BIG $contentLength bytes>" else requestBuffer.readUtf8()
+        val logString = constructRqBody(rqId, request, body)
         logger.log(loggingLevel, logString)
+    }
+
+    protected open fun constructRqBody(
+        rqId: String,
+        request: Request,
+        body: String,
+    ): String {
+        val logString =
+            """
+            
+            ===========================CLIENT OKHttp request begin===========================
+            =ID           : $rqId
+            =URI          : ${request.method} ${request.url}
+            =Headers      : ${getHeaders(request.headers)}    
+            =Body         : $body
+            ===========================CLIENT OKHttp request end   ==========================
+            """.trimIndent()
+        return logString
     }
 
     companion object {
         private val RANDOM = Random()
-        fun getIdString(): String {
+
+        protected fun getIdString(): String {
             val integer = RANDOM.nextInt(10000000)
             val leftPad = integer.toString().padStart(7, '0')
             return leftPad.substring(0, 4) + '-' + leftPad.substring(5)

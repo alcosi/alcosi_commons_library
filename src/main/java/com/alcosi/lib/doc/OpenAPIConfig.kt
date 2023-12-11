@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,13 +26,12 @@
 
 package com.alcosi.lib.doc
 
-import com.alcosi.lib.dto.APIError
 import org.apache.commons.io.IOUtils
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.function.RouterFunction
@@ -41,68 +40,78 @@ import org.springframework.web.servlet.function.ServerResponse
 import java.util.logging.Level
 import java.util.logging.Logger
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(
-    prefix = "common-lib.springdoc",
-    name = arrayOf("disabled"),
+    prefix = "common-lib.openapi",
+    name = ["disabled"],
     matchIfMissing = true,
-    havingValue = "false"
+    havingValue = "false",
 )
-open class OpenAPIConfig {
+@EnableConfigurationProperties(OpenAPIProperties::class)
+class OpenAPIConfig {
     val allowedFileRegex: Regex = "^([a-zA-Z0-9_\\-()])+(\\.\\w{1,4})\$".toRegex()
     val logger = Logger.getLogger(this.javaClass.name)
 
     @Bean
     @ConditionalOnMissingBean(OpenDocErrorConstructor::class)
-    open fun openApiErrorConstructor(): OpenDocErrorConstructor.Default {
+    fun openApiErrorConstructor(): OpenDocErrorConstructor.Default {
         return OpenDocErrorConstructor.Default()
     }
 
     @Bean
-    open fun openAPIRoute(
-        @Value("\${common-lib.openapi.url:/openapi/{fileName}}") apiWebPath: String,
-        @Value("\${common-lib.openapi.file-path:openapi.yaml}") apiFilePath: String,
-        errorConstructor: OpenDocErrorConstructor
+    fun openAPIRoute(
+        openAPIProperties: OpenAPIProperties,
+        errorConstructor: OpenDocErrorConstructor,
     ): RouterFunction<ServerResponse> {
         return RouterFunctions
             .route()
-            .GET(apiWebPath) {
+            .GET(openAPIProperties.apiWebPath) {
                 val fileName = it.pathVariable("fileName")
-                val rs = try {
-                    if (!allowedFileRegex.matches(fileName)) {
-                        throw RuntimeException("Bad filename")
-                    }
-                    val resourceToByteArray = IOUtils.resourceToByteArray("/openapi/$fileName").let {array->
-                        if (fileName.equals("swagger-initializer.js",true)){
-                            String(array).replace("@ApiPathName@",apiFilePath).toByteArray()
-                        } else{
-                            array
+                val rs =
+                    try {
+                        if (!allowedFileRegex.matches(fileName)) {
+                            throw RuntimeException("Bad filename")
                         }
-                    }
-                    val type =
-                        if (fileName.endsWith("html", true)) MediaType.TEXT_HTML_VALUE
-                        else if (fileName.endsWith("js", true)) "application/javascript; charset=utf-8"
-                        else if (fileName.endsWith("css", true)) "text/css"
-                        else if (fileName.endsWith("png", true)) MediaType.IMAGE_PNG_VALUE
-                        else if (fileName.endsWith("json", true)) MediaType.APPLICATION_JSON_VALUE
-                        else if (fileName.endsWith("yml", true)) MediaType.TEXT_PLAIN_VALUE
-                        else if (fileName.endsWith("yaml", true)) MediaType.TEXT_PLAIN_VALUE
-                        else MediaType.APPLICATION_OCTET_STREAM_VALUE
+                        val resourceToByteArray =
+                            IOUtils.resourceToByteArray("/openapi/$fileName").let { array ->
+                                if (fileName.equals("swagger-initializer.js", true)) {
+                                    String(array).replace("@ApiPathName@", openAPIProperties.filePath).toByteArray()
+                                } else {
+                                    array
+                                }
+                            }
+                        val type =
+                            if (fileName.endsWith("html", true)) {
+                                MediaType.TEXT_HTML_VALUE
+                            } else if (fileName.endsWith("js", true)) {
+                                "application/javascript; charset=utf-8"
+                            } else if (fileName.endsWith("css", true)) {
+                                "text/css"
+                            } else if (fileName.endsWith("png", true)) {
+                                MediaType.IMAGE_PNG_VALUE
+                            } else if (fileName.endsWith("json", true)) {
+                                MediaType.APPLICATION_JSON_VALUE
+                            } else if (fileName.endsWith("yml", true)) {
+                                MediaType.TEXT_PLAIN_VALUE
+                            } else if (fileName.endsWith("yaml", true)) {
+                                MediaType.TEXT_PLAIN_VALUE
+                            } else {
+                                MediaType.APPLICATION_OCTET_STREAM_VALUE
+                            }
 
-                    val builder = ServerResponse.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, type);
-                    if (type == MediaType.APPLICATION_OCTET_STREAM_VALUE) {
-                        builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
+                        val builder =
+                            ServerResponse.ok()
+                                .header(HttpHeaders.CONTENT_TYPE, type)
+                        if (type == MediaType.APPLICATION_OCTET_STREAM_VALUE) {
+                            builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
+                        }
+                        builder.body(resourceToByteArray)
+                    } catch (t: Throwable) {
+                        logger.log(Level.WARNING, "Error in openapi controller", t)
+                        errorConstructor.constructError(t)
                     }
-                    builder.body(resourceToByteArray)
-                } catch (t: Throwable) {
-                    logger.log(Level.WARNING, "Error in openapi controller", t)
-                    errorConstructor.constructError(t)
-                }
                 return@GET rs
             }
             .build()
     }
-
-
 }

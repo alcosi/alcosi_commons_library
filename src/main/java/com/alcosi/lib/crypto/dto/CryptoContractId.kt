@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -28,16 +28,13 @@ package com.alcosi.lib.crypto.dto
 
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.math.BigInteger
-import kotlin.jvm.JvmRecord;
 
 @JvmRecord
 data class CryptoContractId(
     @JsonProperty("address") val address: String,
     @JsonProperty("chainId")
     @JsonAlias("chain_id") val chainId: Long,
-
-    ) {
+) {
     override fun toString(): String {
         return "$chainId:$address"
     }

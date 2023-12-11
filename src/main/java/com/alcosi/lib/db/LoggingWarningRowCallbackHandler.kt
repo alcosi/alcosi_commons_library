@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -33,16 +33,17 @@ import java.util.logging.Logger
 
 class LoggingWarningRowCallbackHandler(private val logLevel: Level?) : RowCallbackHandler {
     override fun processRow(rs: ResultSet) {
-        if (logLevel == null||logLevel== Level.OFF) {
-            return;
+        if (logLevel == null || logLevel == Level.OFF) {
+            return
         }
-        var warning = rs?.statement?.warnings
+        var warning = rs.statement?.warnings
         while (warning != null) {
             logger.log(logLevel, "SQL warning ${warning.sqlState}:${warning.message}")
             warning = warning.nextWarning
         }
     }
-    companion object{
-        val logger= Logger.getLogger(this::class.java.name)
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }

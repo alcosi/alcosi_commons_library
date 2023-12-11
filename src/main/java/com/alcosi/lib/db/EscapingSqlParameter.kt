@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -28,23 +28,36 @@ package com.alcosi.lib.db
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 
-class EscapingSqlParameter: MapSqlParameterSource()  {
-    protected fun escapeString(value:Any?):Any?{
+class EscapingSqlParameter : MapSqlParameterSource() {
+    protected fun escapeString(value: Any?): Any? {
         if (value is String) {
-            return value?.replace("\u0000", "<0x00>");
-        } else{
+            return value.replace("\u0000", "<0x00>")
+        } else {
             return value
         }
     }
-    override fun addValue(paramName: String, value: Any?): MapSqlParameterSource {
+
+    override fun addValue(
+        paramName: String,
+        value: Any?,
+    ): MapSqlParameterSource {
         return super.addValue(paramName, escapeString(value))
     }
 
-    override fun addValue(paramName: String, value: Any?, sqlType: Int): MapSqlParameterSource {
+    override fun addValue(
+        paramName: String,
+        value: Any?,
+        sqlType: Int,
+    ): MapSqlParameterSource {
         return super.addValue(paramName, escapeString(value), sqlType)
     }
 
-    override fun addValue(paramName: String, value: Any?, sqlType: Int, typeName: String): MapSqlParameterSource {
+    override fun addValue(
+        paramName: String,
+        value: Any?,
+        sqlType: Int,
+        typeName: String,
+    ): MapSqlParameterSource {
         return super.addValue(paramName, escapeString(value), sqlType, typeName)
     }
 

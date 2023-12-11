@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -29,10 +29,10 @@ package com.alcosi.lib.db
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowCallbackHandler
 import java.sql.ResultSet
-@JvmRecord
-data class CallbackProcessorResultSetExtractor<T>(val callbacks: List<RowCallbackHandler>,val extractor: ResultSetExtractor<T>):ResultSetExtractor<T> {
-    override fun extractData(rs: ResultSet): T? {
-      return  extractor.extractData(LoggingResultSet(callbacks,rs))
-    }
 
+@JvmRecord
+data class CallbackProcessorResultSetExtractor<T>(val callbacks: List<RowCallbackHandler>, val extractor: ResultSetExtractor<T>) : ResultSetExtractor<T> {
+    override fun extractData(rs: ResultSet): T? {
+        return extractor.extractData(LoggingResultSet(callbacks, rs))
+    }
 }

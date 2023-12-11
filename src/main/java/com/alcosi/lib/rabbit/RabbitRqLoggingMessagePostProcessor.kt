@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,36 +27,55 @@
 package com.alcosi.lib.rabbit
 
 import org.springframework.amqp.core.Message
+import org.springframework.amqp.core.MessageProperties
 import java.nio.charset.StandardCharsets
 import java.util.logging.Logger
 
-
-open class RabbitRqLoggingMessagePostProcessor (    val maxBodySize: Int): RabbitLoggingMessagePostProcessor {
+open class RabbitRqLoggingMessagePostProcessor(val maxBodySize: Int) : RabbitLoggingMessagePostProcessor {
     override fun postProcessMessage(message: Message): Message {
-        val time=System.currentTimeMillis()
+        val time = System.currentTimeMillis()
         val properties = message.messageProperties
-       val id= properties.correlationId?: RabbitLoggingMessagePostProcessor.getIdString()
-        val propsString =properties.toCompactString()
+        val id = properties.correlationId ?: RabbitLoggingMessagePostProcessor.getIdString()
+        val propsString = properties.toCompactString()
         val headers = properties.headers.map { "${it.key}:${it.value}" }
         val body =
-            if (message.body == null || message.body.isEmpty()) "" else  if (message.body.size > maxBodySize) "<TOO BIG ${message.body.size} bytes>" else String(message.body, StandardCharsets.UTF_8)
-        val logBody = """
-
-===========================SERVER AMQP request begin===========================
-=ID           : ${id}
-=Exchange     : ${properties.receivedExchange}
-=Routing key  : ${properties.receivedRoutingKey}
-=Queue        : ${properties.consumerQueue}
-=Headers      : ${headers}
-=Properties   : ${propsString}    
-=Body         : $body
-===========================SERVER AMQP request end   ==========================
-        """.trimIndent()
+            if (message.body == null || message.body.isEmpty()) {
+                ""
+            } else if (message.body.size > maxBodySize) {
+                "<TOO BIG ${message.body.size} bytes>"
+            } else {
+                String(message.body, StandardCharsets.UTF_8)
+            }
+        val logBody = constructRqBody(id, properties, headers, propsString, body)
         logger.info(logBody)
-        properties.correlationId="$id;${properties.receivedExchange};${properties.receivedRoutingKey};${properties.consumerQueue};$time"
-        return message;
+        properties.correlationId = "$id;${properties.receivedExchange};${properties.receivedRoutingKey};${properties.consumerQueue};$time"
+        return message
     }
-    companion object{
-        val logger= Logger.getLogger(this.javaClass.name)
+
+    protected open fun constructRqBody(
+        id: String,
+        properties: MessageProperties,
+        headers: List<String>,
+        propsString: String,
+        body: String,
+    ): String {
+        val logBody =
+            """
+            
+            ===========================SERVER AMQP request begin===========================
+            =ID           : $id
+            =Exchange     : ${properties.receivedExchange}
+            =Routing key  : ${properties.receivedRoutingKey}
+            =Queue        : ${properties.consumerQueue}
+            =Headers      : $headers
+            =Properties   : $propsString    
+            =Body         : $body
+            ===========================SERVER AMQP request end   ==========================
+            """.trimIndent()
+        return logBody
+    }
+
+    companion object {
+        val logger = Logger.getLogger(this.javaClass.name)
     }
 }

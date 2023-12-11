@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,15 +27,14 @@
 package com.alcosi.lib.doc
 
 import com.alcosi.lib.dto.APIError
-import org.springframework.context.annotation.Configuration
-import org.springframework.stereotype.Component
 import org.springframework.web.servlet.function.ServerResponse
 
 interface OpenDocErrorConstructor {
-    fun constructError(t:Throwable):ServerResponse
-    class Default:OpenDocErrorConstructor{
+    fun constructError(t: Throwable): ServerResponse
+
+    class Default : OpenDocErrorConstructor {
         override fun constructError(t: Throwable): ServerResponse {
-            val error=APIError(t.message?:"",404000,t.javaClass.simpleName);
+            val error = APIError(t.message ?: "", 404000, t.javaClass.simpleName)
             return ServerResponse.status(error.httpCode).body(error)
         }
     }

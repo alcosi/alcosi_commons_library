@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -32,30 +32,35 @@ import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
 
-interface RabbitLoggingMessagePostProcessor: MessagePostProcessor {
-    fun MessageProperties.toCompactString() : String {
-        val string = PROPERTIES_FIELDS
-            .asSequence()
-            .map { it.first to it.second?.get(this) }
-            .filter { it.second != null }
-            .map { "${it.first}:${it.second}" }
-            .joinToString(", ")
+interface RabbitLoggingMessagePostProcessor : MessagePostProcessor {
+    fun MessageProperties.toCompactString(): String {
+        val string =
+            PROPERTIES_FIELDS
+                .asSequence()
+                .map { it.first to it.second?.get(this) }
+                .filter { it.second != null }
+                .map { "${it.first}:${it.second}" }
+                .joinToString(", ")
         return "[$string]"
     }
+
     companion object {
         private val RANDOM = Random()
+
         fun getIdString(): String {
             val integer = RANDOM.nextInt(10000000)
             val leftPad = integer.toString().padStart(7, '0')
             return leftPad.substring(0, 4) + '-' + leftPad.substring(5)
         }
-        val PROPERTIES_FIELDS=MessageProperties::class.declaredMemberProperties.asSequence()
-            .filter { it.name != "headers" }
-            .filter { !it.name.startsWith("target") }
-            .map {
-                val javaField = it.javaField
-                javaField?.trySetAccessible()
-                it.name to javaField
-            }.toList()
+
+        val PROPERTIES_FIELDS =
+            MessageProperties::class.declaredMemberProperties.asSequence()
+                .filter { it.name != "headers" }
+                .filter { !it.name.startsWith("target") }
+                .map {
+                    val javaField = it.javaField
+                    javaField?.trySetAccessible()
+                    it.name to javaField
+                }.toList()
     }
 }

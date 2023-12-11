@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,19 +27,14 @@
 package com.alcosi.lib.rabbit
 
 import org.springframework.amqp.core.Message
-import org.springframework.beans.factory.annotation.Value
 import java.nio.charset.StandardCharsets
 import java.util.logging.Logger
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.jvm.javaField
-import kotlin.reflect.jvm.javaGetter
-
 
 open class RabbitRsLoggingMessagePostProcessor(val maxBodySize: Int) :
     RabbitLoggingMessagePostProcessor {
     override fun postProcessMessage(message: Message): Message {
         val properties = message.messageProperties
-        val correlationInfoParts = properties.correlationId.split(";");
+        val correlationInfoParts = properties.correlationId.split(";")
         val id = correlationInfoParts[0]
         val exchange = correlationInfoParts[1]
         val routingKey = correlationInfoParts[2]
@@ -49,28 +44,46 @@ open class RabbitRsLoggingMessagePostProcessor(val maxBodySize: Int) :
         val propsString = properties.toCompactString()
         val headers = properties.headers.map { "${it.key}:${it.value}" }
         val body =
-            if (message.body == null || message.body.isEmpty()) "" else if (message.body.size > maxBodySize) "<TOO BIG ${message.body.size} bytes>" else
+            if (message.body == null || message.body.isEmpty()) {
+                ""
+            } else if (message.body.size > maxBodySize) {
+                "<TOO BIG ${message.body.size} bytes>"
+            } else {
                 String(message.body, StandardCharsets.UTF_8)
-        val logBody = """
-
-===========================SERVER AMQP response begin===========================
-=ID           : ${id}
-=Took         : ${System.currentTimeMillis() - time} ms
-=Exchange     : ${exchange}
-=Routing key  : ${routingKey}
-=Queue        : ${queue}
-=Headers      : ${headers}
-=Properties   : ${propsString}    
-=Body         : $body
-===========================SERVER AMQP response end   ==========================
-        """.trimIndent()
+            }
+        val logBody = constructRsBody(id, time, exchange, routingKey, queue, headers, propsString, body)
         logger.info(logBody)
-        return message;
+        return message
+    }
+
+    protected open fun constructRsBody(
+        id: String,
+        time: Long,
+        exchange: String,
+        routingKey: String,
+        queue: String,
+        headers: List<String>,
+        propsString: String,
+        body: String,
+    ): String {
+        val logBody =
+            """
+            
+            ===========================SERVER AMQP response begin===========================
+            =ID           : $id
+            =Took         : ${System.currentTimeMillis() - time} ms
+            =Exchange     : $exchange
+            =Routing key  : $routingKey
+            =Queue        : $queue
+            =Headers      : $headers
+            =Properties   : $propsString    
+            =Body         : $body
+            ===========================SERVER AMQP response end   ==========================
+            """.trimIndent()
+        return logBody
     }
 
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
-
     }
-
 }

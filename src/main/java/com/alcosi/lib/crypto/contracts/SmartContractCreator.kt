@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,33 +26,30 @@
 
 package com.alcosi.lib.crypto.contracts
 
-
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
+import com.alcosi.lib.crypto.dto.CryptoContractId
+import com.alcosi.lib.crypto.nodes.CryptoNodesAdminServiceHolder
+import com.alcosi.lib.executors.SchedulerTimer
+import com.alcosi.lib.utils.PrepareHexService
 import org.web3j.crypto.Credentials
 import org.web3j.protocol.Web3j
 import org.web3j.tx.Contract
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.TransactionManager
 import org.web3j.tx.gas.ContractGasProvider
-import com.alcosi.lib.crypto.dto.CryptoContractId
-import com.alcosi.lib.crypto.nodes.CryptoNodesAdminServiceHolder
-import com.alcosi.lib.utils.PrepareHexService
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
+import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.stream.Collectors
 
-class SmartContractCreator(
+open class SmartContractCreator(
     val lifetime: Duration,
-    @Value("\${common-lib.crypto.address.pk:#{T(com.alcosi.lib.crypto.contracts.SmartContractCreator).Companion.generateRandomPk()}}")
     val pk: String,
+    val clearDelay: Duration,
     val gasProvider: ContractGasProvider,
     val prepareWalletComponent: PrepareHexService,
     val nodesAdminService: CryptoNodesAdminServiceHolder,
-)  {
+) {
     val contractMap: MutableMap<ContractKey, ContractPair> = HashMap()
 
     @JvmRecord
@@ -60,36 +57,43 @@ class SmartContractCreator(
         val credentials: Credentials,
         val address: String,
         val chainId: Int,
-        val contractType: Class<*>
+        val contractType: Class<*>,
     )
 
     @JvmRecord
-    data class ContractPair(val contract: Contract, val usedTime: LocalDateTime = LocalDateTime.now()) {
-    }
+    data class ContractPair(val contract: Contract, val usedTime: LocalDateTime = LocalDateTime.now())
 
-
-    fun <T : Contract> build(contractId: CryptoContractId, c: Class<T>): T {
+    open fun <T : Contract> build(
+        contractId: CryptoContractId,
+        c: Class<T>,
+    ): T {
         val credential = Credentials.create(pk)
         return getContract(
             contractId.chainId.toInt(),
             "0x" + prepareWalletComponent.prepareAddr(contractId.address),
             credential,
-            c
+            c,
         )
     }
 
-    private fun <T : Contract> getContract(chainId: Int, address: String, credential: Credentials, c: Class<T>): T {
+    protected open fun <T : Contract> getContract(
+        chainId: Int,
+        address: String,
+        credential: Credentials,
+        c: Class<T>,
+    ): T {
         val contractKey = ContractKey(credential, address, chainId, c)
         return if (!contractMap.containsKey(contractKey)) {
             val tm = getTM(credential, chainId)
-            val load = c.getDeclaredConstructor(
-                String::class.java,
-                Web3j::class.java,
-                TransactionManager::class.java,
-                ContractGasProvider::class.java
-            )
+            val load =
+                c.getDeclaredConstructor(
+                    String::class.java,
+                    Web3j::class.java,
+                    TransactionManager::class.java,
+                    ContractGasProvider::class.java,
+                )
             load.isAccessible = true
-            val contract = load.newInstance(address, nodesAdminService!![chainId], tm, gasProvider) as Contract
+            val contract = load.newInstance(address, nodesAdminService[chainId], tm, gasProvider) as Contract
             contractMap[contractKey] = ContractPair(contract)
             contract as T
         } else {
@@ -98,41 +102,43 @@ class SmartContractCreator(
                 contractMap.remove(contractKey)
                 return getContract(chainId, address, credential, c)
             }
-            contractMap[contractKey]=ContractPair(contractPair.contract)
+            contractMap[contractKey] = ContractPair(contractPair.contract)
             contractPair.contract as T
         }
     }
 
-    fun getTM(credentials: Credentials, chainId: Int): TransactionManager {
-        return RawTransactionManager(nodesAdminService!![chainId], credentials, chainId.toLong())
+    open fun getTM(
+        credentials: Credentials,
+        chainId: Int,
+    ): TransactionManager {
+        return RawTransactionManager(nodesAdminService[chainId], credentials, chainId.toLong())
     }
-    @Scheduled(initialDelay = 2000, fixedDelayString = "\${common-lib.clear.delay.smart_contracts_holder:PT5S}")
-    fun clear() {
-        val now = LocalDateTime.now()
-        val old = contractMap.entries
-            .filter {(key,value)->
-                value
-                    .usedTime
-                    .plus(lifetime)
-                    .isBefore(now)
-            }.map { it.key }
-        val removed = old
-            .stream()
-            .map { key: ContractKey -> key to contractMap.remove(key) }
-            .map { p-> "${p.first}:${p.second}" }
-            .collect(Collectors.joining(";"))
-        if (removed.isNotBlank()) {
-            logger.warning("Smart contract for $removed removed ")
-        }
-    }
-    companion object {
-        val logger=Logger.getLogger(this::class.java.name)
 
-        fun generateRandomPk(): String {
-            val alphabet: List<Char> = ('a'..'f') + ('0'..'9')
-            val pk = List(64) { alphabet.random() }.joinToString("")
-            logger.info("Node pk generated:$pk")
-            return pk
+    protected open val scheduler =
+        object : SchedulerTimer(clearDelay, "ClearContracts", Level.FINEST) {
+            override fun startBatch() {
+                val now = LocalDateTime.now()
+                val old =
+                    contractMap.entries
+                        .filter { (key, value) ->
+                            value
+                                .usedTime
+                                .plus(lifetime)
+                                .isBefore(now)
+                        }.map { it.key }
+                val removed =
+                    old
+                        .stream()
+                        .map { key: ContractKey -> key to contractMap.remove(key) }
+                        .map { p -> "${p.first}:${p.second}" }
+                        .collect(Collectors.joining(";"))
+                if (removed.isNotBlank()) {
+                    Companion.logger.warning("Smart contract for $removed removed ")
+                }
+            }
         }
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }

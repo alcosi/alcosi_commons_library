@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -32,12 +32,12 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
-import java.util.UUID
+import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
-open class CryptoNodeHealthChecker(val client: OkHttpClient)  {
-    val body = createBody();
+open class CryptoNodeHealthChecker(val client: OkHttpClient) {
+    val body = createBody()
 
     @JvmRecord
     data class HeathStatus(val status: Boolean, val timeout: Long) {
@@ -54,24 +54,26 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient)  {
 
     fun check(url: URL): HeathStatus {
         val time = System.currentTimeMillis()
-        val status = checkStatus(url);
+        val status = checkStatus(url)
         return HeathStatus(status, System.currentTimeMillis() - time)
     }
 
     protected fun checkStatus(url: URL): Boolean {
         try {
-            val request = Request.Builder().url(url)
-                .post(body)
-                .build();
+            val request =
+                Request.Builder().url(url)
+                    .post(body)
+                    .build()
             val call = client.newCall(request)
             val response = call.execute()
             return response.isSuccessful
         } catch (th: Throwable) {
-            logger.log(Level.SEVERE,"Error health check $url", th)
+            logger.log(Level.SEVERE, "Error health check $url", th)
             return false
         }
     }
-    companion object{
-        val logger= Logger.getLogger(this::class.java.name)
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }

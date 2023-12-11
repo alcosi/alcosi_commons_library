@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,47 +26,51 @@
 
 package com.alcosi.lib.crypto.nodes
 
-
+import com.alcosi.lib.executors.NormalThreadPoolExecutor
+import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.logging.http.okhttp.OKLoggingInterceptor
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
 import org.web3j.protocol.admin.Admin
 import org.web3j.tx.gas.ContractGasProvider
 import org.web3j.tx.gas.DefaultGasProvider
-import com.alcosi.lib.executors.NormalThreadPoolExecutor
-import com.alcosi.lib.logging.http.okhttp.OKLoggingInterceptor
 import java.time.Duration
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.logging.Level
 
-@ConditionalOnClass(Scheduled::class,Admin::class)
+@ConditionalOnClass(Scheduled::class, Admin::class)
 @ConditionalOnProperty(
-    prefix = "common-lib.crypto.admins",
-    name = arrayOf("disabled"),
+    prefix = "common-lib.crypto.node",
+    name = ["disabled"],
     matchIfMissing = true,
-    havingValue = "false"
+    havingValue = "false",
 )
-@Configuration
-open class CryptoNodesConfig(
-    val configMap: CryptoNodeProperties,
-) {
-
+@EnableConfigurationProperties(CryptoNodeProperties::class)
+@AutoConfiguration
+class CryptoNodesConfig {
     @Bean("cryptoNodeHttpClient")
     fun createOkHttpClient(
-        @Value("\${common-lib.request_body_log.max.ok_client_nodes:10000}") maxBodySize: Int,
-        @Value("\${common-lib.crypto.node.timeout:15s}") nodeTimeout: Duration,
-        @Value("\${common-lib.logging.level.nodes_http:INFO}") loggingLevel: String,
+        cryptoNodeProperties: CryptoNodeProperties,
+        headerHelper: HeaderHelper,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
-        configureTimeouts(builder, OKLoggingInterceptor(maxBodySize, Level.parse(loggingLevel)), nodeTimeout)
+        configureTimeouts(
+            builder,
+            OKLoggingInterceptor(
+                cryptoNodeProperties.nodesLoggingMaxBody,
+                Level.parse(cryptoNodeProperties.nodesLoggingLevel),
+                headerHelper,
+            ),
+            cryptoNodeProperties.nodesTimeout,
+        )
         return builder.build()
     }
 
@@ -80,49 +84,68 @@ open class CryptoNodesConfig(
         builder.writeTimeout(nodeTimeout)
         builder.addInterceptor(interceptor)
     }
+
     @Bean
     @ConditionalOnMissingBean(ContractGasProvider::class)
     fun gasProvider(): ContractGasProvider {
         return DefaultGasProvider()
     }
 
-@Bean("healthCheckerNormalThreadPoolExecutor")
-fun getHealthCheckerNormalThreadPoolExecutor(   @Value("\${common-lib.crypto.node.balancer.health_check_executor_threads:20}") executorThreads: Int,):NormalThreadPoolExecutor{
-    return NormalThreadPoolExecutor.build(executorThreads,"crypto-health-check", Duration.ofDays(1))
-}
+    @Bean("healthCheckerNormalThreadPoolExecutor")
+    fun getHealthCheckerNormalThreadPoolExecutor(cryptoNodeProperties: CryptoNodeProperties): NormalThreadPoolExecutor {
+        return NormalThreadPoolExecutor.build(cryptoNodeProperties.health.threads, "crypto-health-check", Duration.ofDays(1))
+    }
+
     @Bean
+    @ConditionalOnMissingBean(CryptoNodeHealthActualizer::class)
     fun getCryptoNodeHealthActualizer(
-        @Value("\${common-lib.logging.level.nodes_health_stats:INFO}") loggingLevel: String,
+        cryptoNodeProperties: CryptoNodeProperties,
         @Qualifier("healthCheckerNormalThreadPoolExecutor") executor: ThreadPoolExecutor,
         @Qualifier("cryptoNodeHttpClient") httpClient: OkHttpClient,
-        @Value("\${common-lib.crypto.node.timeout.refresh:10s}") refreshTimeout: Duration,
-        ):CryptoNodeHealthActualizer{
-        return                     CryptoNodeHealthActualizer(Level.parse(loggingLevel),configMap, executor, CryptoNodeHealthChecker(httpClient), refreshTimeout)
+    ): CryptoNodeHealthActualizer {
+        return CryptoNodeHealthActualizer(
+            Level.parse(cryptoNodeProperties.health.nodesLoggingLevel),
+            cryptoNodeProperties,
+            executor,
+            CryptoNodeHealthChecker(httpClient),
+            cryptoNodeProperties.health.refreshTimeout,
+        )
     }
-    @ConditionalOnSingleCandidate(ContractGasProvider::class)
-    fun getDefaultGasProvider():ContractGasProvider{
+
+    @ConditionalOnMissingBean(ContractGasProvider::class)
+    fun getDefaultGasProvider(): ContractGasProvider {
         return DefaultGasProvider()
     }
+
     @Bean
+    @ConditionalOnMissingBean(CryptoNodesAdminServiceHolder::class)
     fun genNodesConfig(
-        @Value("\${common-lib.crypto.node.pooling.interval:15s}") poolingInterval: Duration,
-        @Value("\${common-lib.crypto.node.threads:20}") threads: Int?,
-        @Value("\${common-lib.crypto.node.timeout.balancer:10s}") balancerTimeout: Duration,
+        properties: CryptoNodeProperties,
         @Qualifier("cryptoNodeHttpClient") httpClient: OkHttpClient,
-        cryptoNodesLoadBalancer:CryptoNodesLoadBalancer
+        cryptoNodesLoadBalancer: CryptoNodesLoadBalancer,
     ): CryptoNodesAdminServiceHolder {
         val map: MutableMap<Int, Admin> = HashMap()
-        val url = configMap.url ?: emptyMap()
+        val url = properties.url ?: emptyMap()
         url
             .forEach { (key, value) ->
-                map[key] = Admin.build(
-                    CryptoNodeLoadBalancedHttpService(key,cryptoNodesLoadBalancer ,httpClient),
-                    poolingInterval.toMillis(),
-                    ScheduledThreadPoolExecutor(
-                        threads!!
+                map[key] =
+                    Admin.build(
+                        CryptoNodeLoadBalancedHttpService(key, cryptoNodesLoadBalancer, httpClient),
+                        properties.poolingInterval.toMillis(),
+                        ScheduledThreadPoolExecutor(
+                            properties.threads!!,
+                        ),
                     )
-                )
             }
         return CryptoNodesAdminServiceHolder(map)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(CryptoNodesLoadBalancer::class)
+    fun getCryptoNodesLoadBalancer(
+        cryptoNodesHealthActualizer: CryptoNodeHealthActualizer,
+        properties: CryptoNodeProperties,
+    ): CryptoNodesLoadBalancer {
+        return CryptoNodesLoadBalancer(cryptoNodesHealthActualizer, properties.balancerTimeout)
     }
 }

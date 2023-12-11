@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,20 +26,59 @@
 
 package com.alcosi.lib.logging.http.okhttp
 
+import com.alcosi.lib.filters.servlet.HeaderHelper
 import okhttp3.Interceptor
-import org.springframework.beans.factory.annotation.Value
+import okhttp3.OkHttpClient
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import java.util.logging.Level
 
-
+@AutoConfiguration
 @ConditionalOnClass(Interceptor::class)
-@ConditionalOnProperty(prefix = "common-lib.okhttp_logging",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-open class OkHttpConfig {
+@EnableConfigurationProperties(OkHttpLoggingProperties::class)
+@ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+class OkHttpConfig {
     @Bean
-    fun getOKLoggingInterceptor(@Value("\${common-lib.request_body_log.max.ok_client:10000}") maxBodySize: Int,@Value("\${common-lib.logging.level.ok_http:FINE}")  loggingLevel: String): OKLoggingInterceptor {
-        return OKLoggingInterceptor(maxBodySize, Level.parse(loggingLevel))
+    @ConditionalOnMissingBean(OKLoggingInterceptor::class)
+    fun getOKLoggingInterceptor(
+        properties: OkHttpLoggingProperties,
+        headerHelper: HeaderHelper,
+    ): OKLoggingInterceptor {
+        return OKLoggingInterceptor(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper)
     }
 
+    @Bean("okHttpClient")
+    @Primary
+    fun createOkHttpClient(
+        properties: OkHttpLoggingProperties,
+        headerHelper: HeaderHelper,
+    ): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+        configureTimeouts(
+            builder,
+            OKLoggingInterceptor(
+                properties.maxLogBodySize,
+                Level.parse(properties.loggingLevel),
+                headerHelper,
+            ),
+            properties,
+        )
+        return builder.build()
+    }
+
+    protected fun configureTimeouts(
+        builder: OkHttpClient.Builder,
+        interceptor: OKLoggingInterceptor,
+        properties: OkHttpLoggingProperties,
+    ) {
+        builder.connectTimeout(properties.connectTimeout)
+        builder.readTimeout(properties.readTimeout)
+        builder.writeTimeout(properties.writeTimeout)
+        builder.addInterceptor(interceptor)
+    }
 }

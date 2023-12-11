@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,33 +26,30 @@
 
 package com.alcosi.lib.db
 
-
 import org.springframework.jdbc.core.*
 import java.sql.ResultSet
 import javax.sql.DataSource
-
 
 open class LoggingJdbcTemplate(
     val callbacks: List<RowCallbackHandler>,
     dataSource: DataSource,
 ) : JdbcTemplate(dataSource) {
-    override fun processResultSet(rs: ResultSet?, param: ResultSetSupportingSqlParameter): MutableMap<String, Any> {
-        if (rs==null){
+    override fun processResultSet(
+        rs: ResultSet?,
+        param: ResultSetSupportingSqlParameter,
+    ): MutableMap<String, Any> {
+        if (rs == null) {
             return HashMap()
         }
-        return super.processResultSet(LoggingResultSet(callbacks,rs), param)
+        return super.processResultSet(LoggingResultSet(callbacks, rs), param)
     }
 
     override fun <T> query(
         psc: PreparedStatementCreator,
         pss: PreparedStatementSetter?,
-        rse: ResultSetExtractor<T>
+        rse: ResultSetExtractor<T>,
     ): T? {
-       val processor= CallbackProcessorResultSetExtractor(callbacks,rse);
-       return super.query(psc, pss,processor);
+        val processor = CallbackProcessorResultSetExtractor(callbacks, rse)
+        return super.query(psc, pss, processor)
     }
-
-
-
-
 }

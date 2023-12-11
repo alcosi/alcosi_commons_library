@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,24 +27,24 @@
 package com.alcosi.lib.logging.annotations
 
 import org.aspectj.lang.annotation.Aspect
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.jdbc.core.JdbcTemplate
-import javax.sql.DataSource
 
 @ConditionalOnClass(Aspect::class)
-@ConditionalOnProperty(prefix = "common-lib.logging_aspects",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-@Configuration
+@ConditionalOnProperty(prefix = "common-lib.aspect", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@AutoConfiguration
+@EnableConfigurationProperties(AspectProperties::class)
 class AspectsConfig {
     @Bean
-    fun getLoggingErrorAspect():LoggingErrorAspect{
-        return LoggingErrorAspect();
+    fun getLoggingErrorAspect(): LoggingErrorAspect {
+        return LoggingErrorAspect()
     }
+
     @Bean
-    fun getLoggingTimeAspect():LoggingTimeAspect{
-        return LoggingTimeAspect();
+    fun getLoggingTimeAspect(): LoggingTimeAspect {
+        return LoggingTimeAspect()
     }
 }

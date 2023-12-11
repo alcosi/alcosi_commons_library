@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,54 +26,53 @@
 
 package com.alcosi.lib.utils
 
-
-import org.springframework.stereotype.Service
 import java.util.regex.Pattern
 
-@Service
-open class PrepareHexService() {
+open class PrepareHexService {
     val walletPattern: Pattern = Pattern.compile("^[0-9a-f]{40}$")
     val hexPattern: Pattern = Pattern.compile("^([0-9a-f][0-9a-f])+$")
 
-    fun isValidWalletAddress(wallet: String): Boolean {
+    open fun isValidWalletAddress(wallet: String): Boolean {
         val prepared = prepareHexInternal(wallet)
         return walletPattern.matcher(prepared).matches()
     }
 
-    fun isValidHex(hex: String): Boolean {
+    open fun isValidHex(hex: String): Boolean {
         val prepared = prepareHexInternal(hex)
         return hexPattern.matcher(prepared).matches()
     }
 
-    fun prepareAddr(wallet: String?): String {
+    open fun prepareAddr(wallet: String?): String {
         requireNotNull(wallet) { "Wallet is null" }
         val prepared = prepareHexInternal(wallet)
         require(walletPattern.matcher(prepared).matches()) { wallet + "is invalid wallet address!" }
         return prepared
     }
 
-    fun prepareHexNoMatcher(hex: String?): String {
+    open fun prepareHexNoMatcher(hex: String?): String {
         requireNotNull(hex) { "Hex string is null" }
-        if (hasHexPrefix(hex) && hex.length == 2) return "00";
-        return prepareHexInternal(hex);
+        if (hasHexPrefix(hex) && hex.length == 2) return "00"
+        return prepareHexInternal(hex)
     }
 
-    fun prepareHex(hex: String?): String {
+    open fun prepareHex(hex: String?): String {
         requireNotNull(hex) { "Hex string is null" }
         val prepared = prepareHexInternal(hex)
         require(hexPattern.matcher(prepared).matches()) { hex + "is invalid hex string!" }
         return prepared
     }
 
-    private fun prepareHexInternal(wallet: String): String = removeHexPrefix(wallet).lowercase()
+    protected open fun prepareHexInternal(wallet: String): String = removeHexPrefix(wallet).lowercase()
 
-    private fun removeHexPrefix(wallet: String): String {
+    protected open fun removeHexPrefix(wallet: String): String {
         return if (hasHexPrefix(wallet)) {
             wallet.substring(2)
-        } else wallet;
+        } else {
+            wallet
+        }
     }
 
-    private fun hasHexPrefix(wallet: String): Boolean {
+    protected open fun hasHexPrefix(wallet: String): Boolean {
         return wallet.length > 1 && wallet[0] == '0' && (wallet[1] == 'x' || wallet[1] == 'X')
     }
 }

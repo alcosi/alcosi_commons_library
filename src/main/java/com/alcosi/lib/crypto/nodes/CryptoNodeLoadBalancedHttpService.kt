@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -39,7 +39,7 @@ import java.io.InputStream
 class CryptoNodeLoadBalancedHttpService(
     val chainId: Int,
     val cryptoNodesLoadBalancer: CryptoNodesLoadBalancer,
-    val okHttpClientRaw: OkHttpClient
+    val okHttpClientRaw: OkHttpClient,
 ) : HttpService(okHttpClientRaw) {
     override fun performIO(request: String): InputStream? {
         val requestBody = request.toRequestBody(JSON_MEDIA_TYPE)
@@ -55,7 +55,7 @@ class CryptoNodeLoadBalancedHttpService(
                 val code = response.code
                 val text = responseBody?.string() ?: "N/A"
                 throw ClientConnectionException(
-                    "Invalid response received: $code; $text"
+                    "Invalid response received: $code; $text",
                 )
             }
         }
@@ -64,5 +64,4 @@ class CryptoNodeLoadBalancedHttpService(
     private fun buildInputStream(responseBody: ResponseBody): InputStream {
         return ByteArrayInputStream(responseBody.bytes())
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -29,12 +29,15 @@ package com.alcosi.lib.executors
 import java.util.logging.Level
 import java.util.logging.Logger
 
-
 class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
-    override fun uncaughtException(t: Thread?, e: Throwable?) {
-        logger.log(Level.SEVERE,"Error in thread ${t}: ", e)
+    override fun uncaughtException(
+        t: Thread?,
+        e: Throwable?,
+    ) {
+        logger.log(Level.SEVERE, "Error in thread $t: ", e)
     }
-    companion object{
-        val logger= Logger.getLogger(this::class.java.name)
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }

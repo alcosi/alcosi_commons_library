@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,19 +26,19 @@
 
 package com.alcosi.lib.serializers
 
+import com.alcosi.lib.utils.PrepareHexService
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.NullNode
-import com.alcosi.lib.utils.PrepareHexService
-import java.util.*
-import java.util.function.Function
 
 class HexStringDeSerializer : StdDeserializer<String?>(
-    Any::class.java
+    Any::class.java,
 ) {
-    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): String? {
+    override fun deserialize(
+        p: JsonParser?,
+        ctxt: DeserializationContext?,
+    ): String? {
         if (p == null) {
             return null
         }
@@ -54,6 +54,7 @@ class HexStringDeSerializer : StdDeserializer<String?>(
         fun setPrepareArgsService(prepareArgsService: PrepareHexService?) {
             Companion.prepareArgsService = prepareArgsService
         }
+
         private var prepareArgsService: PrepareHexService? = null
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,40 +26,68 @@
 
 package com.alcosi.lib.db
 
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.jdbc.JdbcProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowCallbackHandler
+import org.springframework.jdbc.core.simple.JdbcClient
 import java.util.logging.Level
 import javax.sql.DataSource
 
 @ConditionalOnClass(JdbcTemplate::class)
-@ConditionalOnProperty(prefix = "common-lib.jdbc_template",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-@Configuration
-open class JdbcTemplateConfig {
+@ConditionalOnProperty(prefix = "common-lib.jdbc-template", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@AutoConfiguration
+@EnableConfigurationProperties(JdbcProperties::class, JdbcTemplateProperties::class)
+class JdbcTemplateConfig {
     @Bean
-    fun namedParameterJdbcTemplate(jdbcTemplate: JdbcTemplate,
-                                   @Value("\${common-lib.request_body_log.max.sql_params_rq:10000}") maxBodySize: Int,
-                                   @Value("\${common-lib.logging.level.sql.query:INFO}")queryLoggingLevel: String?,
-                                   @Value("\${common-lib.logging.level.sql.params_rq:INFO}")paramsLoggingLevel: String?
+    fun namedParameterJdbcTemplate(
+        jdbcTemplate: JdbcTemplate,
+        jdbcTemplateProperties: JdbcTemplateProperties,
     ): LoggingNamedParameterJdbcTemplate {
-        return LoggingNamedParameterJdbcTemplate(maxBodySize,jdbcTemplate,
-            Level.parse(queryLoggingLevel),Level.parse(paramsLoggingLevel))
-    }
-    @Bean
-    fun jdbcLoggingWarningCallBackHandler(@Value("\${common-lib.logging.level.sql.warning:INFO}")warningsLoggingLevel: String?): LoggingWarningRowCallbackHandler {
-        return LoggingWarningRowCallbackHandler(Level.parse(warningsLoggingLevel))
-    }
-    @Bean
-    fun jdbcLoggingResponseCallBackHandler(     @Value("\${common-lib.request_body_log.max.sql_params_rs:10000}") maxBodySize: Int,@Value("\${common-lib.logging.level.sql.params_rs:INFO}")warningsLoggingLevel: String?): LoggingResponseRowCallbackHandler {
-        return LoggingResponseRowCallbackHandler(maxBodySize,Level.parse(warningsLoggingLevel))
-    }
-    @Bean
-    fun jdbcTemplate(callbacks: List<RowCallbackHandler>, dataSource: DataSource): JdbcTemplate {
-        return LoggingJdbcTemplate(callbacks,dataSource)
+        return LoggingNamedParameterJdbcTemplate(
+            jdbcTemplateProperties.loggingMaxBodySize,
+            jdbcTemplate,
+            Level.parse(jdbcTemplateProperties.loggingQueryLevel),
+            Level.parse(jdbcTemplateProperties.loggingParametersLevel),
+        )
     }
 
+    @Bean
+    fun jdbcLoggingWarningCallBackHandler(jdbcTemplateProperties: JdbcTemplateProperties): LoggingWarningRowCallbackHandler {
+        return LoggingWarningRowCallbackHandler(Level.parse(jdbcTemplateProperties.loggingWarningLevel))
+    }
+
+    @Bean
+    fun jdbcLoggingResponseCallBackHandler(jdbcTemplateProperties: JdbcTemplateProperties): LoggingResponseRowCallbackHandler {
+        return LoggingResponseRowCallbackHandler(
+            jdbcTemplateProperties.loggingMaxBodySize,
+            Level.parse(jdbcTemplateProperties.loggingResponseLevel),
+        )
+    }
+
+    @Bean
+    fun jdbcTemplate(
+        callbacks: List<RowCallbackHandler>,
+        dataSource: DataSource,
+        properties: JdbcProperties,
+    ): JdbcTemplate {
+        val jdbcTemplate = LoggingJdbcTemplate(callbacks, dataSource)
+        val template: JdbcProperties.Template = properties.template
+        jdbcTemplate.fetchSize = template.fetchSize
+        jdbcTemplate.maxRows = template.maxRows
+        if (template.queryTimeout != null) {
+            jdbcTemplate.queryTimeout = template.queryTimeout.seconds.toInt()
+        }
+        return jdbcTemplate
+    }
+
+    @Bean
+    @ConditionalOnClass(JdbcClient::class)
+    fun JdbcClient(template: LoggingNamedParameterJdbcTemplate): JdbcClient {
+        return JdbcClient.create(template)
+    }
 }

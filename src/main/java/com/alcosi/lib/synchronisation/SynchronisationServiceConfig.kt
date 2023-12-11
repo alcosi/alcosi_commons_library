@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,21 +26,22 @@
 
 package com.alcosi.lib.synchronisation
 
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
-import java.time.Duration
 
 @ConditionalOnClass(Scheduled::class)
-@ConditionalOnProperty(prefix = "common-lib.synchronisation",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-@Configuration
+@ConditionalOnProperty(prefix = "common-lib.synchronisation", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@AutoConfiguration
+@EnableConfigurationProperties(SynchronisationProperties::class)
 class SynchronisationServiceConfig {
     @Bean
-    fun getSynchronizationService(@Value("\${common-lib.lifetime.synchronisation_lock:10m}") lifetime:Duration): SynchronizationService {
-        return SynchronizationService(lifetime);
+    @ConditionalOnMissingBean(SynchronizationService::class)
+    fun getSynchronizationService(synchronisationProperties: SynchronisationProperties): SynchronizationService {
+        return SynchronizationService(synchronisationProperties.lockTimeout, synchronisationProperties.clearDelay)
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -31,13 +31,12 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.aspectj.lang.reflect.MethodSignature
-import org.springframework.stereotype.Component
 import java.util.logging.Level
 import java.util.logging.Logger
 
 @Aspect
-class LoggingTimeAspect {
-    var loggerMap: MutableMap<Class<*>, Logger> = HashMap()
+open class LoggingTimeAspect {
+    protected open var loggerMap: MutableMap<Class<*>, Logger> = HashMap()
 
     @Pointcut("@annotation(com.alcosi.lib.logging.annotations.LogTime)|| within(@com.alcosi.lib.logging.annotations.LogTime *)")
     fun callAt() {
@@ -57,13 +56,17 @@ class LoggingTimeAspect {
             val signature = joinPoint.signature as MethodSignature
             val declaringType = signature.declaringType
             val msg = "Time metric ${declaringType.simpleName}:${signature.name} took ${System.currentTimeMillis() - start} ms. Exception:$exception"
-            getLogger(joinPoint).log(getLoggingLevel(signature,declaringType), msg)
+            getLogger(joinPoint).log(getLoggingLevel(signature, declaringType), msg)
         }
     }
 
-    fun getLoggingLevel(sign: MethodSignature, type: Class<Any>): Level {
+    fun getLoggingLevel(
+        sign: MethodSignature,
+        type: Class<Any>,
+    ): Level {
         val methodLevel = sign.method.getDeclaredAnnotation(LogTime::class.java)?.level
-        val level = if (methodLevel == null) {
+        val level =
+            if (methodLevel == null) {
                 type.getDeclaredAnnotation(LogTime::class.java)?.level ?: "INFO"
             } else {
                 methodLevel
@@ -72,7 +75,7 @@ class LoggingTimeAspect {
     }
 
     @Synchronized
-    private fun getLogger(joinPoint: ProceedingJoinPoint): Logger {
+    protected open fun getLogger(joinPoint: ProceedingJoinPoint): Logger {
         val clazz: Class<*> = joinPoint.target.javaClass
         val logger = loggerMap[clazz]
         return if (logger == null) {

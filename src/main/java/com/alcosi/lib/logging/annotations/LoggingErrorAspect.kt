@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -35,11 +35,13 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 @Aspect
-class LoggingErrorAspect {
-    var loggerMap: MutableMap<Class<*>, Logger> = HashMap()
+open class LoggingErrorAspect {
+    protected open var loggerMap: MutableMap<Class<*>, Logger> = HashMap()
+
     @Pointcut("@annotation(com.alcosi.lib.logging.annotations.LogError)|| within(@com.alcosi.lib.logging.annotations.LogError *)")
     fun callAt() {
     }
+
     @Around(value = "callAt()")
     @Throws(Throwable::class)
     fun logMethodTime(joinPoint: ProceedingJoinPoint): Any? {
@@ -48,22 +50,27 @@ class LoggingErrorAspect {
         } catch (t: Throwable) {
             val signature = joinPoint.signature as MethodSignature
             val declaringType = signature.declaringType
-            getLogger(joinPoint).log(getLoggingLevel(signature,declaringType),"${declaringType.simpleName}:${signature.name}. Exception:", t)
+            getLogger(joinPoint).log(getLoggingLevel(signature, declaringType), "${declaringType.simpleName}:${signature.name}. Exception:", t)
             throw t
         }
     }
-    fun getLoggingLevel(sign: MethodSignature, type: Class<Any>): Level {
+
+    open fun getLoggingLevel(
+        sign: MethodSignature,
+        type: Class<Any>,
+    ): Level {
         val methodLevel = sign.method.getDeclaredAnnotation(LogError::class.java)?.level
-        val level = if (methodLevel == null) {
-            type.getDeclaredAnnotation(LogError::class.java)?.level ?: "INFO"
-        } else {
-            methodLevel
-        }
+        val level =
+            if (methodLevel == null) {
+                type.getDeclaredAnnotation(LogError::class.java)?.level ?: "INFO"
+            } else {
+                methodLevel
+            }
         return Level.parse(level)
     }
 
     @Synchronized
-    private fun getLogger(joinPoint: ProceedingJoinPoint): Logger {
+    protected open fun getLogger(joinPoint: ProceedingJoinPoint): Logger {
         val clazz: Class<*> = joinPoint.target.javaClass
         val logger = loggerMap[clazz]
         return if (logger == null) {

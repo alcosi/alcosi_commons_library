@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,14 +26,12 @@
 
 package com.alcosi.lib.logging.annotations
 
-import kotlin.annotation.Retention
-
 @Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER,
     AnnotationTarget.ANNOTATION_CLASS,
-    AnnotationTarget.CLASS
+    AnnotationTarget.CLASS,
 )
-annotation class LogTime (val level: String = "INFO")
+annotation class LogTime(val level: String = "INFO")

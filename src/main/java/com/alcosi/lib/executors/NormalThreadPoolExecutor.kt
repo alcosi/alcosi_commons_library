@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -38,38 +38,45 @@ open class NormalThreadPoolExecutor protected constructor(
     keepAliveTime: Duration,
     workQueue: BlockingQueue<Runnable?>?,
     threadFactory: ThreadFactory?,
-    handler: RejectedExecutionHandler?
+    handler: RejectedExecutionHandler?,
 ) : ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime.toMillis(), TimeUnit.MILLISECONDS, workQueue, threadFactory, handler) {
-
-    override fun afterExecute(r: Runnable?, t: Throwable?) {
+    override fun afterExecute(
+        r: Runnable?,
+        t: Throwable?,
+    ) {
         if (t != null) {
-            logger.log(Level.SEVERE,"Exception in thread ${Thread.currentThread().name}.", t)
+            logger.log(Level.SEVERE, "Exception in thread ${Thread.currentThread().name}.", t)
         } else {
-            logger.log(Level.CONFIG,"Tsk ${Thread.currentThread().name} completed ")
+            logger.log(Level.CONFIG, "Tsk ${Thread.currentThread().name} completed ")
         }
         super.afterExecute(r, t)
     }
 
     companion object {
-        val logger=Logger.getLogger(this::class.java.name)
+        val logger = Logger.getLogger(this::class.java.name)
         protected val UNCAUGHT_EXCEPTION_HANDLER = UncaughtExceptionHandler()
         protected val WAITING_REJECTED_EXECUTOR = WaitingRejectedExecutor()
-        fun build(threads: Int, name: String, keepAlive: Duration): NormalThreadPoolExecutor {
-            val factory = BasicThreadFactory.Builder()
-                .namingPattern("$name-%d")
-                .daemon(false)
-                .uncaughtExceptionHandler(UNCAUGHT_EXCEPTION_HANDLER)
-                .priority(Thread.NORM_PRIORITY)
-                .build()
+
+        fun build(
+            threads: Int,
+            name: String,
+            keepAlive: Duration,
+        ): NormalThreadPoolExecutor {
+            val factory =
+                BasicThreadFactory.Builder()
+                    .namingPattern("$name-%d")
+                    .daemon(false)
+                    .uncaughtExceptionHandler(UNCAUGHT_EXCEPTION_HANDLER)
+                    .priority(Thread.NORM_PRIORITY)
+                    .build()
             return NormalThreadPoolExecutor(
                 threads,
                 threads,
                 keepAlive,
                 LinkedBlockingQueue(),
                 factory,
-                WAITING_REJECTED_EXECUTOR
+                WAITING_REJECTED_EXECUTOR,
             )
         }
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,6 +26,7 @@
 
 package com.alcosi.lib.logging.http.resttemplate
 
+import com.alcosi.lib.filters.servlet.HeaderHelper
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
@@ -37,80 +38,125 @@ import java.util.function.Consumer
 import java.util.logging.Level
 import java.util.logging.Logger
 
-
-open class LogRequestResponseFilter(val maxBodySize: Int, val loggingLevel: Level) :
-    ClientHttpRequestInterceptor{
-
+open class LogRequestResponseFilter(
+    val maxBodySize: Int,
+    val loggingLevel: Level,
+    val headerHelper: HeaderHelper,
+) :
+    ClientHttpRequestInterceptor {
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
-        execution: ClientHttpRequestExecution
+        execution: ClientHttpRequestExecution,
     ): ClientHttpResponse {
         val time = System.currentTimeMillis()
-        val id = getIdString()
+        val id = headerHelper.getContextRqId()
         traceRequest(id, request, body)
+        addHeaders(request)
         val response: ClientHttpResponse = execution.execute(request, body)
         traceResponse(id, response, request, time)
         return response
     }
 
-    private fun traceRequest(id: String, request: HttpRequest, body: ByteArray) {
-        if ( loggingLevel == Level.OFF){
+    protected open fun addHeaders(request: HttpRequest) {
+        headerHelper.createRequestHeadersMap().forEach {
+            request.headers[it.key] = it.value
+        }
+    }
+
+    protected open fun traceRequest(
+        id: String,
+        request: HttpRequest,
+        body: ByteArray,
+    ) {
+        if (loggingLevel == Level.OFF) {
             return
         }
-        val contentLength=body.size
-        val bodyString = if (contentLength >maxBodySize) "<TOO BIG ${contentLength} bytes>" else String(body, StandardCharsets.UTF_8)
-        val logBody = """
-
-===========================CLIENT REST request begin===========================
-=ID           : ${id}
-=URI          : ${request.method} ${request.uri}
-=Headers      : ${headersToString(request.headers)}    
-=Body         : $bodyString
-===========================CLIENT REST request end   ==========================
-        """.trimIndent()
+        val contentLength = body.size
+        val bodyString =
+            if (contentLength > maxBodySize) {
+                "<TOO BIG $contentLength bytes>"
+            } else {
+                String(
+                    body,
+                    StandardCharsets.UTF_8,
+                )
+            }
+        val logBody = constructRqBody(id, request, bodyString)
         logger.log(loggingLevel, logBody)
     }
 
-    private fun traceResponse(id: String, response: ClientHttpResponse, request: HttpRequest, time: Long) {
-        if ( loggingLevel == Level.OFF){
+    protected open fun constructRqBody(
+        id: String,
+        request: HttpRequest,
+        bodyString: String,
+    ): String {
+        val logBody =
+            """
+            
+            ===========================CLIENT REST request begin===========================
+            =ID           : $id
+            =URI          : ${request.method} ${request.uri}
+            =Headers      : ${headersToString(request.headers)}    
+            =Body         : $bodyString
+            ===========================CLIENT REST request end   ==========================
+            """.trimIndent()
+        return logBody
+    }
+
+    protected open fun traceResponse(
+        id: String,
+        response: ClientHttpResponse,
+        request: HttpRequest,
+        time: Long,
+    ) {
+        if (loggingLevel == Level.OFF) {
             return
         }
-        val contentLength=response.headers.contentLength;
-        val bodyString=if (contentLength >maxBodySize) "<TOO BIG ${contentLength} bytes>" else {
-            val readAllBytes = response.body.readAllBytes()
-            String(readAllBytes,StandardCharsets.UTF_8)
-        }
-        val logBody = """
-
-===========================CLIENT REST response begin===========================
-=ID           : ${id}
-=URI          : ${response.statusCode} ${request.method} ${request.uri}
-=Took         : ${System.currentTimeMillis() - time} ms
-=Headers      : ${headersToString(response.headers)}    
-=Body         : ${bodyString}
-===========================CLIENT REST response end   ==========================
-        """.trimIndent()
+        val contentLength = response.headers.contentLength
+        val bodyString =
+            if (contentLength > maxBodySize) {
+                "<TOO BIG $contentLength bytes>"
+            } else {
+                val readAllBytes = response.body.readAllBytes()
+                String(readAllBytes, StandardCharsets.UTF_8)
+            }
+        val logBody = constructRsBody(id, response, request, time, bodyString)
         logger.log(loggingLevel, logBody)
     }
 
-    private fun headersToString(headers: HttpHeaders): String {
+    protected open fun constructRsBody(
+        id: String,
+        response: ClientHttpResponse,
+        request: HttpRequest,
+        time: Long,
+        bodyString: String,
+    ): String {
+        val logBody =
+            """
+            
+            ===========================CLIENT REST response begin===========================
+            =ID           : $id
+            =URI          : ${response.statusCode} ${request.method} ${request.uri}
+            =Took         : ${System.currentTimeMillis() - time} ms
+            =Headers      : ${headersToString(response.headers)}    
+            =Body         : $bodyString
+            ===========================CLIENT REST response end   ==========================
+            """.trimIndent()
+        return logBody
+    }
+
+    protected open fun headersToString(headers: HttpHeaders): String {
         val list: MutableList<String> = LinkedList<String>()
         headers.forEach { key: String, value: List<String> ->
             value.forEach(
-                Consumer { v: String -> list.add("$key:$v") })
+                Consumer { v: String -> list.add("$key:$v") },
+            )
         }
         return java.lang.String.join(";", list)
     }
 
     companion object {
-        private val RANDOM = Random()
-        val logger=Logger.getLogger(this.javaClass.name)
-
-        fun getIdString(): String {
-            val integer = RANDOM.nextInt(10000000)
-            val leftPad = integer.toString().padStart(7,'0')
-            return leftPad.substring(0, 4) + '-' + leftPad.substring(5)
-        }
+        val logger = Logger.getLogger(this.javaClass.name)
     }
 }

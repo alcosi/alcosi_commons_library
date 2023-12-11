@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -31,7 +31,7 @@ data class APIError(
     val message: String,
     val code: Int,
     val errorClass: String,
-    val httpCode: Int = code.toString().take(3).toInt()
+    val httpCode: Int = code.toString().take(3).toInt(),
 ) {
     override fun toString(): String {
         return "$errorClass:$code:$message"

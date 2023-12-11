@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,45 +26,43 @@
 
 package com.alcosi.lib.crypto.contracts
 
-import org.springframework.beans.factory.annotation.Value
+import com.alcosi.lib.crypto.nodes.CryptoNodesAdminServiceHolder
+import com.alcosi.lib.utils.PrepareHexService
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
 import org.web3j.tx.Contract
 import org.web3j.tx.gas.ContractGasProvider
-import org.web3j.tx.gas.DefaultGasProvider
-import com.alcosi.lib.crypto.nodes.CryptoNodesAdminServiceHolder
-import com.alcosi.lib.synchronisation.SynchronizationService
-import com.alcosi.lib.utils.PrepareHexService
-import java.time.Duration
 
-@ConditionalOnClass(Scheduled::class,Contract::class)
+@ConditionalOnClass(Scheduled::class, Contract::class)
 @ConditionalOnProperty(
-    prefix = "common-lib.smart_contract_creator",
-    name = arrayOf("disabled"),
+    prefix = "common-lib.crypto.smart-contract-creator",
+    name = ["disabled"],
     matchIfMissing = true,
-    havingValue = "false"
+    havingValue = "false",
 )
-@Configuration
+@AutoConfiguration
+@EnableConfigurationProperties(SmartContractCreatorProperties::class)
 class SmartContractCreatorConfig {
-    @ConditionalOnSingleCandidate(ContractGasProvider::class)
-    fun getGasProvider():ContractGasProvider{
-        return DefaultGasProvider()
-    }
-
     @Bean
+    @ConditionalOnMissingBean(SmartContractCreator::class)
     fun getSmartContractCreator(
-        @Value("\${common-lib.lifetime.smart_contract_creator:10m}") lifetime: Duration,
-        @Value("\${common-lib.crypto.address.pk:#{T(com.alcosi.lib.crypto.contracts.SmartContractCreator).Companion.generateRandomPk()}}")
-        pk: String,
+        properties: SmartContractCreatorProperties,
         gasProvider: ContractGasProvider,
         prepareWalletComponent: PrepareHexService,
         nodesAdminService: CryptoNodesAdminServiceHolder,
     ): SmartContractCreator {
-        return SmartContractCreator(lifetime,pk,gasProvider,prepareWalletComponent,nodesAdminService);
+        return SmartContractCreator(
+            properties.lifetime,
+            properties.pk,
+            properties.clearDelay,
+            gasProvider,
+            prepareWalletComponent,
+            nodesAdminService,
+        )
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -27,7 +27,6 @@
 package com.alcosi.lib.utils
 
 import java.io.FileInputStream
-import java.net.URL
 import java.net.URLClassLoader
 import java.nio.file.Path
 import java.util.jar.JarEntry
@@ -38,40 +37,46 @@ import java.util.logging.Logger
 import kotlin.io.path.listDirectoryEntries
 
 open class ExternalJarLoad {
-    val logger= Logger.getLogger(this.javaClass.name)
+    val logger = Logger.getLogger(this.javaClass.name)
 
-    open fun loadDependency(paths: List<Path>,setCurrentClassLoader:Boolean=false,classLoader :ClassLoader = this.javaClass.classLoader): ClassLoader {
+    open fun loadDependency(
+        paths: List<Path>,
+        setCurrentClassLoader: Boolean = false,
+        classLoader: ClassLoader = this.javaClass.classLoader,
+    ): ClassLoader {
         if (paths.isEmpty()) {
             return classLoader
         }
-        val jarList = paths.flatMap {
-            try {
-                it.listDirectoryEntries()
-            } catch (t: Throwable) {
-                listOf()
+        val jarList =
+            paths.flatMap {
+                try {
+                    it.listDirectoryEntries()
+                } catch (t: Throwable) {
+                    listOf()
+                }
             }
-        }
         if (jarList.isEmpty()) {
             return classLoader
         }
         val child = URLClassLoader(jarList.map { it.toUri().toURL() }.toTypedArray(), classLoader)
-        val classes = jarList
-            .flatMap {
-                val classNames = getClassNamesFromJar(it.toString())
-                    .map { className ->
-                        logger.log(INFO,"Loaded $className")
-                        Class.forName(className, true, child)
-                    }
-                return@flatMap classNames
-            }
+        val classes =
+            jarList
+                .flatMap {
+                    val classNames =
+                        getClassNamesFromJar(it.toString())
+                            .map { className ->
+                                logger.log(INFO, "Loaded $className")
+                                Class.forName(className, true, child)
+                            }
+                    return@flatMap classNames
+                }
         if (setCurrentClassLoader) {
-            Thread.currentThread().setContextClassLoader(child);
+            Thread.currentThread().setContextClassLoader(child)
         }
         return child
     }
 
-
-    protected fun getClassNamesFromJar(jarFile: JarInputStream): ArrayList<String> {
+    protected open fun getClassNamesFromJar(jarFile: JarInputStream): ArrayList<String> {
         val classNames = ArrayList<String>()
         try {
             var jar: JarEntry?
@@ -87,15 +92,12 @@ open class ExternalJarLoad {
                 }
             }
         } catch (e: Throwable) {
-            logger.log(SEVERE,"Error load external jar ", e)
+            logger.log(SEVERE, "Error load external jar ", e)
         }
         return classNames
     }
 
-
-    protected fun getClassNamesFromJar(jarPath: String): ArrayList<String> {
+    protected open fun getClassNamesFromJar(jarPath: String): ArrayList<String> {
         return getClassNamesFromJar(JarInputStream(FileInputStream(jarPath)))
     }
-
-
 }

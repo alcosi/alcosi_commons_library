@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,5 +26,4 @@
 
 package com.alcosi.lib.rabbit
 
-interface AmqpRepeatableException {
-}
+interface AmqpRepeatableException

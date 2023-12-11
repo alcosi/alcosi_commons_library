@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -32,53 +32,58 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import com.alcosi.lib.rabbit.RabbitRsLoggingMessagePostProcessor
 
-@ConditionalOnClass(value = [RabbitAdmin::class,SimpleRabbitListenerContainerFactory::class])
-@ConditionalOnProperty(prefix = "common-lib.rabbit",name = arrayOf("disabled"), matchIfMissing = true, havingValue = "false")
-@Configuration
-class RabbitConfig(val objectMapper: ObjectMapper)  {
-
+@ConditionalOnClass(value = [RabbitAdmin::class, SimpleRabbitListenerContainerFactory::class])
+@ConditionalOnProperty(prefix = "common-lib.rabbit", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@AutoConfiguration
+@EnableConfigurationProperties(RabbitProperties::class)
+class RabbitConfig(val objectMapper: ObjectMapper) {
     @Bean
+    @ConditionalOnMissingBean(RabbitAdmin::class)
     fun getRabbitAdmin(template: RabbitTemplate): RabbitAdmin {
         val rabbitAdmin = RabbitAdmin(template)
         return rabbitAdmin
     }
 
     @Bean("rabbitExHandler")
+    @ConditionalOnMissingBean(RabbitListenerErrorHandler::class)
     fun getRabbitHandler(): RabbitListenerErrorHandler {
         return RabbitErrorHandler(objectMapper)
     }
 
     @Bean("rabbitRqLoggingMessagePostProcessor")
-    fun getRabbitRqLoggingMessagePostProcessor(@Value("\${common-lib.request_body_log.max.rabbit:10000}") maxBodySize: Int): RabbitRqLoggingMessagePostProcessor {
-        return RabbitRqLoggingMessagePostProcessor(maxBodySize);
+    @ConditionalOnMissingBean(RabbitRqLoggingMessagePostProcessor::class)
+    fun getRabbitRqLoggingMessagePostProcessor(properties: RabbitProperties): RabbitRqLoggingMessagePostProcessor {
+        return RabbitRqLoggingMessagePostProcessor(properties.maxLogBodySize)
     }
+
     @Bean("rabbitRsLoggingMessagePostProcessor")
-    fun getRabbitRsLoggingMessagePostProcessor(@Value("\${common-lib.request_body_log.max.rabbit:10000}") maxBodySize: Int): RabbitRsLoggingMessagePostProcessor {
-        return RabbitRsLoggingMessagePostProcessor(maxBodySize);
+    @ConditionalOnMissingBean(RabbitRsLoggingMessagePostProcessor::class)
+    fun getRabbitRsLoggingMessagePostProcessor(properties: RabbitProperties): RabbitRsLoggingMessagePostProcessor {
+        return RabbitRsLoggingMessagePostProcessor(properties.maxLogBodySize)
     }
+
     @Bean
+    @ConditionalOnMissingBean(SimpleRabbitListenerContainerFactory::class)
     fun rabbitListenerContainerFactory(
         connectionFactory: CachingConnectionFactory,
         configurer: SimpleRabbitListenerContainerFactoryConfigurer,
         rsLogger: RabbitRsLoggingMessagePostProcessor,
         rqLogger: RabbitRqLoggingMessagePostProcessor,
-        errorHandler: RabbitListenerErrorHandler
+        errorHandler: RabbitListenerErrorHandler,
     ): SimpleRabbitListenerContainerFactory {
         val factory = SimpleRabbitListenerContainerFactory()
-        configurer.configure(factory, connectionFactory);
+        configurer.configure(factory, connectionFactory)
         factory.setAfterReceivePostProcessors(rqLogger)
         factory.setBeforeSendReplyPostProcessors(rsLogger)
         factory.setConnectionFactory(connectionFactory)
-
         return factory
     }
-
 }

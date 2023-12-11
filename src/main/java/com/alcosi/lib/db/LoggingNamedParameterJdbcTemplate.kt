@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -26,7 +26,9 @@
 
 package com.alcosi.lib.db
 
-import org.springframework.jdbc.core.*
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.PreparedStatementCreator
+import org.springframework.jdbc.core.PreparedStatementCreatorFactory
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.core.namedparam.SqlParameterSource
 import org.springframework.lang.Nullable
@@ -35,18 +37,18 @@ import java.util.logging.Level
 import java.util.logging.Level.OFF
 import java.util.logging.Logger
 
-
 open class LoggingNamedParameterJdbcTemplate(
     val maxBodySize: Int,
     jdbcTemplate: JdbcTemplate,
     val queryLoggingLevel: Level?,
     val logParamsLevel: Level?,
 ) : NamedParameterJdbcTemplate(jdbcTemplate) {
-    val logger= Logger.getLogger(this.javaClass.name)
+    val logger = Logger.getLogger(this.javaClass.name)
 
     override fun getPreparedStatementCreator(
-        sql: String, paramSource: SqlParameterSource,
-        @Nullable customizer: Consumer<PreparedStatementCreatorFactory>?
+        sql: String,
+        paramSource: SqlParameterSource,
+        @Nullable customizer: Consumer<PreparedStatementCreatorFactory>?,
     ): PreparedStatementCreator {
         return execute(sql, paramSource, customizer)
     }
@@ -54,27 +56,27 @@ open class LoggingNamedParameterJdbcTemplate(
     private fun execute(
         sql: String,
         paramSource: SqlParameterSource,
-        customizer: Consumer<PreparedStatementCreatorFactory>?
+        customizer: Consumer<PreparedStatementCreatorFactory>?,
     ): PreparedStatementCreator {
-        if (queryLoggingLevel != null&&queryLoggingLevel!=OFF) {
+        if (queryLoggingLevel != null && queryLoggingLevel != OFF) {
             logger.log(queryLoggingLevel, "Executing SQL: $sql")
         }
-        if (paramSource.parameterNames != null && logParamsLevel != null&&logParamsLevel!=OFF) {
+        if (paramSource.parameterNames != null && logParamsLevel != null && logParamsLevel != OFF) {
             val params = paramSource.parameterNames?.map { "$it:${serializeValue(paramSource, it)}" }?.joinToString(";")
-            logger.log(logParamsLevel, "SQL params: $params");
+            logger.log(logParamsLevel, "SQL params: $params")
         }
         return super.getPreparedStatementCreator(sql, paramSource, customizer)
     }
 
     private fun serializeValue(
         paramSource: SqlParameterSource,
-        it: String?
+        it: String?,
     ): String {
-        if (it==null){
+        if (it == null) {
             return "<null>"
         }
-        val value = paramSource.getValue(it)?.toString()?:"<null>";
+        val value = paramSource.getValue(it)?.toString() ?: "<null>"
         val length = value.length
-        return if (length >maxBodySize)  "<TOO BIG ${length} bytes>" else value;
+        return if (length > maxBodySize) "<TOO BIG $length bytes>" else value
     }
 }

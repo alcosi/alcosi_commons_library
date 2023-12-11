@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023  Alcosi Group Ltd. and affiliates.
+ * Copyright (c) 2024  Alcosi Group Ltd. and affiliates.
  *
  * Portions of this software are licensed as follows:
  *
@@ -32,14 +32,18 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 class WaitingRejectedExecutor : RejectedExecutionHandler {
-    override fun rejectedExecution(r: Runnable, executor: ThreadPoolExecutor) {
+    override fun rejectedExecution(
+        r: Runnable,
+        executor: ThreadPoolExecutor,
+    ) {
         try {
             executor.queue.put(r)
         } catch (t: Throwable) {
-            logger.log(Level.SEVERE,"Error executor ${r}", t)
+            logger.log(Level.SEVERE, "Error executor $r", t)
         }
     }
-    companion object{
-        val logger= Logger.getLogger(this::class.java.name)
+
+    companion object {
+        val logger = Logger.getLogger(this::class.java.name)
     }
 }
