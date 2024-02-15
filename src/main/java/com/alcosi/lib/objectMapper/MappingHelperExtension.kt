@@ -24,13 +24,22 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.security
+package com.alcosi.lib.objectMapper
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-open class ClientAccountDetails(
-    id: String,
-    authorities: List<String>,
-    val clientId: String,
-) : AccountDetails(id, authorities)
+inline fun <reified T : Any> MappingHelper.mapOne(s: String?): T? {
+    return mapOne(s, T::class.java)
+}
+
+inline fun <reified T : Any> MappingHelper.mapOneNode(s: JsonNode?): T? {
+    return mapOneNode(s, T::class.java)
+}
+
+inline fun <reified T : Any> MappingHelper.mapList(s: String?): List<T> {
+    return mapList(s, T::class.java)
+}
+
+inline fun <reified T : Any> MappingHelper.mapListNode(s: JsonNode?): List<T> {
+    return mapListNode(s, T::class.java)
+}

@@ -30,7 +30,7 @@ def appName = 'commons-library-basic-dependency'
 def springVersion = '3.2.2'
 def kotlinVersion = '1.9.22'
 def jacksonVersion = '2.16.0'
-def depVersion = "3.2.9"
+def depVersion = "3.2.10"
 def kotlinCoroutinesVersion = "1.7.3"
 
 group = 'com.alcosi'

@@ -5,10 +5,13 @@ import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
 import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.objectMapper.mapOne
+import com.alcosi.lib.objectMapper.mapOneNode
 import com.alcosi.lib.security.AccountDetails
 import com.alcosi.lib.security.ClientAccountDetails
 import com.alcosi.lib.security.PrincipalDetails
 import com.alcosi.lib.security.UserDetails
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.servlet.FilterChain
 import org.springframework.web.util.ContentCachingResponseWrapper
 
@@ -38,15 +41,13 @@ open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadConte
     }
 
     protected open fun getAccount(request: CachingRequestWrapper): AccountDetails? {
-        val account = request.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne(it, ClientAccountDetails::class.java) }
-        return if (account == null) {
+        val node = request.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne<JsonNode>(it) }
+        return if (node == null) {
             null
+        } else if (node.hasNonNull("clientId")) {
+            mappingHelper.mapOneNode<ClientAccountDetails>(node)
         } else {
-            if (account.clientId == null) {
-                AccountDetails(account.id, account.authorities)
-            } else {
-                account
-            }
+            mappingHelper.mapOneNode<AccountDetails>(node)
         }
     }
 }

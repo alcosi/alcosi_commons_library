@@ -27,6 +27,8 @@
 package com.alcosi.lib.objectMapper
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JavaType
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
 
@@ -42,6 +44,17 @@ class MappingHelper(protected val objectMapper: ObjectMapper) {
         }
     }
 
+    fun <T : Any> mapOneNode(
+        s: JsonNode?,
+        c: Class<T>,
+    ): T? {
+        return if (s == null) {
+            null
+        } else {
+            objectMapper.treeToValue(s, c)
+        }
+    }
+
     fun <T : Any> mapOne(
         s: String?,
         c: TypeReference<T>,
@@ -50,6 +63,17 @@ class MappingHelper(protected val objectMapper: ObjectMapper) {
             null
         } else {
             (objectMapper.readValue(s, c))
+        }
+    }
+
+    fun <T : Any> mapOneNode(
+        s: JsonNode?,
+        c: JavaType,
+    ): T? {
+        return if (s == null) {
+            null
+        } else {
+            objectMapper.treeToValue(s, c)
         }
     }
 
@@ -75,4 +99,23 @@ class MappingHelper(protected val objectMapper: ObjectMapper) {
             .map { t -> t as T }
             .toList()
     }
+
+    fun <T : Any> mapListNode(
+        s: JsonNode?,
+        c: Class<T>,
+    ): List<T> {
+        return if (s == null) {
+            return emptyList()
+        } else {
+            val arrayType = c.arrayType()
+            val t = objectMapper.treeToValue(s, arrayType) as Array<*>
+            return mapArrayToList(t)
+        }
+    }
+
+    private fun <T : Any> mapArrayToList(t: Array<*>): MutableList<T> =
+        Arrays
+            .stream(t)
+            .map { it as T }
+            .toList()
 }
