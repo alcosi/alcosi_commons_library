@@ -24,7 +24,7 @@ open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadConte
         try {
             val principal = getPrincipal(request)
             principal?.let { threadContext.setAuthPrincipal(it) }
-            principal?.let { request.setAttribute(HeaderHelper.AUTH_PRINCIPAL, it) }
+            principal?.let { request.setAttribute(ThreadContext.AUTH_PRINCIPAL, it) }
         } catch (t: Throwable) {
             logger.error("Error during auth", t)
         }

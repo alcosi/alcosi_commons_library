@@ -26,6 +26,8 @@
 
 package com.alcosi.lib.filters.servlet
 
+import com.alcosi.lib.filters.servlet.ThreadContext.Companion.AUTH_PRINCIPAL
+import com.alcosi.lib.filters.servlet.ThreadContext.Companion.RQ_ID_INDEX
 import com.alcosi.lib.filters.servlet.context.ContextFilter
 import com.alcosi.lib.security.ClientAccountDetails
 import com.alcosi.lib.security.UserDetails
@@ -68,11 +70,11 @@ open class HeaderHelper(
     }
 
     protected open fun getRqIdIndex(): Int {
-        return if (threadContext.contains("RQ_ID_INDEX")) {
-            threadContext.get<AtomicInteger>("RQ_ID_INDEX")!!.incrementAndGet()
+        return if (threadContext.contains(RQ_ID_INDEX)) {
+            threadContext.get<AtomicInteger>(RQ_ID_INDEX)!!.incrementAndGet()
         } else {
             val firstIndex = 1
-            threadContext.set("RQ_ID_INDEX", AtomicInteger(firstIndex))
+            threadContext.set(RQ_ID_INDEX, AtomicInteger(firstIndex))
             firstIndex
         }
     }
@@ -89,6 +91,5 @@ open class HeaderHelper(
         val ACCOUNT_DETAILS = "ACCOUNT_DETAILS"
         val RQ_ID = "RQ_ID"
         val ACTION = "ACTION"
-        val AUTH_PRINCIPAL = "AUTH_PRINCIPAL"
     }
 }

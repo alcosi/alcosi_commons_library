@@ -24,67 +24,15 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.filters.servlet.context;
+package com.alcosi.lib.filters.servlet
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+inline fun <reified T : Enum<T>> ThreadContext.getEnum(
+    key: String,
+    default: T,
+): T {
+    return getEnumOrNull<T>(key) ?: default
+}
 
-@ConfigurationProperties("common-lib.filter.context")
-public class ContextFilterProperties {
-    private Boolean disabled = false;
-    private Integer orderDelta = 2;
-    private Headers headers = new Headers();
-
-    public Headers getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(Headers headers) {
-        this.headers = headers;
-    }
-
-    public Integer getOrderDelta() {
-        return orderDelta;
-    }
-
-    public void setOrderDelta(Integer orderDelta) {
-        this.orderDelta = orderDelta;
-    }
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
-    public static class Headers{
-        private String userAgent="User-Agent";
-        private String ip="X-Real-IP";
-        private String platform="X-Platform";
-
-        public String getUserAgent() {
-            return userAgent;
-        }
-
-        public void setUserAgent(String userAgent) {
-            this.userAgent = userAgent;
-        }
-
-        public String getIp() {
-            return ip;
-        }
-
-        public void setIp(String ip) {
-            this.ip = ip;
-        }
-
-        public String getPlatform() {
-            return platform;
-        }
-
-        public void setPlatform(String platform) {
-            this.platform = platform;
-        }
-    }
-
+inline fun <reified T : Enum<T>> ThreadContext.getEnumOrNull(key: String): T? {
+    return enumValues<T>().firstOrNull { it.name == getAll()[key] }
 }

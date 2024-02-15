@@ -40,8 +40,9 @@ open class ContextFilter(
     protected val objectMapper: ObjectMapper,
     protected val contextHeaders: List<String>,
     protected val jsonHeaders: List<JsonHeader>,
+    protected val headersConfig: ContextFilterProperties.Headers,
 ) : OncePerRequestFilter() {
-    data class JsonHeader(val header: String, val clazz: KClass<*>, val contextName: String)
+    data class JsonHeader(val header: String, val clazz: KClass<*>, val threadContextName: String)
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -66,6 +67,7 @@ open class ContextFilter(
     protected open fun parseHeaders(request: HttpServletRequest) {
         setJson(request)
         setPlain(request)
+        setRequestContext(request)
         threadContext.set("HTTP_REQUEST", request)
     }
 
@@ -75,14 +77,20 @@ open class ContextFilter(
         values.forEach { request.setAttribute(it.first, it.second) }
     }
 
+    protected open fun setRequestContext(request: HttpServletRequest) {
+        request.getHeader(headersConfig.userAgent)?.let { threadContext.set(ThreadContext.REQUEST_ORIGINAL_USER_AGENT, it) }
+        (request.getHeader(headersConfig.ip) ?: request.remoteAddr)?.let { threadContext.set(ThreadContext.REQUEST_ORIGINAL_IP, it) }
+        request.getHeader(headersConfig.platform)?.let { threadContext.set(ThreadContext.REQUEST_PLATFORM, it) }
+    }
+
     protected open fun setJson(request: HttpServletRequest) {
         val values = jsonHeaders.filter { j -> request.getHeader(j.header) != null }
         values
             .forEach { j ->
                 try {
                     val readValue = objectMapper.readValue(request.getHeader(j.header), j.clazz.java)
-                    threadContext.set(j.contextName, readValue)
-                    request.setAttribute(j.contextName, readValue)
+                    threadContext.set(j.threadContextName, readValue)
+                    request.setAttribute(j.threadContextName, readValue)
                 } catch (t: Throwable) {
                     logger.error("Error mapping thread value ${j.header}")
                 }

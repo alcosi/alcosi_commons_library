@@ -34,30 +34,34 @@ import java.util.*
 open class ThreadContext {
     protected val local: InheritableThreadLocal<MutableMap<String, Any?>> = PresetInheritableThreadLocal(mutableMapOf())
 
+    open fun getAll(): MutableMap<String, Any?> {
+        return local.get()
+    }
+
     open fun <T> get(name: String): T? {
-        val any = local.get()[name]
+        val any = getAll()[name]
         return any as T?
     }
 
     open fun contains(name: String): Boolean {
-        return local.get().contains(name)
+        return getAll().contains(name)
     }
 
     open fun setAuthPrincipal(value: PrincipalDetails) {
-        local.get()[HeaderHelper.AUTH_PRINCIPAL] = value
+        getAll()[AUTH_PRINCIPAL] = value
     }
 
     open fun <T : PrincipalDetails> getAuthPrincipal(): T? {
-        return local.get()[HeaderHelper.AUTH_PRINCIPAL] as T?
+        return getAll()[AUTH_PRINCIPAL] as T?
     }
 
     open fun getRqId(): String {
-        val value = get<String>(HeaderHelper.RQ_ID)
+        val value = get<String>(RQ_ID)
         if (value != null) {
             return value
         } else {
             val generated = getIdString()
-            set(HeaderHelper.RQ_ID, generated)
+            set(RQ_ID, generated)
             return generated
         }
     }
@@ -66,7 +70,7 @@ open class ThreadContext {
         name: String,
         value: Any?,
     ) {
-        local.get()[name] = value
+        getAll()[name] = value
     }
 
     open fun clear() {
@@ -74,6 +78,14 @@ open class ThreadContext {
     }
 
     companion object {
+        val AUTH_PRINCIPAL = "AUTH_PRINCIPAL"
+        val RQ_ID = "RQ_ID"
+        val RQ_ID_INDEX = "RQ_ID_INDEX"
+
+        val REQUEST_ORIGINAL_IP = "REQUEST_ORIGINAL_IP"
+        val REQUEST_ORIGINAL_USER_AGENT = "REQUEST_ORIGINAL_USER_AGENT"
+        val REQUEST_PLATFORM = "REQUEST_PLATFORM"
+
         private val RANDOM = Random()
 
         protected fun getIdString(): String {

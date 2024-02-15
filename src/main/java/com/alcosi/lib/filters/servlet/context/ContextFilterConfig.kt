@@ -65,7 +65,7 @@ open class ContextFilterConfig {
     ): FilterRegistrationBean<ContextFilter> {
         val registrationBean = FilterRegistrationBean<ContextFilter>()
         registrationBean.filter =
-            ContextFilter(threadContext, mapper, headerHelper.contextHeaders, headerHelper.jsonHeaders)
+            ContextFilter(threadContext, mapper, headerHelper.contextHeaders, headerHelper.jsonHeaders, properties.headers)
         registrationBean.order = servletFilterProperties.baseOrder + properties.orderDelta
         return registrationBean
     }
