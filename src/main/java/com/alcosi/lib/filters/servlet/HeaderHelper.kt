@@ -89,6 +89,7 @@ open class HeaderHelper(
         val USER_ID = "USER_ID"
         val USER_DETAILS = "USER_DETAILS"
         val ACCOUNT_DETAILS = "ACCOUNT_DETAILS"
+        val ORIGINAL_AUTHORISATION = "ORIGINAL_AUTHORISATION"
         val RQ_ID = "RQ_ID"
         val ACTION = "ACTION"
     }

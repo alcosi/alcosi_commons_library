@@ -1,7 +1,9 @@
 package com.alcosi.lib.filters.servlet.principalAuth
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.filters.servlet.HeaderHelper.Companion.ORIGINAL_AUTHORISATION
 import com.alcosi.lib.filters.servlet.ThreadContext
+import com.alcosi.lib.filters.servlet.ThreadContext.Companion.REQUEST_ORIGINAL_AUTHORISATION_TOKEN
 import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
 import com.alcosi.lib.objectMapper.MappingHelper
@@ -25,6 +27,9 @@ open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadConte
             val principal = getPrincipal(request)
             principal?.let { threadContext.setAuthPrincipal(it) }
             principal?.let { request.setAttribute(ThreadContext.AUTH_PRINCIPAL, it) }
+            val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)
+            originalToken?.let { request.setAttribute(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
+            originalToken?.let { threadContext.set(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
         } catch (t: Throwable) {
             logger.error("Error during auth", t)
         }
