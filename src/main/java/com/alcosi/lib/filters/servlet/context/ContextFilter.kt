@@ -27,7 +27,11 @@
 package com.alcosi.lib.filters.servlet.context
 
 import com.alcosi.lib.filters.servlet.ThreadContext
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.alcosi.lib.filters.servlet.mapAccountDetails
+import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.objectMapper.mapOne
+import com.alcosi.lib.security.AccountDetails
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -37,7 +41,7 @@ import kotlin.reflect.KClass
 
 open class ContextFilter(
     protected val threadContext: ThreadContext,
-    protected val objectMapper: ObjectMapper,
+    protected val mappingHelper: MappingHelper,
     protected val contextHeaders: List<String>,
     protected val jsonHeaders: List<JsonHeader>,
     protected val headersConfig: ContextFilterProperties.Headers,
@@ -88,13 +92,28 @@ open class ContextFilter(
         values
             .forEach { j ->
                 try {
-                    val readValue = objectMapper.readValue(request.getHeader(j.header), j.clazz.java)
-                    threadContext.set(j.threadContextName, readValue)
-                    request.setAttribute(j.threadContextName, readValue)
+                    val obj = mapJsonObject(j.clazz.java, request.getHeader(j.header), request, j)
+                    threadContext.set(j.threadContextName, obj)
+                    request.setAttribute(j.threadContextName, obj)
                 } catch (t: Throwable) {
                     logger.error("Error mapping thread value ${j.header}")
                 }
             }
+    }
+
+    private fun mapJsonObject(
+        javaClass: Class<out Any>,
+        headerValue: String?,
+        request: HttpServletRequest,
+        j: JsonHeader,
+    ): Any {
+        return when (javaClass) {
+            AccountDetails::class.java -> {
+                val node = mappingHelper.mapOne<JsonNode>(headerValue)
+                node.mapAccountDetails(mappingHelper)!!
+            }
+            else -> mappingHelper.mapOne(request.getHeader(j.header), javaClass)!!
+        }
     }
 
     companion object {

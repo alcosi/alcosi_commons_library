@@ -9,10 +9,7 @@ import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
 import com.alcosi.lib.objectMapper.MappingHelper
 import com.alcosi.lib.objectMapper.mapOne
 import com.alcosi.lib.objectMapper.mapOneNode
-import com.alcosi.lib.security.AccountDetails
-import com.alcosi.lib.security.ClientAccountDetails
-import com.alcosi.lib.security.PrincipalDetails
-import com.alcosi.lib.security.UserDetails
+import com.alcosi.lib.security.*
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.servlet.FilterChain
 import org.springframework.web.util.ContentCachingResponseWrapper
@@ -51,6 +48,8 @@ open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadConte
             null
         } else if (node.hasNonNull("clientId")) {
             mappingHelper.mapOneNode<ClientAccountDetails>(node)
+        } else if (node.hasNonNull("organisationId")) {
+            mappingHelper.mapOneNode<OrganisationAccountDetails>(node)
         } else {
             mappingHelper.mapOneNode<AccountDetails>(node)
         }
