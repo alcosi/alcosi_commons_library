@@ -26,8 +26,11 @@
 
 package com.alcosi.lib.security
 
+import com.alcosi.lib.serializers.principal.UserDetailsPrincipalDeSerializer
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+@JsonDeserialize(using = UserDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class UserDetails(
     id: String,

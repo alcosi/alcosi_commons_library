@@ -26,10 +26,12 @@
 
 package com.alcosi.lib.security
 
-import com.alcosi.lib.serializers.PrincipalDeSerializer
+import com.alcosi.lib.serializers.principal.DefaultPrincipalDetailsDeSerializer
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
-@JsonDeserialize(using = PrincipalDeSerializer::class)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonDeserialize(using = DefaultPrincipalDetailsDeSerializer::class)
 open class DefaultPrincipalDetails(
     override val id: String,
     override val authorities: List<String>,

@@ -26,35 +26,34 @@
 
 package com.alcosi.lib.serializers
 
-import com.alcosi.lib.objectMapper.MappingHelper
 import com.alcosi.lib.utils.PrepareHexService
+import com.alcosi.lib.utils.PrepareHexServiceConfig
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 
 @ConditionalOnClass(StdSerializer::class)
 @AutoConfiguration
-@ConditionalOnBean(PrepareHexService::class)
+@AutoConfigureAfter(PrepareHexServiceConfig::class)
 class SerializersConfig {
     @Autowired
+    @ConditionalOnBean(PrepareHexService::class)
     fun configureHexDeSerializer(prepareArgsService: PrepareHexService) {
         HexStringDeSerializer.setPrepareArgsService(prepareArgsService)
     }
 
     @Autowired
+    @ConditionalOnBean(PrepareHexService::class)
     fun configureHexSerializer(prepareArgsService: PrepareHexService) {
         HexStringSerializer.setPrepareArgsService(prepareArgsService)
     }
 
     @Autowired
+    @ConditionalOnBean(PrepareHexService::class)
     fun configureHexBigIntDeSerializer(prepareArgsService: PrepareHexService) {
         HexBigIntDeSerializer.setPrepareArgsService(prepareArgsService)
-    }
-
-    @Autowired
-    fun configurePrincipalDeSerializer(helper: MappingHelper) {
-        PrincipalDeSerializer.mappingHelper = helper
     }
 }

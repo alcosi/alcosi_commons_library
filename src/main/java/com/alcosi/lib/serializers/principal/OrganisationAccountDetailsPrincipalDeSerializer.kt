@@ -24,17 +24,30 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.security
+package com.alcosi.lib.serializers.principal
 
-import com.alcosi.lib.serializers.principal.OrganisationAccountDetailsPrincipalDeSerializer
+import com.alcosi.lib.security.AccountDetails
+import com.alcosi.lib.security.OrganisationAccountDetails
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonNode
 
-@JsonDeserialize(using = OrganisationAccountDetailsPrincipalDeSerializer::class)
-@JsonIgnoreProperties(ignoreUnknown = true)
-open class OrganisationAccountDetails(
-    id: String,
-    authorities: List<String>,
-    val organisationId: String,
-    className: String = OrganisationAccountDetails::class.java.name,
-) : AccountDetails(id, authorities, className)
+open class OrganisationAccountDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSerializer<OrganisationAccountDetailsPrincipalDeSerializer.OrganisationAccountDetailsSerializationObject>(OrganisationAccountDetails::class.java) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    open class OrganisationAccountDetailsSerializationObject(
+        id: String,
+        authorities: List<String>,
+        className: String,
+        type: String,
+        val organisationId: String,
+    ) : PrincipalSerializationObject(id, authorities, className, type)
+
+    override fun returnRealObject(serializationObject: OrganisationAccountDetailsSerializationObject): AccountDetails {
+        return OrganisationAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.organisationId, serializationObject.className)
+    }
+
+    override fun getInternalTypeObject(
+        ctxt: DeserializationContext,
+        node: JsonNode,
+    ): OrganisationAccountDetailsSerializationObject = ctxt.readTreeAsValue(node, OrganisationAccountDetailsSerializationObject::class.java)
+}

@@ -26,8 +26,10 @@
 
 package com.alcosi.lib.security
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.security.Principal
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 interface PrincipalDetails : Principal {
     val authorities: List<String>
     val id: String

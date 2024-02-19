@@ -26,8 +26,11 @@
 
 package com.alcosi.lib.security
 
+import com.alcosi.lib.serializers.principal.AccountDetailsPrincipalDeSerializer
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+@JsonDeserialize(using = AccountDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class AccountDetails(
     id: String,
