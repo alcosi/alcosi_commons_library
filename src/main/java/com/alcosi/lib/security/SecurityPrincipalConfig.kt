@@ -26,14 +26,19 @@
 
 package com.alcosi.lib.security
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.JsonNode
+import com.alcosi.lib.objectMapper.MappingHelper
+import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-open class ClientAccountDetails(
-    id: String,
-    authorities: List<String>,
-    val clientId: String,
-    className: String = ClientAccountDetails::class.java.name,
-    originalJsonNode: JsonNode,
-) : AccountDetails(id, authorities, className, originalJsonNode)
+@ConditionalOnClass(StdSerializer::class)
+@AutoConfiguration
+@ConditionalOnBean(MappingHelper::class)
+class SecurityPrincipalConfig {
+    @Autowired
+    fun configureMappingHelperForAbstractPrincipalDetails(helper: MappingHelper) {
+        GeneralPrincipalDetails.mappingHelper = helper
+    }
+}

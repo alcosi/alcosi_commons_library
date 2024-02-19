@@ -27,11 +27,11 @@
 package com.alcosi.lib.security
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class UserDetails(
-    override val id: String,
-) : PrincipalDetails {
-    override val type = "USER"
-    override val authorities = listOf("USER_PERMISSION")
-}
+    id: String,
+    className: String = UserDetails::class.java.name,
+    originalJsonNode: JsonNode,
+) : OneAuthorityPrincipal(id, "PERMISSION_USER", className, "USER", originalJsonNode)

@@ -21,3 +21,4 @@ com.alcosi.lib.filters.servlet.cors.CorsFilterConfig
 com.alcosi.lib.filters.servlet.log.LoggingFilterConfig
 com.alcosi.lib.filters.servlet.principalAuth.PrincipalAuthFilterConfig
 com.alcosi.lib.filters.router.RouterFilterConfig
+com.alcosi.lib.security.SecurityPrincipalConfig

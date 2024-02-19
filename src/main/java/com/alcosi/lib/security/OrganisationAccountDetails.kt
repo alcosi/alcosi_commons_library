@@ -30,10 +30,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-open class ClientAccountDetails(
+open class OrganisationAccountDetails(
     id: String,
     authorities: List<String>,
-    val clientId: String,
-    className: String = ClientAccountDetails::class.java.name,
+    val organisationId: String,
+    className: String = OrganisationAccountDetails::class.java.name,
     originalJsonNode: JsonNode,
 ) : AccountDetails(id, authorities, className, originalJsonNode)

@@ -26,14 +26,31 @@
 
 package com.alcosi.lib.security
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.serializers.PrincipalDeSerializer
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import kotlin.reflect.KClass
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-open class ClientAccountDetails(
-    id: String,
-    authorities: List<String>,
-    val clientId: String,
-    className: String = ClientAccountDetails::class.java.name,
-    originalJsonNode: JsonNode,
-) : AccountDetails(id, authorities, className, originalJsonNode)
+@JsonDeserialize(using = PrincipalDeSerializer::class)
+open class GeneralPrincipalDetails(
+    override val id: String,
+    override val authorities: List<String>,
+    val className: String,
+    override val type: String,
+    @JsonIgnore
+    protected val originalJsonNode: JsonNode,
+) : PrincipalDetails {
+    fun <T : GeneralPrincipalDetails> toPrincipal(clazz: KClass<T>): T {
+        return mappingHelper.mapOneNode(originalJsonNode, clazz.java) as T
+    }
+
+    inline fun <reified T : GeneralPrincipalDetails> toPrincipal(): T {
+        return toPrincipal(T::class)
+    }
+
+    companion object {
+        lateinit var mappingHelper: MappingHelper
+    }
+}

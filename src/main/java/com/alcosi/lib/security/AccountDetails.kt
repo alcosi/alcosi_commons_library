@@ -27,11 +27,12 @@
 package com.alcosi.lib.security
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.JsonNode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class AccountDetails(
-    override val id: String,
-    override val authorities: List<String>,
-) : PrincipalDetails {
-    override val type = "ACCOUNT"
-}
+    id: String,
+    authorities: List<String>,
+    className: String = AccountDetails::class.java.name,
+    originalJsonNode: JsonNode,
+) : GeneralPrincipalDetails(id, authorities, className, "ACCOUNT", originalJsonNode)

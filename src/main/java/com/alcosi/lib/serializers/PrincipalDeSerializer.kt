@@ -24,16 +24,41 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.security
+package com.alcosi.lib.serializers
 
+import com.alcosi.lib.security.GeneralPrincipalDetails
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import com.fasterxml.jackson.databind.node.NullNode
+import kotlin.reflect.KClass
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-open class ClientAccountDetails(
-    id: String,
-    authorities: List<String>,
-    val clientId: String,
-    className: String = ClientAccountDetails::class.java.name,
-    originalJsonNode: JsonNode,
-) : AccountDetails(id, authorities, className, originalJsonNode)
+open class PrincipalDeSerializer : StdDeserializer<GeneralPrincipalDetails?>(GeneralPrincipalDetails::class.java) {
+    @JvmRecord
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class PrincipalSerializationObject(
+        val id: String,
+        val authorities: List<String>,
+        val className: String,
+        val type: String,
+    )
+
+    override fun deserialize(
+        p: JsonParser?,
+        ctxt: DeserializationContext?,
+    ): GeneralPrincipalDetails? {
+        if (ctxt == null || p == null) {
+            return getNullValue(ctxt)
+        }
+        val node: JsonNode = p.codec.readTree(p)
+        if (node is NullNode) {
+            return getNullValue(ctxt)
+        }
+        val serializationObject = ctxt.readValue(p, PrincipalSerializationObject::class.java)
+        val originalClass = Class.forName(serializationObject.className)
+        val commonPrincipal = GeneralPrincipalDetails(serializationObject.id, serializationObject.authorities, serializationObject.className, serializationObject.type, node)
+        return commonPrincipal.toPrincipal(originalClass.kotlin as KClass<out GeneralPrincipalDetails>)
+    }
+}

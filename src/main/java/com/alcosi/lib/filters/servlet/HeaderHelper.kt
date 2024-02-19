@@ -29,7 +29,7 @@ package com.alcosi.lib.filters.servlet
 import com.alcosi.lib.filters.servlet.ThreadContext.Companion.AUTH_PRINCIPAL
 import com.alcosi.lib.filters.servlet.ThreadContext.Companion.RQ_ID_INDEX
 import com.alcosi.lib.filters.servlet.context.ContextFilter
-import com.alcosi.lib.security.ClientAccountDetails
+import com.alcosi.lib.security.AccountDetails
 import com.alcosi.lib.security.UserDetails
 import org.springframework.http.HttpHeaders
 import java.util.concurrent.atomic.AtomicInteger
@@ -39,18 +39,17 @@ open class HeaderHelper(
     val environment: String,
     protected val threadContext: ThreadContext,
 ) {
-    open val contextHeaders = listOf(CLIENT_ID, ACCOUNT_ID, USER_ID, RQ_ID, ACTION)
+    open val contextHeaders = listOf(ACCOUNT_ID, USER_ID, RQ_ID, ACTION)
     open val jsonHeaders =
         listOf(
             ContextFilter.JsonHeader(USER_DETAILS, UserDetails::class, AUTH_PRINCIPAL),
-            ContextFilter.JsonHeader(ACCOUNT_DETAILS, ClientAccountDetails::class, AUTH_PRINCIPAL),
+            ContextFilter.JsonHeader(ACCOUNT_DETAILS, AccountDetails::class, AUTH_PRINCIPAL),
         )
 
     open fun createRequestHeadersMap(): Map<String, String> {
         val headers = mutableMapOf<String, String?>()
         headers[ENV_HEADER] = environment
         headers[SERVICE_NAME] = serviceName
-        headers[CLIENT_ID] = threadContext.get(CLIENT_ID)
         headers[ACCOUNT_ID] = threadContext.get(ACCOUNT_ID)
         headers[USER_ID] = threadContext.get(USER_ID)
         headers[RQ_ID] = "${getContextRqId()}-${getRqIdIndex()}"
@@ -84,7 +83,6 @@ open class HeaderHelper(
         val SERVICE_AUTH_HEADER = "AUTHORIZATION"
         val ENV_HEADER = "ENVIRONMENT"
         val SERVICE_NAME = "SERVICE_NAME"
-        val CLIENT_ID = "CLIENT_ID"
         val ACCOUNT_ID = "ACCOUNT_ID"
         val USER_ID = "USER_ID"
         val USER_DETAILS = "USER_DETAILS"

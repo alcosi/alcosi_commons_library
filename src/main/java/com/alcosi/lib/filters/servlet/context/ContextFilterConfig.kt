@@ -30,7 +30,7 @@ import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.alcosi.lib.objectMapper.MappingHelper
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -60,12 +60,12 @@ open class ContextFilterConfig {
         properties: ContextFilterProperties,
         servletFilterProperties: ServletFilterProperties,
         threadContext: ThreadContext,
-        mapper: ObjectMapper,
+        mappingHelper: MappingHelper,
         headerHelper: HeaderHelper,
     ): FilterRegistrationBean<ContextFilter> {
         val registrationBean = FilterRegistrationBean<ContextFilter>()
         registrationBean.filter =
-            ContextFilter(threadContext, mapper, headerHelper.contextHeaders, headerHelper.jsonHeaders, properties.headers)
+            ContextFilter(threadContext, mappingHelper, headerHelper.contextHeaders, headerHelper.jsonHeaders, properties.headers)
         registrationBean.order = servletFilterProperties.baseOrder + properties.orderDelta
         return registrationBean
     }
