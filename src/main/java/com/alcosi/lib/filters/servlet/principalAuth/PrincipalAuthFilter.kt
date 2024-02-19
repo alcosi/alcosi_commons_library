@@ -8,11 +8,17 @@ import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
 import com.alcosi.lib.objectMapper.MappingHelper
 import com.alcosi.lib.objectMapper.mapOne
+import com.alcosi.lib.secured.encrypt.SensitiveComponent
 import com.alcosi.lib.security.*
 import jakarta.servlet.FilterChain
 import org.springframework.web.util.ContentCachingResponseWrapper
+import java.nio.charset.Charset
 
-open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadContext: ThreadContext) : WrappedOnePerRequestFilter(Int.MAX_VALUE) {
+open class PrincipalAuthFilter(
+    protected open val mappingHelper: MappingHelper,
+    protected open val threadContext: ThreadContext,
+    protected open val sensitiveComponent: SensitiveComponent,
+) : WrappedOnePerRequestFilter(Int.MAX_VALUE) {
     override fun doFilterWrapped(
         request: CachingRequestWrapper,
         response: ContentCachingResponseWrapper,
@@ -22,7 +28,7 @@ open class PrincipalAuthFilter(val mappingHelper: MappingHelper, val threadConte
             val principal = getPrincipal(request)
             principal?.let { threadContext.setAuthPrincipal(it) }
             principal?.let { request.setAttribute(ThreadContext.AUTH_PRINCIPAL, it) }
-            val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)
+            val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)?.let { sensitiveComponent.deserialize(it)?.toString(Charset.defaultCharset()) }
             originalToken?.let { request.setAttribute(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
             originalToken?.let { threadContext.set(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
         } catch (t: Throwable) {

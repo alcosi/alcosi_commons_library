@@ -30,6 +30,7 @@ import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.secured.encrypt.SensitiveComponent
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -58,11 +59,12 @@ open class PrincipalAuthFilterConfig {
     fun principalAuthFilter(
         properties: PrincipalAuthFilterProperties,
         servletProperties: ServletFilterProperties,
+        sensitiveComponent: SensitiveComponent,
         mappingHelper: MappingHelper,
         threadContext: ThreadContext,
     ): FilterRegistrationBean<PrincipalAuthFilter> {
         val registrationBean = FilterRegistrationBean<PrincipalAuthFilter>()
-        registrationBean.filter = PrincipalAuthFilter(mappingHelper, threadContext)
+        registrationBean.filter = PrincipalAuthFilter(mappingHelper, threadContext, sensitiveComponent)
         registrationBean.order = servletProperties.baseOrder + properties.orderDelta
         return registrationBean
     }
