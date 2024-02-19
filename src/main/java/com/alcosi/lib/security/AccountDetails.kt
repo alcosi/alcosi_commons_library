@@ -27,12 +27,10 @@
 package com.alcosi.lib.security
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.JsonNode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class AccountDetails(
     id: String,
     authorities: List<String>,
     className: String = AccountDetails::class.java.name,
-    originalJsonNode: JsonNode,
-) : GeneralPrincipalDetails(id, authorities, className, "ACCOUNT", originalJsonNode)
+) : DefaultPrincipalDetails(id, authorities, className, "ACCOUNT")

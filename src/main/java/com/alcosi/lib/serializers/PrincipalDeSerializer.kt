@@ -26,16 +26,16 @@
 
 package com.alcosi.lib.serializers
 
-import com.alcosi.lib.security.GeneralPrincipalDetails
+import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.security.DefaultPrincipalDetails
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.NullNode
-import kotlin.reflect.KClass
 
-open class PrincipalDeSerializer : StdDeserializer<GeneralPrincipalDetails?>(GeneralPrincipalDetails::class.java) {
+open class PrincipalDeSerializer : StdDeserializer<DefaultPrincipalDetails?>(DefaultPrincipalDetails::class.java) {
     @JvmRecord
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PrincipalSerializationObject(
@@ -48,7 +48,7 @@ open class PrincipalDeSerializer : StdDeserializer<GeneralPrincipalDetails?>(Gen
     override fun deserialize(
         p: JsonParser?,
         ctxt: DeserializationContext?,
-    ): GeneralPrincipalDetails? {
+    ): DefaultPrincipalDetails? {
         if (ctxt == null || p == null) {
             return getNullValue(ctxt)
         }
@@ -58,7 +58,10 @@ open class PrincipalDeSerializer : StdDeserializer<GeneralPrincipalDetails?>(Gen
         }
         val serializationObject = ctxt.readTreeAsValue(node, PrincipalSerializationObject::class.java)
         val originalClass = Class.forName(serializationObject.className)
-        val commonPrincipal = GeneralPrincipalDetails(serializationObject.id, serializationObject.authorities, serializationObject.className, serializationObject.type, node)
-        return commonPrincipal.toPrincipal(originalClass.kotlin as KClass<out GeneralPrincipalDetails>)
+        return mappingHelper.mapOneNode(node, originalClass) as DefaultPrincipalDetails?
+    }
+
+    companion object {
+        lateinit var mappingHelper: MappingHelper
     }
 }

@@ -24,9 +24,10 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.security
+package com.alcosi.lib.serializers
 
 import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.utils.PrepareHexService
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.AutoConfiguration
@@ -35,10 +36,25 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 
 @ConditionalOnClass(StdSerializer::class)
 @AutoConfiguration
-@ConditionalOnBean(MappingHelper::class)
-class SecurityPrincipalConfig {
+@ConditionalOnBean(PrepareHexService::class)
+class SerializersConfig {
     @Autowired
-    fun configureMappingHelperForAbstractPrincipalDetails(helper: MappingHelper) {
-        GeneralPrincipalDetails.mappingHelper = helper
+    fun configureHexDeSerializer(prepareArgsService: PrepareHexService) {
+        HexStringDeSerializer.setPrepareArgsService(prepareArgsService)
+    }
+
+    @Autowired
+    fun configureHexSerializer(prepareArgsService: PrepareHexService) {
+        HexStringSerializer.setPrepareArgsService(prepareArgsService)
+    }
+
+    @Autowired
+    fun configureHexBigIntDeSerializer(prepareArgsService: PrepareHexService) {
+        HexBigIntDeSerializer.setPrepareArgsService(prepareArgsService)
+    }
+
+    @Autowired
+    fun configurePrincipalDeSerializer(helper: MappingHelper) {
+        PrincipalDeSerializer.mappingHelper = helper
     }
 }

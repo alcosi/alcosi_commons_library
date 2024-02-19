@@ -11,7 +11,7 @@ com.alcosi.lib.objectMapper.ObjectMapperConfig
 com.alcosi.lib.rabbit.RabbitConfig
 com.alcosi.lib.secured.encrypt.EncryptionConfig
 com.alcosi.lib.secured.encrypt.EncryptionContainerConfig
-com.alcosi.lib.serializers.HexServiceSerializersConfig
+com.alcosi.lib.serializers.SerializersConfig
 com.alcosi.lib.synchronisation.SynchronisationServiceConfig
 com.alcosi.lib.utils.PrepareHexServiceConfig
 com.alcosi.lib.filters.servlet.auth.AuthFilterConfig
@@ -21,4 +21,3 @@ com.alcosi.lib.filters.servlet.cors.CorsFilterConfig
 com.alcosi.lib.filters.servlet.log.LoggingFilterConfig
 com.alcosi.lib.filters.servlet.principalAuth.PrincipalAuthFilterConfig
 com.alcosi.lib.filters.router.RouterFilterConfig
-com.alcosi.lib.security.SecurityPrincipalConfig

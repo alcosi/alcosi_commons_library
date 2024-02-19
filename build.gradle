@@ -28,7 +28,7 @@ plugins {
 }
 
 group = 'com.alcosi'
-version = '3.3.01'
+version = '3.3.03'
 sourceCompatibility = "21"
 def appName = 'commons-library'
 

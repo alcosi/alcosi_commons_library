@@ -27,7 +27,6 @@
 package com.alcosi.lib.security
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.JsonNode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class ClientAccountDetails(
@@ -35,5 +34,4 @@ open class ClientAccountDetails(
     authorities: List<String>,
     val clientId: String,
     className: String = ClientAccountDetails::class.java.name,
-    originalJsonNode: JsonNode,
-) : AccountDetails(id, authorities, className, originalJsonNode)
+) : AccountDetails(id, authorities, className)
