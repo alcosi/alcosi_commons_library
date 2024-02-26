@@ -49,9 +49,13 @@ open class ContextFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        parseHeaders(request)
-        filterChain.doFilter(request, response)
-        setResponseHeaders(request, response)
+        try {
+            parseHeaders(request)
+            filterChain.doFilter(request, response)
+            setResponseHeaders(request, response)
+        } finally {
+            threadContext.clear()
+        }
     }
 
     private fun setResponseHeaders(
