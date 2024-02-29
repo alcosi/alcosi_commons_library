@@ -19,7 +19,7 @@ buildscript {
 plugins {
     id("java-library")
     id("maven-publish")
-    id("org.springframework.boot") version "3.2.2"
+    id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
     id("org.jetbrains.kotlin.jvm") version "1.9.22"
     id("org.jetbrains.kotlin.plugin.spring") version "1.9.22"
@@ -27,7 +27,7 @@ plugins {
 }
 
 def appName = 'commons-library-basic-dependency'
-def springVersion = '3.2.2'
+def springVersion = '3.2.3'
 def kotlinVersion = '1.9.22'
 def jacksonVersion = '2.16.0'
 def depVersion = "3.3.15"
@@ -123,7 +123,7 @@ dependencies {
     api("commons-codec:commons-codec:1.16.0")
     api("org.apache.commons:commons-text:1.11.0")
     api("org.bouncycastle:bcprov-jdk18on:1.77")
-    api("org.postgresql:postgresql:42.7.1")
+    api("org.postgresql:postgresql:42.7.2")
     api("org.flywaydb:flyway-core:10.4.1")
     api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
