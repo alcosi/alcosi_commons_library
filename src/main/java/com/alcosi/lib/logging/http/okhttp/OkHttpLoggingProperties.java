@@ -33,11 +33,29 @@ import java.time.Duration;
 @ConfigurationProperties("common-lib.okhttp")
 public class OkHttpLoggingProperties {
     private Boolean disabled = false;
+    private Boolean loggingDisabled = false;
+    private Boolean contextHeadersDisabled = false;
     private Integer maxLogBodySize = 10000;
     private String loggingLevel = "INFO";
     private Duration connectTimeout = Duration.ofSeconds(10);
     private Duration readTimeout = Duration.ofSeconds(120);
     private Duration writeTimeout = Duration.ofSeconds(120);
+
+    public Boolean getLoggingDisabled() {
+        return loggingDisabled;
+    }
+
+    public void setLoggingDisabled(Boolean loggingDisabled) {
+        this.loggingDisabled = loggingDisabled;
+    }
+
+    public Boolean getContextHeadersDisabled() {
+        return contextHeadersDisabled;
+    }
+
+    public void setContextHeadersDisabled(Boolean contextHeadersDisabled) {
+        this.contextHeadersDisabled = contextHeadersDisabled;
+    }
 
     public Duration getConnectTimeout() {
         return connectTimeout;

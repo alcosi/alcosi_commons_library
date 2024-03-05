@@ -33,11 +33,31 @@ import java.time.Duration;
 @ConfigurationProperties("common-lib.rest-template")
 public class RestTemplateProperties {
     private Boolean disabled = false;
+    private Boolean loggingDisabled = false;
+    private Boolean contextHeadersDisabled = false;
+
+
     private Integer maxLogBodySize = 10000;
     private String loggingLevel ="INFO";
 
     private Duration connectionTimeout =Duration.ofSeconds(6);
     private Duration readTimeout =Duration.ofSeconds(60);
+
+    public Boolean getLoggingDisabled() {
+        return loggingDisabled;
+    }
+
+    public void setLoggingDisabled(Boolean loggingDisabled) {
+        this.loggingDisabled = loggingDisabled;
+    }
+
+    public Boolean getContextHeadersDisabled() {
+        return contextHeadersDisabled;
+    }
+
+    public void setContextHeadersDisabled(Boolean contextHeadersDisabled) {
+        this.contextHeadersDisabled = contextHeadersDisabled;
+    }
 
     public Duration getConnectionTimeout() {
         return connectionTimeout;

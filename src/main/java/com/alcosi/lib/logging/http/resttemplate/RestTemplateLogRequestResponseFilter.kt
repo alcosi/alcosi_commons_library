@@ -27,6 +27,7 @@
 package com.alcosi.lib.logging.http.resttemplate
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
+import org.springframework.core.Ordered
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
@@ -38,12 +39,12 @@ import java.util.function.Consumer
 import java.util.logging.Level
 import java.util.logging.Logger
 
-open class LogRequestResponseFilter(
+open class RestTemplateLogRequestResponseFilter(
     val maxBodySize: Int,
     val loggingLevel: Level,
     val headerHelper: HeaderHelper,
-) :
-    ClientHttpRequestInterceptor {
+    private val order: Int,
+) : ClientHttpRequestInterceptor, Ordered {
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
@@ -52,16 +53,9 @@ open class LogRequestResponseFilter(
         val time = System.currentTimeMillis()
         val id = headerHelper.getContextRqId()
         traceRequest(id, request, body)
-        addHeaders(request)
         val response: ClientHttpResponse = execution.execute(request, body)
         traceResponse(id, response, request, time)
         return response
-    }
-
-    protected open fun addHeaders(request: HttpRequest) {
-        headerHelper.createRequestHeadersMap().forEach {
-            request.headers[it.key] = it.value
-        }
     }
 
     protected open fun traceRequest(
@@ -158,5 +152,9 @@ open class LogRequestResponseFilter(
 
     companion object {
         val logger = Logger.getLogger(this.javaClass.name)
+    }
+
+    override fun getOrder(): Int {
+        return order
     }
 }

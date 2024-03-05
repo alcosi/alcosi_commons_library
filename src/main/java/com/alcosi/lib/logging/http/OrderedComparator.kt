@@ -24,41 +24,39 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.filters.servlet
+package com.alcosi.lib.logging.http
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.AutoConfiguration
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.context.annotation.Bean
-import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.core.Ordered
+import org.springframework.core.PriorityOrdered
 
-@AutoConfiguration
-@ConditionalOnClass(OncePerRequestFilter::class)
-@ConditionalOnProperty(
-    prefix = "common-lib.filter.all",
-    name = ["disabled"],
-    matchIfMissing = true,
-    havingValue = "false",
-)
-@EnableConfigurationProperties(EnvironmentProperties::class, ServletFilterProperties::class)
-class FilterConfig {
-    @Bean
-    @ConditionalOnMissingBean(ThreadContext::class)
-    fun getThreadContext(): ThreadContext {
-        return ThreadContext()
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(HeaderHelper::class)
-    fun getHeaderHelper(
-        @Value("\${spring.application.name}") serviceName: String,
-        @Value("\${spring.application.environment}") environmentName: String,
-        environment: EnvironmentProperties, // sometimes it's not working (values from properties file/env are not setted to EnvironmentProperties), no idea why
-        context: ThreadContext,
-    ): HeaderHelper {
-        return HeaderHelper(serviceName, environmentName, context)
+object OrderedComparator : Comparator<Any?> {
+    override fun compare(
+        a: Any?,
+        b: Any?,
+    ): Int {
+        if (a == null) {
+            return if (b == null) 0 else -1
+        }
+        if (b == null)
+            {
+                return 1
+            }
+        val priorityOrderedCompare =
+            when (a) {
+                is PriorityOrdered -> if (b is PriorityOrdered) a.order.compareTo(b.order) else 1
+                else -> if (b is PriorityOrdered) -1 else 0
+            }
+        if (priorityOrderedCompare != 0) {
+            return priorityOrderedCompare
+        }
+        val orderedCompare =
+            when (a) {
+                is Ordered -> if (b is Ordered) a.order.compareTo(b.order) else 1
+                else -> if (b is Ordered) -1 else 0
+            }
+        if (orderedCompare != 0) {
+            return orderedCompare
+        }
+        return a.javaClass.simpleName.compareTo(b.javaClass.simpleName)
     }
 }

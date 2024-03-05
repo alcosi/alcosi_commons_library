@@ -27,7 +27,7 @@
 package com.alcosi.lib.logging.http.resttemplate
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
-import com.alcosi.lib.filters.servlet.ThreadContext
+import com.alcosi.lib.logging.http.OrderedComparator
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
@@ -57,14 +57,23 @@ import java.util.logging.Level
 class RestTemplateConfig {
     @Bean
     @ConditionalOnClass(RestTemplate::class)
-    @ConditionalOnMissingBean(LogRequestResponseFilter::class)
-    @ConditionalOnBean(HeaderHelper::class, ThreadContext::class)
+    @ConditionalOnMissingBean(RestTemplateLogRequestResponseFilter::class)
+    @ConditionalOnBean(HeaderHelper::class)
+    @ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["logging-disabled"], matchIfMissing = true, havingValue = "false")
     fun getLogRequestResponseFilter(
         properties: RestTemplateProperties,
         headerHelper: HeaderHelper,
-        threadContext: ThreadContext,
-    ): LogRequestResponseFilter {
-        return LogRequestResponseFilter(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper)
+    ): RestTemplateLogRequestResponseFilter {
+        return RestTemplateLogRequestResponseFilter(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper, 1)
+    }
+
+    @Bean
+    @ConditionalOnClass(RestTemplate::class)
+    @ConditionalOnMissingBean(RestTemplateContextHeadersFilter::class)
+    @ConditionalOnBean(HeaderHelper::class)
+    @ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["context-headers-disabled"], matchIfMissing = true, havingValue = "false")
+    fun getRestTemplateContextFilter(headerHelper: HeaderHelper): RestTemplateContextHeadersFilter {
+        return RestTemplateContextHeadersFilter(headerHelper, 0)
     }
 
     @Bean("clientHttpRequestFactory")
@@ -87,7 +96,8 @@ class RestTemplateConfig {
         configurer: ObjectProvider<RestTemplateBuilderConfigurer>,
     ): RestTemplateBuilder {
         val builder = RestTemplateBuilder().requestFactory { -> factory }
-        val filtersList = filters.toList()
+        val filtersList =
+            filters.toList().sortedWith(OrderedComparator)
         builder.interceptors(filtersList)
         configurer.stream().forEach { it.configure(builder) }
         return builder

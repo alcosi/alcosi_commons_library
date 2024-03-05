@@ -30,33 +30,25 @@ import com.alcosi.lib.filters.servlet.HeaderHelper
 import okhttp3.*
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
+import org.springframework.core.Ordered
 import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
-open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, val headerHelper: HeaderHelper) : Interceptor {
+open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, val headerHelper: HeaderHelper, private val order: Int) : Interceptor, Ordered {
     val logger = Logger.getLogger(this.javaClass.name)
 
     override fun intercept(chain: Interceptor.Chain): Response {
         return try {
             val t1 = System.currentTimeMillis()
             val rqId = getIdString()
-            val httpRequest = addRequestHeaders(chain)
+            val httpRequest = chain.request()
             logRq(rqId, httpRequest)
             logRs(rqId, chain.proceed(httpRequest), httpRequest, t1)
         } catch (e: Exception) {
             logger.log(Level.SEVERE, "interceptor error ", e)
             throw e
         }
-    }
-
-    private fun addRequestHeaders(chain: Interceptor.Chain): Request {
-        val httpRequestBuilder = chain.request().newBuilder()
-        headerHelper.createRequestHeadersMap().forEach {
-            httpRequestBuilder.addHeader(it.key, it.value)
-        }
-        val httpRequest = httpRequestBuilder.build()
-        return httpRequest
     }
 
     protected open fun logRs(
@@ -154,5 +146,9 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
             val leftPad = integer.toString().padStart(7, '0')
             return leftPad.substring(0, 4) + '-' + leftPad.substring(5)
         }
+    }
+
+    override fun getOrder(): Int {
+        return order
     }
 }

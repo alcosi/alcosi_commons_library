@@ -68,6 +68,7 @@ class CryptoNodesConfig {
                 cryptoNodeProperties.nodesLoggingMaxBody,
                 Level.parse(cryptoNodeProperties.nodesLoggingLevel),
                 headerHelper,
+                0,
             ),
             cryptoNodeProperties.nodesTimeout,
         )

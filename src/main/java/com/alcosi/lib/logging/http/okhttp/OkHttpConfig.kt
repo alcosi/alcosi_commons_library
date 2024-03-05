@@ -27,9 +27,12 @@
 package com.alcosi.lib.logging.http.okhttp
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.logging.http.OrderedComparator
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -45,11 +48,21 @@ import java.util.logging.Level
 class OkHttpConfig {
     @Bean
     @ConditionalOnMissingBean(OKLoggingInterceptor::class)
+    @ConditionalOnBean(HeaderHelper::class)
+    @ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["logging-disabled"], matchIfMissing = true, havingValue = "false")
     fun getOKLoggingInterceptor(
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
     ): OKLoggingInterceptor {
-        return OKLoggingInterceptor(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper)
+        return OKLoggingInterceptor(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper, 1)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(OKContextHeadersInterceptor::class)
+    @ConditionalOnBean(HeaderHelper::class)
+    @ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["context-headers-disabled"], matchIfMissing = true, havingValue = "false")
+    fun getOKContextInterceptor(headerHelper: HeaderHelper): OKContextHeadersInterceptor {
+        return OKContextHeadersInterceptor(headerHelper, 0)
     }
 
     @Bean("okHttpClient")
@@ -57,15 +70,12 @@ class OkHttpConfig {
     fun createOkHttpClient(
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
+        interceptors: ObjectProvider<Interceptor>,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
         configureTimeouts(
             builder,
-            OKLoggingInterceptor(
-                properties.maxLogBodySize,
-                Level.parse(properties.loggingLevel),
-                headerHelper,
-            ),
+            interceptors.toList().sortedWith(OrderedComparator),
             properties,
         )
         return builder.build()
@@ -73,12 +83,14 @@ class OkHttpConfig {
 
     protected fun configureTimeouts(
         builder: OkHttpClient.Builder,
-        interceptor: OKLoggingInterceptor,
+        interceptors: List<Interceptor>,
         properties: OkHttpLoggingProperties,
     ) {
         builder.connectTimeout(properties.connectTimeout)
         builder.readTimeout(properties.readTimeout)
         builder.writeTimeout(properties.writeTimeout)
-        builder.addInterceptor(interceptor)
+        interceptors.forEach { interceptor ->
+            builder.addInterceptor(interceptor)
+        }
     }
 }

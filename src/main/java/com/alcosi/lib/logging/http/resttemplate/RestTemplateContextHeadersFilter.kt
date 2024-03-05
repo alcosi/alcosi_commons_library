@@ -24,41 +24,37 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.alcosi.lib.filters.servlet
+package com.alcosi.lib.logging.http.resttemplate
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.AutoConfiguration
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.context.annotation.Bean
-import org.springframework.web.filter.OncePerRequestFilter
+import com.alcosi.lib.filters.servlet.HeaderHelper
+import org.springframework.core.Ordered
+import org.springframework.http.HttpRequest
+import org.springframework.http.client.ClientHttpRequestExecution
+import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.http.client.ClientHttpResponse
 
-@AutoConfiguration
-@ConditionalOnClass(OncePerRequestFilter::class)
-@ConditionalOnProperty(
-    prefix = "common-lib.filter.all",
-    name = ["disabled"],
-    matchIfMissing = true,
-    havingValue = "false",
-)
-@EnableConfigurationProperties(EnvironmentProperties::class, ServletFilterProperties::class)
-class FilterConfig {
-    @Bean
-    @ConditionalOnMissingBean(ThreadContext::class)
-    fun getThreadContext(): ThreadContext {
-        return ThreadContext()
+open class RestTemplateContextHeadersFilter(
+    val headerHelper: HeaderHelper,
+    private val order: Int = 0,
+) :
+    ClientHttpRequestInterceptor, Ordered {
+    override fun intercept(
+        request: HttpRequest,
+        body: ByteArray,
+        execution: ClientHttpRequestExecution,
+    ): ClientHttpResponse {
+        return execution.execute(addHeaders(request), body)
     }
 
-    @Bean
-    @ConditionalOnMissingBean(HeaderHelper::class)
-    fun getHeaderHelper(
-        @Value("\${spring.application.name}") serviceName: String,
-        @Value("\${spring.application.environment}") environmentName: String,
-        environment: EnvironmentProperties, // sometimes it's not working (values from properties file/env are not setted to EnvironmentProperties), no idea why
-        context: ThreadContext,
-    ): HeaderHelper {
-        return HeaderHelper(serviceName, environmentName, context)
+    protected open fun addHeaders(request: HttpRequest): HttpRequest {
+        headerHelper.createRequestHeadersMap()
+            .forEach {
+                request.headers[it.key] = it.value
+            }
+        return request
+    }
+
+    override fun getOrder(): Int {
+        return order
     }
 }
