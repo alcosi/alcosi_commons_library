@@ -29,7 +29,6 @@ package com.alcosi.lib.filters.servlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("spring.application")
-
 public class EnvironmentProperties {
     private String name="dev";
     private String environment="dev";
