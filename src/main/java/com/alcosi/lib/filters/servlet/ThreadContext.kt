@@ -38,7 +38,7 @@ open class ThreadContext {
         return getAll().contains(name)
     }
 
-    open fun setAuthPrincipal(value: PrincipalDetails) {
+    open fun setAuthPrincipal(value: PrincipalDetails?) {
         getAll()[AUTH_PRINCIPAL] = value
     }
 

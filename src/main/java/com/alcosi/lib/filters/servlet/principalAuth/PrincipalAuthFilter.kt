@@ -45,8 +45,8 @@ open class PrincipalAuthFilter(
         try {
             try {
                 val principal = getPrincipal(request)
-                principal?.let { threadContext.setAuthPrincipal(it) }
-                principal?.let { request.setAttribute(ThreadContext.AUTH_PRINCIPAL, it) }
+                threadContext.setAuthPrincipal(principal)
+                request.setAttribute(ThreadContext.AUTH_PRINCIPAL, principal)
                 val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)?.let { sensitiveComponent.deserialize(it)?.toString(Charset.defaultCharset()) }
                 originalToken?.let { request.setAttribute(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
                 originalToken?.let { threadContext.set(REQUEST_ORIGINAL_AUTHORISATION_TOKEN, it) }
