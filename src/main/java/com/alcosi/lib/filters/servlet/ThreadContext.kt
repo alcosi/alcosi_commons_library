@@ -21,9 +21,10 @@ import com.alcosi.lib.executors.PresetInheritableThreadLocal
 import com.alcosi.lib.security.PrincipalDetails
 import org.apache.commons.lang3.StringUtils
 import java.util.*
+import java.util.function.Supplier
 
 open class ThreadContext {
-    protected val local: InheritableThreadLocal<MutableMap<String, Any?>> = PresetInheritableThreadLocal(mutableMapOf())
+    protected val local: InheritableThreadLocal<MutableMap<String, Any?>> = PresetInheritableThreadLocal(Supplier { mutableMapOf() })
 
     open fun getAll(): MutableMap<String, Any?> {
         return local.get()
@@ -65,7 +66,7 @@ open class ThreadContext {
     }
 
     open fun clear() {
-        local.set(mutableMapOf())
+        local.remove()
     }
 
     companion object {

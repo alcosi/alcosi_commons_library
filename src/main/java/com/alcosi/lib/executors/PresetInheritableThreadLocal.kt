@@ -17,8 +17,17 @@
 
 package com.alcosi.lib.executors
 
-class PresetInheritableThreadLocal<T>(protected val initialVal: T) : InheritableThreadLocal<T>() {
+import java.util.function.Supplier
+
+class PresetInheritableThreadLocal<T>(protected val initialValSupplier: Supplier<T>) : InheritableThreadLocal<T>() {
+    constructor(initialVal: T) : this(Supplier { initialVal })
+
     override fun initialValue(): T {
-        return initialVal
+        return initialValSupplier.get()
+    }
+
+    override fun remove() {
+        super.remove()
+        set(initialValue())
     }
 }
