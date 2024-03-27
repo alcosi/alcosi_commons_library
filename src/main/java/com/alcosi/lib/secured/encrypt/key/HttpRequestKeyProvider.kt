@@ -18,6 +18,7 @@
 package com.alcosi.lib.secured.encrypt.key
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.logging.annotations.LogTime
 import com.alcosi.lib.secured.encrypt.SensitiveComponent
 import org.springframework.http.HttpMethod
 import org.springframework.http.RequestEntity
@@ -32,6 +33,7 @@ open class HttpRequestKeyProvider(
 ) : KeyProvider {
     protected val restTemplate = RestTemplate()
 
+    @LogTime(level = "FINEST")
     override fun key(mode: KeyProvider.MODE): ByteArray {
         val headers = headerHelper.createRequestHeaders()
         headers[HeaderHelper.KEY_PROVIDER_AUTH_HEADER] = accessKey
