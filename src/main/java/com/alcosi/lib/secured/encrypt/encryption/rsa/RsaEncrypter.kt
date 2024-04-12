@@ -18,12 +18,14 @@
 package com.alcosi.lib.secured.encrypt.encryption.rsa
 
 import com.alcosi.lib.secured.encrypt.encryption.Encrypter
+import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaDecrypter.Companion.executor
 import java.security.PublicKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
+import java.util.concurrent.Executors
 import javax.crypto.Cipher
 
-class RsaEncrypter : Encrypter {
+open class RsaEncrypter : Encrypter {
     override fun encrypt(
         data: ByteArray?,
         key: ByteArray,
@@ -52,12 +54,15 @@ class RsaEncrypter : Encrypter {
         return result
     }
 
-    protected fun encryptChunck(
+    protected open fun encryptChunck(
         pubKey: PublicKey,
         data: ByteArray,
     ): ByteArray {
         val cipher = Rsa.createCipher()
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
         return cipher.doFinal(data)
+    }
+    companion object {
+        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
     }
 }

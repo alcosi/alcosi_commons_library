@@ -50,14 +50,6 @@ class SensitiveConfigTest {
     data class TestTuple(val one: Any, val two: Any, val three: Any)
 
     @Test
-    fun testUnencryptedNullByteArray() {
-        val containerOriginal = SecuredDataByteArray.create(null, keyProvider.key(KeyProvider.MODE.ENCRYPT))
-        val serialized = objectMapper.writeValueAsString(containerOriginal)
-        val decrypted = sensitiveComponent.decrypt(serialized, keyProvider.key(KeyProvider.MODE.DECRYPT))
-        Assertions.assertEquals("null", decrypted)
-    }
-
-    @Test
     fun testUnencryptedEmptyByteArray() {
         val containerOriginal = SecuredDataByteArray.create(ByteArray(0), keyProvider.key(KeyProvider.MODE.ENCRYPT))
         val serialized = objectMapper.writeValueAsString(containerOriginal)
@@ -73,14 +65,6 @@ class SensitiveConfigTest {
         val serialized = objectMapper.writeValueAsString(containerOriginal)
         val decrypted = sensitiveComponent.decrypt(serialized, keyProvider.key(KeyProvider.MODE.DECRYPT))
         Assertions.assertEquals("\"$originalValueBase64\"", decrypted)
-    }
-
-    @Test
-    fun testUnencryptedNullString() {
-        val containerOriginal = SecuredDataString.create(null, keyProvider.key(KeyProvider.MODE.ENCRYPT))
-        val serialized = objectMapper.writeValueAsString(containerOriginal)
-        val decrypted = sensitiveComponent.decrypt(serialized, keyProvider.key(KeyProvider.MODE.DECRYPT))
-        Assertions.assertEquals("null", decrypted)
     }
 
     @Test

@@ -31,7 +31,7 @@ object Rsa {
         return Cipher.getInstance(TRANSFORMATION)
     }
 
-    init {
-        Security.addProvider(BouncyCastleProvider())
-    }
+//    init {
+//        Security.addProvider(BouncyCastleProvider())
+//    }
 }

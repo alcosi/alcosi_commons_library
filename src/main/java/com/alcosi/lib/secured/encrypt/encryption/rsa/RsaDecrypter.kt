@@ -20,9 +20,12 @@ package com.alcosi.lib.secured.encrypt.encryption.rsa
 import com.alcosi.lib.secured.encrypt.encryption.Decrypter
 import java.security.interfaces.RSAPrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 import javax.crypto.Cipher
 
 class RsaDecrypter : Decrypter {
+
     override fun decrypt(
         data: ByteArray?,
         key: ByteArray,
@@ -47,23 +50,29 @@ class RsaDecrypter : Decrypter {
         val lastChunkDecrypted = decryptChunk(privKey, data.copyOfRange(lastChunkStart, length))
         val lastChunkSize = lastChunkDecrypted.size
         val result = ByteArray((loops * chunkSizeEncrypt) + lastChunkSize)
-        for (i in 0..<loops) {
-            val startIndex = i * chunkSize
-            val endIndex = startIndex + chunkSize
-            val chunk = data.copyOfRange(startIndex, endIndex)
-            val decryptedChunk = decryptChunk(privKey, chunk)
-            decryptedChunk.copyInto(destination = result, destinationOffset = chunkSizeEncrypt * i)
-        }
         lastChunkDecrypted.copyInto(destination = result, destinationOffset = chunkSizeEncrypt * loops)
+        val results=(0 until loops).map {  i->
+            executor.submit{
+                val startIndex = i * chunkSize
+                val endIndex = startIndex + chunkSize
+                val chunk = data.copyOfRange(startIndex, endIndex)
+                val decryptedChunk = decryptChunk(privKey, chunk)
+                decryptedChunk.copyInto(destination = result, destinationOffset = chunkSizeEncrypt * i)
+            }
+        }
+        results.map { it.get() }
         return result
     }
 
-    private fun decryptChunk(
+    protected open fun decryptChunk(
         privKey: RSAPrivateKey,
         data: ByteArray,
     ): ByteArray {
         val cipher = Rsa.createCipher()
         cipher.init(Cipher.DECRYPT_MODE, privKey)
         return cipher.doFinal(data)
+    }
+    companion object {
+        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
     }
 }

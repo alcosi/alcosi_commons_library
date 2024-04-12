@@ -20,7 +20,7 @@ package com.alcosi.lib.secured.encrypt.encryption.aes
 import com.alcosi.lib.secured.encrypt.encryption.Decrypter
 import javax.crypto.Cipher
 
-class AesDecrypter : Decrypter {
+open class AesDecrypter : Decrypter {
     override fun decrypt(
         value: ByteArray?,
         key: ByteArray,
