@@ -62,7 +62,4 @@ open class RsaEncrypter : Encrypter {
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
         return cipher.doFinal(data)
     }
-    companion object {
-        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
-    }
 }

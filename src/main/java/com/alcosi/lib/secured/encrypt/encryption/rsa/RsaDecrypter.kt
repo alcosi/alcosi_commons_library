@@ -73,6 +73,7 @@ class RsaDecrypter : Decrypter {
         return cipher.doFinal(data)
     }
     companion object {
-        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
+        protected open val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+//        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
     }
 }

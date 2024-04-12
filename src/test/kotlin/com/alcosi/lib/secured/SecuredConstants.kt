@@ -37,7 +37,7 @@ object SecuredConstants {
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.     
-        """.trimIndent().repeat(1000)
+        """.trimIndent().repeat(10000)
 
     val SMALL_TEXT = "Hello, World!"
     val AES_TEST_KEY = "997e3cb05773cad20f3087c0360044602ef6164745e6fc245b1962db04cece67"
