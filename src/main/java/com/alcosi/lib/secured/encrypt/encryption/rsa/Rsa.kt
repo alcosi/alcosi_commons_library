@@ -17,21 +17,23 @@
 
 package com.alcosi.lib.secured.encrypt.encryption.rsa
 
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.KeyFactory
 import java.security.Security
 import javax.crypto.Cipher
 
 object Rsa {
+    init {
+        Security.addProvider(BouncyCastleProvider())
+    }
+
     val ALGORITHM = "RSA"
     val TRANSFORMATION = "RSA"
-    val keyFactory = KeyFactory.getInstance(ALGORITHM)
+    val keyFactory = KeyFactory.getInstance(ALGORITHM,)
+
 
     fun createCipher(): Cipher {
         return Cipher.getInstance(TRANSFORMATION)
     }
-
-//    init {
-//        Security.addProvider(BouncyCastleProvider())
-//    }
 }

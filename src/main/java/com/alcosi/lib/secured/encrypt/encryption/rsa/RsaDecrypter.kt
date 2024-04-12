@@ -20,7 +20,6 @@ package com.alcosi.lib.secured.encrypt.encryption.rsa
 import com.alcosi.lib.secured.encrypt.encryption.Decrypter
 import java.security.interfaces.RSAPrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import javax.crypto.Cipher
 
@@ -47,33 +46,40 @@ class RsaDecrypter : Decrypter {
             throw IllegalArgumentException("Length of encoded data is not correct for $bitLength key")
         }
         val lastChunkStart = loops * chunkSize
-        val lastChunkDecrypted = decryptChunk(privKey, data.copyOfRange(lastChunkStart, length))
+        val threadLocal= ThreadLocal.withInitial{createCipher(privKey)}
+        val lastChunkDecryptedFuture =executor.submit<ByteArray> { decryptChunk( data.copyOfRange(lastChunkStart, length),threadLocal)}
+        val lastChunkDecrypted=lastChunkDecryptedFuture.get()
         val lastChunkSize = lastChunkDecrypted.size
         val result = ByteArray((loops * chunkSizeEncrypt) + lastChunkSize)
-        lastChunkDecrypted.copyInto(destination = result, destinationOffset = chunkSizeEncrypt * loops)
-        val results=(0 until loops).map {  i->
-            executor.submit{
+        lastChunkDecrypted .copyInto(destination = result, destinationOffset = chunkSizeEncrypt * loops)
+        val results = (0 until loops).map { i ->
+            executor.submit {
                 val startIndex = i * chunkSize
                 val endIndex = startIndex + chunkSize
                 val chunk = data.copyOfRange(startIndex, endIndex)
-                val decryptedChunk = decryptChunk(privKey, chunk)
+                val decryptedChunk = decryptChunk( chunk,threadLocal)
                 decryptedChunk.copyInto(destination = result, destinationOffset = chunkSizeEncrypt * i)
             }
         }
+
         results.map { it.get() }
         return result
     }
 
     protected open fun decryptChunk(
-        privKey: RSAPrivateKey,
         data: ByteArray,
+        tl:ThreadLocal<Cipher>
     ): ByteArray {
+        return tl.get().doFinal(data)
+    }
+
+    protected open fun createCipher(privKey: RSAPrivateKey): Cipher {
         val cipher = Rsa.createCipher()
         cipher.init(Cipher.DECRYPT_MODE, privKey)
-        return cipher.doFinal(data)
+        return cipher
     }
+
     companion object {
         protected open val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
-//        protected open val executor = Executors.newVirtualThreadPerTaskExecutor()
     }
 }

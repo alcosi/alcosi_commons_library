@@ -18,7 +18,6 @@
 package com.alcosi.lib.secured.encrypt.encryption.rsa
 
 import com.alcosi.lib.secured.encrypt.encryption.Encrypter
-import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaDecrypter.Companion.executor
 import java.security.PublicKey
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
@@ -44,22 +43,34 @@ open class RsaEncrypter : Encrypter {
         val length = data.size
         val loops = (length / chunkSizeEncrypt) + if (length % chunkSizeEncrypt > 0) 1 else 0
         val result = ByteArray(loops * chunkSize)
-        for (i in 0..<loops) {
-            val startIndex = i * chunkSizeEncrypt
-            val endIndex = minOf(startIndex + chunkSizeEncrypt, length)
-            val chunk = data.copyOfRange(startIndex, endIndex)
-            val encryptedChunk = encryptChunck(pubKey, chunk)
-            encryptedChunk.copyInto(destination = result, destinationOffset = chunkSize * i)
+        val threadLocal = ThreadLocal.withInitial { createCipher(pubKey) }
+        val results = (0 until loops).map { i ->
+            executor.submit {
+                val startIndex = i * chunkSizeEncrypt
+                val endIndex = minOf(startIndex + chunkSizeEncrypt, length)
+                val chunk = data.copyOfRange(startIndex, endIndex)
+                val encryptedChunk = encryptChunck(chunk, threadLocal)
+                encryptedChunk.copyInto(destination = result, destinationOffset = chunkSize * i)
+            }
         }
+        results.map { it.get() }
         return result
     }
 
     protected open fun encryptChunck(
-        pubKey: PublicKey,
         data: ByteArray,
+        tl: ThreadLocal<Cipher>
     ): ByteArray {
+        return tl.get().doFinal(data)
+    }
+
+    protected open fun createCipher(pubKey: PublicKey): Cipher {
         val cipher = Rsa.createCipher()
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
-        return cipher.doFinal(data)
+        return cipher
+    }
+
+    companion object {
+        protected open val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     }
 }
