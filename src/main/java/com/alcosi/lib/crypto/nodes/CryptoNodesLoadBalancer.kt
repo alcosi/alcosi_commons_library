@@ -48,14 +48,14 @@ open class CryptoNodesLoadBalancer(
     )
 
     @LogTime
-    fun getActualUrl(
+    open fun getActualUrl(
         chainId: Int,
         timeout: Long = 0,
     ): Future<URL> {
         return executor.submit(Callable { internal(chainId, timeout) })
     }
 
-    private fun internal(
+    protected open fun internal(
         chainId: Int,
         timeout: Long = 0,
     ): URL {

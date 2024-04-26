@@ -20,7 +20,7 @@ package com.alcosi.lib.crypto.nodes
 import org.web3j.protocol.admin.Admin
 import java.util.*
 
-class CryptoNodesAdminServiceHolder(adminMap: Map<Int, Admin>?) {
+open class CryptoNodesAdminServiceHolder(adminMap: Map<Int, Admin>?) {
     val adminMap: Map<Int, Admin>
 
     init {
@@ -32,7 +32,7 @@ class CryptoNodesAdminServiceHolder(adminMap: Map<Int, Admin>?) {
         return adminMap[chainId]!!
     }
 
-    fun networks(): Set<Int> {
+    open fun networks(): Set<Int> {
         return adminMap.keys
     }
 }

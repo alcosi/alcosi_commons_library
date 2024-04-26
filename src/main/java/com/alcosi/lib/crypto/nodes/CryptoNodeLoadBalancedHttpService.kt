@@ -27,7 +27,7 @@ import org.web3j.protocol.http.HttpService
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-class CryptoNodeLoadBalancedHttpService(
+open class CryptoNodeLoadBalancedHttpService(
     val chainId: Int,
     val cryptoNodesLoadBalancer: CryptoNodesLoadBalancer,
     val okHttpClientRaw: OkHttpClient,
@@ -52,7 +52,7 @@ class CryptoNodeLoadBalancedHttpService(
         }
     }
 
-    private fun buildInputStream(responseBody: ResponseBody): InputStream {
+    protected open fun buildInputStream(responseBody: ResponseBody): InputStream {
         return ByteArrayInputStream(responseBody.bytes())
     }
 }

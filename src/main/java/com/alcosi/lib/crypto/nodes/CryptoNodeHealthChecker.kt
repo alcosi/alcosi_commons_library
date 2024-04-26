@@ -37,19 +37,19 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient) {
         }
     }
 
-    protected fun createBody(): RequestBody {
+    protected open fun createBody(): RequestBody {
         val currentBlockRequest =
             """{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":"ethBlockNumberPing${UUID.randomUUID()}"}"""
         return currentBlockRequest.toRequestBody("application/json".toMediaTypeOrNull())
     }
 
-    fun check(url: URL): HeathStatus {
+    open fun check(url: URL): HeathStatus {
         val time = System.currentTimeMillis()
         val status = checkStatus(url)
         return HeathStatus(status, System.currentTimeMillis() - time)
     }
 
-    protected fun checkStatus(url: URL): Boolean {
+    protected open fun checkStatus(url: URL): Boolean {
         try {
             val request =
                 Request.Builder().url(url)
