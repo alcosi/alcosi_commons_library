@@ -109,9 +109,15 @@ public class CryptoNodeProperties {
         private String nodesLoggingLevel = "FINEST";
         private Duration refreshTimeout = Duration.ofSeconds(10);
         private Duration checkDelay = Duration.ofSeconds(60);
-
+        private Duration firstDelay = Duration.ofSeconds(1);
         private Integer threads =20;
+        public Duration getFirstDelay() {
+            return firstDelay;
+        }
 
+        public void setFirstDelay(Duration firstDelay) {
+            this.firstDelay = firstDelay;
+        }
         public Duration getCheckDelay() {
             return checkDelay;
         }
