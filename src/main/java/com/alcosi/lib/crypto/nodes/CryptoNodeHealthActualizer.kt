@@ -61,7 +61,7 @@ open class CryptoNodeHealthActualizer(
     )
 
     protected open val scheduler =
-        object : SchedulerTimer(cryptoNodeProperties.health.checkDelay, "CheckNodes", loggingLevel,) {
+        object : SchedulerTimer(cryptoNodeProperties.health.checkDelay, "CheckNodes", loggingLevel,cryptoNodeProperties.health.firstDelay) {
             override fun startBatch() {
                 val list =
                     serviceListRaw
