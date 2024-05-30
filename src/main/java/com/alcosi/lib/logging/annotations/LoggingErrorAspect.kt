@@ -17,6 +17,8 @@
 
 package com.alcosi.lib.logging.annotations
 
+import com.alcosi.lib.logging.JavaLoggingLevel
+import com.alcosi.lib.logging.LoggerClassesCache
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
@@ -25,17 +27,33 @@ import org.aspectj.lang.reflect.MethodSignature
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * LoggingErrorAspect class is an aspect that handles logging of errors.
+ *
+ */
 @Aspect
 open class LoggingErrorAspect {
-    protected open var loggerMap: MutableMap<Class<*>, Logger> = HashMap()
 
+    /**
+     * A pointcut method that matches execution of methods annotated
+     * with @LogError or within classes annotated with @LogError.
+     */
     @Pointcut("@annotation(com.alcosi.lib.logging.annotations.LogError)|| within(@com.alcosi.lib.logging.annotations.LogError *)")
-    fun callAt() {
+    open fun callAt() {
     }
 
+    /**
+     * Logs the execution time of a method and handles logging of any thrown
+     * exceptions.
+     *
+     * @param joinPoint The ProceedingJoinPoint representing the method being
+     *     executed.
+     * @return The result of the method execution.
+     * @throws Throwable if an exception is thrown by the method.
+     */
     @Around(value = "callAt()")
     @Throws(Throwable::class)
-    fun logMethodTime(joinPoint: ProceedingJoinPoint): Any? {
+    open fun logMethodTime(joinPoint: ProceedingJoinPoint): Any? {
         return try {
             joinPoint.proceed()
         } catch (t: Throwable) {
@@ -46,6 +64,13 @@ open class LoggingErrorAspect {
         }
     }
 
+    /**
+     * Retrieves the logging level for a given method and class.
+     *
+     * @param sign The MethodSignature representing the method.
+     * @param type The Class representing the class.
+     * @return The logging level for the error as a Level enum.
+     */
     open fun getLoggingLevel(
         sign: MethodSignature,
         type: Class<Any>,
@@ -53,23 +78,20 @@ open class LoggingErrorAspect {
         val methodLevel = sign.method.getDeclaredAnnotation(LogError::class.java)?.level
         val level =
             if (methodLevel == null) {
-                type.getDeclaredAnnotation(LogError::class.java)?.level ?: "INFO"
+                type.getDeclaredAnnotation(LogError::class.java)?.level ?: JavaLoggingLevel.INFO
             } else {
                 methodLevel
             }
-        return Level.parse(level)
+        return level.javaLevel
     }
 
-    @Synchronized
+    /**
+     * Retrieves or creates a logger for the specified join point target class.
+     *
+     * @param joinPoint The ProceedingJoinPoint representing the method call.
+     * @return The logger associated with the join point target class.
+     */
     protected open fun getLogger(joinPoint: ProceedingJoinPoint): Logger {
-        val clazz: Class<*> = joinPoint.target.javaClass
-        val logger = loggerMap[clazz]
-        return if (logger == null) {
-            val loggerVal = Logger.getLogger(clazz.name)
-            loggerMap[clazz] = loggerVal
-            loggerVal
-        } else {
-            logger
-        }
+       return LoggerClassesCache.INSTANCE.getLogger(joinPoint)
     }
 }

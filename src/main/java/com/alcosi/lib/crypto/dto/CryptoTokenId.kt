@@ -21,6 +21,12 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.BigInteger
 
+/**
+ * CryptoTokenId represents the ID of a crypto token. It contains the token ID and contract ID.
+ *
+ * @property tokenId The ID of the token.
+ * @property contractId The ID of the contract that the token belongs to.
+ */
 @JvmRecord
 data class CryptoTokenId(
     @JsonAlias("token_id") @JsonProperty("tokenId") val tokenId: BigInteger,

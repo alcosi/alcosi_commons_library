@@ -22,7 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("common-lib.filter.logging")
 public class LoggingFilterProperties {
     private Boolean disabled = false;
-    private Integer orderDelta = 1;
+    private Integer orderDelta = 2;
     private Integer maxBodySizeLog = 10000;
     private Integer maxBodySize = 10000;
 

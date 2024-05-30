@@ -22,7 +22,22 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class WaitingRejectedExecutor : RejectedExecutionHandler {
+/**
+ * This class represents a custom implementation of the [RejectedExecutionHandler] interface.
+ * When a task is rejected by a [ThreadPoolExecutor], this class will attempt to put the rejected task back into the executor's queue for later execution.
+ * If an error occurs while trying to put the task back into the queue, it will be logged at the [SEVERE] level using the provided logger.
+ *
+ * @property logger The logger instance used for logging any errors that occur during the execution of the rejected task.
+ */
+open class WaitingRejectedExecutor : RejectedExecutionHandler {
+    /**
+     * This method is called when a task is rejected by a [ThreadPoolExecutor].
+     * It attempts to put the rejected task back into the executor's queue for later execution.
+     * If an error occurs while trying to put the task back into the queue, it logs the error at the SEVERE level using the provided logger.
+     *
+     * @param r The rejected task that needs to be put back into the executor's queue.
+     * @param executor The [ThreadPoolExecutor] that rejected the task.
+     */
     override fun rejectedExecution(
         r: Runnable,
         executor: ThreadPoolExecutor,
@@ -34,6 +49,10 @@ class WaitingRejectedExecutor : RejectedExecutionHandler {
         }
     }
 
+    /**
+     * This class represents the companion object for the [WaitingRejectedExecutor] class.
+     * It provides a logger instance for logging any errors that occur during the execution of a rejected task.
+     */
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
     }

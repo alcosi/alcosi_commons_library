@@ -17,11 +17,19 @@
 
 package com.alcosi.lib.secured.encrypt.key
 
+/**
+ * Provides a key for encryption or decryption.
+ */
 interface KeyProvider {
     enum class MODE {
         ENCRYPT,
         DECRYPT,
     }
-
+    /**
+     * Generates a key for encryption or decryption.
+     *
+     * @param mode The mode in which the key will be used (ENCRYPT or DECRYPT).
+     * @return The generated key as a byte array.
+     */
     fun key(mode: MODE): ByteArray
 }

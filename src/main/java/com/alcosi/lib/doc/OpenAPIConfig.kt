@@ -31,6 +31,13 @@ import org.springframework.web.servlet.function.ServerResponse
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * Configuration class for OpenAPI.
+ *
+ * This class provides configuration for serving OpenAPI documentation files and handling requests for those files.
+ *
+ * The configuration can be customized using properties defined in OpenAPIProperties.
+ */
 @AutoConfiguration
 @ConditionalOnProperty(
     prefix = "common-lib.openapi",
@@ -40,15 +47,41 @@ import java.util.logging.Logger
 )
 @EnableConfigurationProperties(OpenAPIProperties::class)
 class OpenAPIConfig {
+    /**
+     * Regular expression pattern for validating allowed file names.
+     * The pattern allows file names consisting of alphanumeric characters, underscores, hyphens, and parentheses,
+     * followed by a dot and a file extension of 1-4 characters.
+     *
+     * Example usage:
+     * val fileName = "example_file.txt"
+     * val isFileNameValid = allowedFileRegex.matches(fileName)
+     */
     val allowedFileRegex: Regex = "^([a-zA-Z0-9_\\-()])+(\\.\\w{1,4})\$".toRegex()
+
+    /**
+     * Represents a logger instance for logging messages and exceptions.
+     */
     val logger = Logger.getLogger(this.javaClass.name)
 
+    /**
+     * Constructs an error response based on the given throwable.
+     *
+     * @param t The throwable.
+     * @return The constructed server response.
+     */
     @Bean
     @ConditionalOnMissingBean(OpenDocErrorConstructor::class)
     fun openApiErrorConstructor(): OpenDocErrorConstructor.Default {
         return OpenDocErrorConstructor.Default()
     }
 
+    /**
+     * Creates a RouterFunction for handling OpenAPI routes.
+     *
+     * @param openAPIProperties The OpenAPIProperties object containing configuration properties.
+     * @param errorConstructor The OpenDocErrorConstructor used for constructing error responses.
+     * @return The RouterFunction for handling OpenAPI routes.
+     */
     @Bean
     fun openAPIRoute(
         openAPIProperties: OpenAPIProperties,

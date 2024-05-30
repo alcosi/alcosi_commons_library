@@ -19,6 +19,9 @@ package com.alcosi.lib.secured.encrypt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Configuration properties for encryption-related settings.
+ */
 @ConfigurationProperties("common-lib.secured")
 public class EncryptionProperties {
     public String getPrivate() {
@@ -88,14 +91,53 @@ public class EncryptionProperties {
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
     }
-
+    /**
+     * The private key used for encryption.
+     */
     private  String privateKey;
+    /**
+     * Represents the public key used for encryption in the EncryptionProperties class.
+     */
     private  String publicKey;
+    /**
+     * The uniform resource identifier (URI) for accessing a resource.
+     */
     private String uri;
+    /**
+     * The accessKey variable represents the access key used for encryption-related settings.
+     * <p>
+     * It is a private variable of type String.
+     * <p>
+     * This variable is declared in the EncryptionProperties class, which is a configuration class
+     * for encryption-related settings. It is used to set and get the access key value.
+     * <p>
+     * The access key can be obtained and modified through the following methods:
+     * - setAccessKey(String accessKey): Sets the access key.
+     * - getAccessKey(): Returns the current access key.
+     * <p>
+     * String accessKey = properties.getAccessKey();
+     */
     private String accessKey;
+    /**
+     * The mode variable represents the encryption mode used in the application.
+     * It is an instance of the ENUM class MODE, which has two possible values: AES and RSA.
+     * The default value of mode is AES.
+     * <p>
+     * The mode is used in the EncryptionProperties class to determine the type of encryption to be used.
+     *
+     * @see EncryptionProperties
+     */
     private MODE mode = MODE.AES;
+    /**
+     * Determines if the encryption functionality is disabled.
+     * <p>
+     * By default, encryption is enabled (disabled = false).
+     *
+     */
     private Boolean disabled = false;
-
+    /**
+     *
+     */
     public  enum MODE {
         AES, RSA
     }

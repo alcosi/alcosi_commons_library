@@ -18,13 +18,34 @@
 package com.alcosi.lib.db
 
 import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.objectMapper.mapOne
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.jdbc.core.RowMapper
 import java.sql.ResultSet
 
-open class JsonRowMapper<T : Any>(protected val mappingHelper: MappingHelper, protected val type: TypeReference<T>) : RowMapper<T> {
-    constructor(mappingHelper: MappingHelper) : this(mappingHelper, object : TypeReference<T>() {})
+/**
+ * The `JsonRowMapper` class is responsible for mapping a JSON string retrieved from a database
+ * ResultSet to an instance of a specified class using a `MappingHelper` and an `ObjectMapper`.
+ *
+ * @param T The type of the object to be mapped.
+ * @param mappingHelper The `MappingHelper` used for mapping the JSON string to the object.
+ * @param type The `TypeReference` representing the type of the object.
+ */
+open class JsonRowMapper<T : Any>(protected val mappingHelper: ObjectMapper, protected val type: TypeReference<T>) : RowMapper<T> {
+    constructor(mappingHelper: ObjectMapper) : this(mappingHelper, object : TypeReference<T>() {})
+    @Deprecated("Use ObjectMapper constructors")
+    constructor(mappingHelper: MappingHelper) : this(mappingHelper.objectMapper, object : TypeReference<T>() {})
+    @Deprecated("Use ObjectMapper constructors")
+    constructor(mappingHelper: MappingHelper,type: TypeReference<T>) : this(mappingHelper.objectMapper, type)
 
+    /**
+     * Maps a single row from a ResultSet to a target object of type T.
+     *
+     * @param rs The ResultSet object that contains the data to be mapped.
+     * @param rowNum The current row number in the ResultSet.
+     * @return The mapped object of type T. Returns null if the ResultSet does not contain data or the mapped object cannot be created.
+     */
     override fun mapRow(
         rs: ResultSet,
         rowNum: Int,

@@ -26,9 +26,29 @@ import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * OKLoggingInterceptor is an open class that implements the Interceptor interface and Ordered interface.
+ * It intercepts the HTTP requests and logs the request and response information.
+ *
+ * @property maxBodySize The maximum size of the response body to log.
+ * @property loggingLevel The logging level for the interceptor.
+ * @property headerHelper An instance of the HeaderHelper class to handle headers.
+ * @property order The order of the interceptor in the chain.
+ */
 open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, val headerHelper: HeaderHelper, private val order: Int) : Interceptor, Ordered {
+    /**
+     * Variable to handle logging functionality.
+     * Uses the java.util.logging.Logger class to log messages.
+     */
     val logger = Logger.getLogger(this.javaClass.name)
 
+    /**
+     * Intercepts the request and logs the request and response.
+     *
+     * @param chain the interceptor chain
+     * @return the intercepted response
+     * @throws Exception if an error occurs while intercepting the request
+     */
     override fun intercept(chain: Interceptor.Chain): Response {
         return try {
             val t1 = System.currentTimeMillis()
@@ -42,6 +62,15 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         }
     }
 
+    /**
+     * Logs the response of a network request.
+     *
+     * @param rqId      The ID of the request.
+     * @param response  The response obtained from the network request.
+     * @param request   The original request made.
+     * @param time      The time taken for the network request.
+     * @return          The modified response with log information.
+     */
     protected open fun logRs(
         rqId: String,
         response: Response,
@@ -51,7 +80,6 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         if (loggingLevel == Level.OFF) {
             return response
         }
-        val t2 = System.currentTimeMillis()
         val contentType = response.body?.contentType()
         val contentLength = response.body?.contentLength() ?: 0
         val content = if (contentLength > maxBodySize) "<TOO BIG $contentLength bytes>" else response.body?.string()
@@ -61,6 +89,16 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         return response.newBuilder().body(wrappedBody).build()
     }
 
+    /**
+     * Constructs the response body for logging.
+     *
+     * @param rqId      The ID of the request.
+     * @param response  The response obtained from the network request.
+     * @param request   The original request made.
+     * @param time      The time taken for the network request.
+     * @param content   The content of the response body.
+     * @return          The constructed response body string.
+     */
     protected open fun constructRsBody(
         rqId: String,
         response: Response,
@@ -82,6 +120,11 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         return logBody
     }
 
+    /**
+     * Converts the given Headers object into a formatted string containing all headers.
+     *
+     * @param headers The Headers object to convert.
+     */
     protected open fun getHeaders(headers: Headers) =
         (
             headers.toMultimap().map {
@@ -91,6 +134,12 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
             }.joinToString(";")
         )
 
+    /**
+     * Logs the request details.
+     *
+     * @param rqId The ID of the request.
+     * @param request The Request object containing the request details.
+     */
     protected open fun logRq(
         rqId: String,
         request: Request,
@@ -98,7 +147,6 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         if (loggingLevel == Level.OFF) {
             return
         }
-        val sb = StringBuilder()
         val requestBuffer = Buffer()
 
         val contentLength = request.body?.contentLength() ?: 0L
@@ -111,6 +159,14 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         logger.log(loggingLevel, logString)
     }
 
+    /**
+     * Constructs the request body for logging.
+     *
+     * @param rqId      The ID of the request.
+     * @param request   The request object containing the request details.
+     * @param body      The body of the request.
+     * @return          The constructed request body string.
+     */
     protected open fun constructRqBody(
         rqId: String,
         request: Request,
@@ -130,8 +186,16 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
     }
 
     companion object {
+        /**
+         * Random number generator.
+         */
         private val RANDOM = Random()
 
+        /**
+         * Generates a unique ID string.
+         *
+         * @return The generated ID string.
+         */
         protected fun getIdString(): String {
             val integer = RANDOM.nextInt(10000000)
             val leftPad = integer.toString().padStart(7, '0')
@@ -139,6 +203,11 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
         }
     }
 
+    /**
+     * Returns the order value of this interceptor.
+     *
+     * @return The order value of this interceptor.
+     */
     override fun getOrder(): Int {
         return order
     }

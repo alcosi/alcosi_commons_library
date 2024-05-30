@@ -19,9 +19,19 @@ package com.alcosi.lib.filters.servlet.principalAuth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Configuration properties for PrincipalAuthFilter.
+ */
 @ConfigurationProperties("common-lib.filter.principal-auth")
 public class PrincipalAuthFilterProperties {
+    /**
+     * The `disabled` variable is a private Boolean variable that represents the current state of the disabled*/
     private Boolean disabled = false;
+    /**
+     * The orderDelta variable is a private Integer variable that represents the order delta value for PrincipalAuthFilter.
+     * It is used to specify the difference in order between PrincipalAuthFilter and other filters.
+     * The default value is 0.
+     */
     private Integer orderDelta = 0;
 
     public Boolean getDisabled() {

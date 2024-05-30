@@ -21,7 +21,7 @@ import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
-import com.alcosi.lib.objectMapper.MappingHelper
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -33,6 +33,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 
+/**
+ * The ContextFilterConfig class is responsible for configuring and creating a FilterRegistrationBean for the ContextFilter.
+ * It is annotated with @AutoConfigureAfter, @ConditionalOnBean, @ConditionalOnProperty, @ConditionalOnClass, @EnableConfigurationProperties, ensuring that it is automatically configured
+ *  and created when the required conditions are met.
+ */
 @AutoConfigureAfter(FilterConfig::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
@@ -44,6 +49,16 @@ import org.springframework.context.annotation.Bean
 @ConditionalOnClass(ServletWebServerFactory::class)
 @EnableConfigurationProperties(ContextFilterProperties::class)
 open class ContextFilterConfig {
+    /**
+     * Creates and configures a FilterRegistrationBean for the ContextFilter.
+     *
+     * @param properties The configuration properties for the ContextFilter.
+     * @param servletFilterProperties The configuration properties for the ServletFilter.
+     * @param threadContext The ThreadContext object used to store and retrieve thread-local data.
+     * @param mappingHelper The ObjectMapper object used to map JSON values to Java objects.
+     * @param headerHelper The HeaderHelper object used to handle headers.
+     * @return A FilterRegistrationBean for the ContextFilter.
+     */
     @Bean(name = ["contextFilterBean"], value = ["contextFilterBean"])
     @ConditionalOnMissingFilterBean(ContextFilter::class)
     @ConditionalOnMissingBean(ContextFilter::class)
@@ -51,7 +66,7 @@ open class ContextFilterConfig {
         properties: ContextFilterProperties,
         servletFilterProperties: ServletFilterProperties,
         threadContext: ThreadContext,
-        mappingHelper: MappingHelper,
+        mappingHelper: ObjectMapper,
         headerHelper: HeaderHelper,
     ): FilterRegistrationBean<ContextFilter> {
         val registrationBean = FilterRegistrationBean<ContextFilter>()

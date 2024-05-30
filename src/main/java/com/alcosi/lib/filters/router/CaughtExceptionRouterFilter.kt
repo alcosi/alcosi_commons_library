@@ -27,7 +27,22 @@ import org.springframework.web.servlet.function.ServerResponse
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * The `CaughtExceptionRouterFilter` class is an implementation of the `RouterFilter` interface.
+ * It is responsible for handling caught exceptions during the routing process.
+ *
+ * @param messageConversionErrorCode The error code to be used for HTTP message conversion exceptions.
+ * @param unknownErrorCode The error code to be used for unknown exceptions.
+ */
 open class CaughtExceptionRouterFilter(val messageConversionErrorCode: Int, val unknownErrorCode: Int) : RouterFilter {
+    /**
+     * This method is an implementation of the `RouterFilter` interface.
+     * It handles the filtering of requests in a server.
+     *
+     * @param request The current server request.
+     * @param next The next handler function to be executed.
+     * @return The server response after executing the next handler function.
+     */
     override fun filter(
         request: ServerRequest,
         next: HandlerFunction<ServerResponse>,
@@ -40,6 +55,12 @@ open class CaughtExceptionRouterFilter(val messageConversionErrorCode: Int, val 
         }
     }
 
+    /**
+     * Converts a throwable to a server response containing an API error.
+     *
+     * @param t The throwable to convert.
+     * @return The server response containing the API error.
+     */
     protected open fun toServerResponse(t: Throwable): ServerResponse {
         val apiError =
             when (t) {
@@ -51,6 +72,10 @@ open class CaughtExceptionRouterFilter(val messageConversionErrorCode: Int, val 
         return ServerResponse.status(apiError.httpCode).body(apiError)
     }
 
+    /**
+     * The `Companion` class contains a single property `logger` that is an instance of `Logger` class.
+     * This property is used to log information, warnings, and errors.
+     */
     companion object {
         val logger = Logger.getLogger(this.javaClass.name)
     }

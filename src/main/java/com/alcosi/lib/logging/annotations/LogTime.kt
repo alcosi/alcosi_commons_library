@@ -17,6 +17,15 @@
 
 package com.alcosi.lib.logging.annotations
 
+import com.alcosi.lib.logging.JavaLoggingLevel
+
+/**
+ * Annotation used to mark methods or classes for logging execution time.
+ *
+ * @property level The logging level for the annotated method or class.
+ *     Defaults to "INFO". The levels in descending order are: SEVERE
+ *     (highest value) WARNING INFO CONFIG FINE FINER FINEST (lowest value)
+ */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.FUNCTION,
@@ -25,4 +34,4 @@ package com.alcosi.lib.logging.annotations
     AnnotationTarget.ANNOTATION_CLASS,
     AnnotationTarget.CLASS,
 )
-annotation class LogTime(val level: String = "INFO")
+annotation class LogTime(val level: JavaLoggingLevel = JavaLoggingLevel.INFO)

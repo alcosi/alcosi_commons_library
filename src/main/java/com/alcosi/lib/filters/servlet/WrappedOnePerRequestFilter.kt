@@ -24,7 +24,19 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingResponseWrapper
 
+/**
+ * This abstract class represents a filter that ensures that only one instance of the filter is executed per request.
+ * It extends the OncePerRequestFilter class.
+ * The filter processes the HttpServletRequest and HttpServletResponse with the help of two abstract methods:
+ *     - doFilterWrapped: This method*/
 abstract class WrappedOnePerRequestFilter(val maxBodySize: Int) : OncePerRequestFilter() {
+    /**
+     * Apply the filter to the incoming HTTP request and response.
+     *
+     * @param request The incoming HTTP request.
+     * @param response The HTTP response.
+     * @param filterChain The filter chain to continue processing the request.
+     */
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -32,22 +44,38 @@ abstract class WrappedOnePerRequestFilter(val maxBodySize: Int) : OncePerRequest
     ) {
         doFilterWrapped(wrapRequest(request), wrapResponse(response), filterChain)
     }
-
+    /**
+     * Performs the actual filtering of the request and response.
+     *
+     * @param request The wrapped version of the HttpServletRequest.
+     * @param response The wrapped version of the HttpServletResponse.
+     * @param filterChain The FilterChain object that manages the filter chain.
+     */
     protected abstract fun doFilterWrapped(
         request: CachingRequestWrapper,
         response: ContentCachingResponseWrapper,
         filterChain: FilterChain,
     )
-
-    private fun wrapRequest(request: HttpServletRequest): CachingRequestWrapper {
+    /**
+     * Wraps the given HttpServletRequest object with a CachingRequestWrapper.
+     *
+     * @param request the HttpServletRequest object to be wrapped
+     * @return a CachingRequestWrapper that wraps the given HttpServletRequest object
+     */
+    protected open fun wrapRequest(request: HttpServletRequest): CachingRequestWrapper {
         return if (request is CachingRequestWrapper) {
             request
         } else {
             CachingRequestWrapper(maxBodySize, request)
         }
     }
-
-    private fun wrapResponse(response: HttpServletResponse): ContentCachingResponseWrapper {
+    /**
+     * Wraps the given HttpServletResponse with a ContentCachingResponseWrapper.
+     *
+     * @param response The HttpServletResponse to be wrapped.
+     * @return The ContentCachingResponseWrapper that wraps the given response.
+     */
+    protected open fun wrapResponse(response: HttpServletResponse): ContentCachingResponseWrapper {
         return if (response is ContentCachingResponseWrapper) {
             response
         } else {

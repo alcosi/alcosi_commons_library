@@ -30,12 +30,28 @@ import java.util.function.Consumer
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * A filter class for logging the request and response of a RestTemplate.
+ *
+ * @param maxBodySize The maximum size of the request/response body to log.
+ * @param loggingLevel The logging level for the filter.
+ * @param headerHelper The header helper class for creating request headers.
+ * @param order The order of the filter in the filter chain.
+ */
 open class RestTemplateLogRequestResponseFilter(
     val maxBodySize: Int,
     val loggingLevel: Level,
     val headerHelper: HeaderHelper,
     private val order: Int,
 ) : ClientHttpRequestInterceptor, Ordered {
+    /**
+     * Intercepts the client HTTP request and response.
+     *
+     * @param request The HTTP request to be intercepted.
+     * @param body The body of the HTTP request.
+     * @param execution The execution object that allows executing the intercepted request.
+     * @return The client HTTP response.
+     */
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
@@ -49,6 +65,17 @@ open class RestTemplateLogRequestResponseFilter(
         return response
     }
 
+    /**
+     * Traces the request with the given [id], [request], and [body].
+     * If the logging level is [Level.OFF], the method returns without performing any logging.
+     * The [body] is converted to a string representation, either as the original string if its size is within the maximum allowed size,
+     * or as a truncated string if its size exceeds the maximum allowed size.
+     * The resulting log body is constructed using the [constructRqBody] method, and logged using the [logger] with the specified [loggingLevel].
+     *
+     * @param id The identifier of the request.
+     * @param request The HTTP request object.
+     * @param body The request body as a byte array.
+     */
     protected open fun traceRequest(
         id: String,
         request: HttpRequest,
@@ -71,6 +98,10 @@ open class RestTemplateLogRequestResponseFilter(
         logger.log(loggingLevel, logBody)
     }
 
+    /**
+     * Constructs the request body for logging purposes.
+     *
+     * @param id The unique identifier for*/
     protected open fun constructRqBody(
         id: String,
         request: HttpRequest,
@@ -89,6 +120,10 @@ open class RestTemplateLogRequestResponseFilter(
         return logBody
     }
 
+    /**
+     * Traces the response received from the client.
+     *
+     * @*/
     protected open fun traceResponse(
         id: String,
         response: ClientHttpResponse,
@@ -110,6 +145,10 @@ open class RestTemplateLogRequestResponseFilter(
         logger.log(loggingLevel, logBody)
     }
 
+    /**
+     * Constructs a response body string for logging purposes.
+     *
+     * @param id the*/
     protected open fun constructRsBody(
         id: String,
         response: ClientHttpResponse,
@@ -131,6 +170,12 @@ open class RestTemplateLogRequestResponseFilter(
         return logBody
     }
 
+    /**
+     * Convert the given HttpHeaders object to a String representation of headers.
+     *
+     * @param headers The HttpHeaders object to convert.
+     * @return A semicolon-separated string representing the headers in the format "key1:value1;key2:value2;...".
+     */
     protected open fun headersToString(headers: HttpHeaders): String {
         val list: MutableList<String> = LinkedList<String>()
         headers.forEach { key: String, value: List<String> ->
@@ -145,6 +190,11 @@ open class RestTemplateLogRequestResponseFilter(
         val logger = Logger.getLogger(this.javaClass.name)
     }
 
+    /**
+     * Returns the order of the item.
+     *
+     * @return The order of the item as an integer value.
+     */
     override fun getOrder(): Int {
         return order
     }

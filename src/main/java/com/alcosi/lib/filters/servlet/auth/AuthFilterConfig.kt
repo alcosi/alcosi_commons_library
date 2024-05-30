@@ -32,6 +32,16 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 
+/**
+ * AuthFilterConfig is a configuration class responsible for registering and configuring the `AuthFilter` as a servlet filter.
+ * It is annotated with @AutoConfigureAfter(FilterConfig::class) to ensure that it is configured after the FilterConfig class.
+ * It is also annotated with @ConditionalOnBean(FilterConfig::class) which checks if the FilterConfig bean is present in the application context.
+ *
+ * The class is annotated with @ConditionalOnProperty to check if the property "common-lib.filter.auth.disabled" is set to false (default is true).
+ * If the property is true or not present, the configuration is not enabled.
+ *
+ * It is annotated with @EnableConfigurationProperties(AuthFilterProperties::class) to enable the configuration properties for the AuthFilter.
+ */
 @AutoConfigureAfter(FilterConfig::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
@@ -42,6 +52,15 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(AuthFilterProperties::class)
 open class AuthFilterConfig {
+    /**
+     * Registers and configures the `AuthFilter` as a servlet filter.
+     *
+     * @param properties The configuration properties for the `AuthFilter`.
+     * @param servletFilterProperties The configuration properties for the servlet filter.
+     * @param mapper The instance of the `ObjectMapper` used for serializing/deserializing JSON.
+     * @param headerHelper The instance of the `HeaderHelper` used for handling request headers.
+     * @return A `FilterRegistrationBean` object representing the registered `AuthFilter`.
+     */
     @Bean(name = ["authFilterBean"], value = ["authFilterBean"])
     @ConditionalOnClass(ServletWebServerFactory::class)
     @ConditionalOnMissingFilterBean(AuthFilter::class)

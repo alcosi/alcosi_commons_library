@@ -19,10 +19,26 @@ package com.alcosi.lib.filters.servlet.context;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * This class represents the configuration properties for the ContextFilter.
+ */
 @ConfigurationProperties("common-lib.filter.context")
 public class ContextFilterProperties {
+    /**
+     * Represents whether the functionality associated with the variable is disabled or not.
+     * By default, the functionality is enabled (value is false).
+     */
     private Boolean disabled = false;
-    private Integer orderDelta = 2;
+    /**
+     * Represents the difference in order for the ContextFilter.
+     * The order delta determines the relative order of the ContextFilter compared to other filters in the application.
+     * A lower value means the filter will be executed earlier, and a higher value means it will be executed later.
+     * The default value is 1.
+     */
+    private Integer orderDelta = 1;
+    /**
+     * The headers configuration for the context filter.
+     */
     private Headers headers = new Headers();
 
     public Headers getHeaders() {

@@ -26,6 +26,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.web.filter.OncePerRequestFilter
 
+/**
+ * The FilterConfig class is responsible for configuring and creating beans related to filters.
+ * It is annotated with @AutoConfiguration and @ConditionalOnClass, ensuring that it is automatically configured when
+ * the OncePerRequestFilter class is present in the classpath.
+ *
+ * The class is also annotated with @ConditionalOnProperty, which checks whether the property "common-lib.filter.all.disabled" is set to false (default is true
+ */
 @AutoConfiguration
 @ConditionalOnClass(OncePerRequestFilter::class)
 @ConditionalOnProperty(
@@ -36,12 +43,31 @@ import org.springframework.web.filter.OncePerRequestFilter
 )
 @EnableConfigurationProperties(EnvironmentProperties::class, ServletFilterProperties::class)
 class FilterConfig {
+    /**
+     * Retrieves the ThreadContext instance.
+     *
+     * This method is annotated with @Bean and @ConditionalOnMissingBean, ensuring that it is automatically
+     * configured when there is no other bean of type ThreadContext present in the application context.
+     *
+     * The method creates a new ThreadContext instance and returns it to the caller.
+     *
+     * @return The ThreadContext instance.
+     */
     @Bean
     @ConditionalOnMissingBean(ThreadContext::class)
     fun getThreadContext(): ThreadContext {
         return ThreadContext()
     }
 
+    /**
+     * Retrieves an instance of `HeaderHelper` with the given parameters.
+     *
+     * @param serviceName The name of the service.
+     * @param environmentName The environment of the service.
+     * @param environment The instance of `EnvironmentProperties`.
+     * @param context The instance of `ThreadContext`.
+     * @return The instance of `HeaderHelper`.
+     */
     @Bean
     @ConditionalOnMissingBean(HeaderHelper::class)
     fun getHeaderHelper(

@@ -24,10 +24,21 @@ import java.util.logging.Level.OFF
 import java.util.logging.Level.SEVERE
 import java.util.logging.Logger
 
-class LoggingResponseRowCallbackHandler(
+/**
+ * A callback handler that logs response rows from a ResultSet.
+ *
+ * @param maxBodySize The maximum size of the value to be logged.
+ * @param logLevel The logging level for the handler.
+ */
+open class LoggingResponseRowCallbackHandler(
     val maxBodySize: Int,
-    private val logLevel: Level?,
+    protected val logLevel: Level?,
 ) : RowCallbackHandler {
+    /**
+     * Processes a row from a ResultSet and logs the column values.
+     *
+     * @param rs The ResultSet containing the row to be processed.
+     */
     override fun processRow(rs: ResultSet) {
         if (logLevel == null || logLevel == OFF) {
             return
@@ -47,7 +58,14 @@ class LoggingResponseRowCallbackHandler(
         logger.log(logLevel, map)
     }
 
-    private fun serializeValue(
+    /**
+     * Serializes a value from a ResultSet.
+     *
+     * @param rs The ResultSet containing the value to be serialized.
+     * @param it The index of the column in the ResultSet.
+     * @return The serialized value as a String.
+     */
+    protected open fun serializeValue(
         rs: ResultSet,
         it: Int,
     ): String {
@@ -65,7 +83,18 @@ class LoggingResponseRowCallbackHandler(
         }
     }
 
+    /**
+     * The `Companion` class is a companion object that contains a logger.
+     * It serves as a utility for logging purposes.
+     *
+     * @property logger The logger instance used for logging.
+     */
     companion object {
+        /**
+         * Variable logger is an instance of the Logger class used for logging purposes.
+         *
+         * @see Logger
+         */
         val logger = Logger.getLogger(this::class.java.name)
     }
 }

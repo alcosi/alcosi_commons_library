@@ -19,13 +19,28 @@ package com.alcosi.lib.executors
 
 import java.util.function.Supplier
 
-class PresetInheritableThreadLocal<T>(protected val initialValSupplier: Supplier<T>) : InheritableThreadLocal<T>() {
+/**
+ * A class that extends the InheritableThreadLocal class to provide preset initial values for thread-local variables.
+ *
+ * @param[T] The type of the thread-local variable.
+ * @property[initialValSupplier] The supplier function that provides the initial value for the thread-local variable.
+ * @constructor Creates a PresetInheritableThreadLocal instance with the given initial value supplier.
+ */
+open class PresetInheritableThreadLocal<T>(protected val initialValSupplier: Supplier<T>) : InheritableThreadLocal<T>() {
     constructor(initialVal: T) : this(Supplier { initialVal })
 
+    /**
+     * Returns the initial value for the InheritableThreadLocal variable.
+     *
+     * @return the initial value for the InheritableThreadLocal variable.
+     */
     override fun initialValue(): T {
         return initialValSupplier.get()
     }
 
+    /**
+     * Removes the current value of the InheritableThreadLocal variable and sets it to the initial value.
+     */
     override fun remove() {
         super.remove()
         set(initialValue())

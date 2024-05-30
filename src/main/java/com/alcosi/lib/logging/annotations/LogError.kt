@@ -17,6 +17,27 @@
 
 package com.alcosi.lib.logging.annotations
 
+import com.alcosi.lib.logging.JavaLoggingLevel
+
+/**
+ * Annotation to mark a method or class for logging errors.
+ *
+ * @property level The logging level for the error. Defaults to "INFO".
+ *
+ * Usage example:
+ *
+ * ```
+ * @LogError(level = "ERROR")
+ * fun handleError() {
+ * The levels in descending order are:
+ * SEVERE (highest value)
+ * WARNING
+ * INFO
+ * CONFIG
+ * FINE
+ * FINER
+ * FINEST (lowest value)
+ *    */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(
     AnnotationTarget.FUNCTION,
@@ -25,4 +46,4 @@ package com.alcosi.lib.logging.annotations
     AnnotationTarget.ANNOTATION_CLASS,
     AnnotationTarget.CLASS,
 )
-annotation class LogError(val level: String = "INFO")
+annotation class LogError( val level: JavaLoggingLevel = JavaLoggingLevel.INFO)

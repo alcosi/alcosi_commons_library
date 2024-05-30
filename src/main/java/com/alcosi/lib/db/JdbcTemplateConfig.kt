@@ -29,11 +29,22 @@ import org.springframework.jdbc.core.simple.JdbcClient
 import java.util.logging.Level
 import javax.sql.DataSource
 
+/**
+ * Configures and creates beans related to the JdbcTemplate functionality.
+ *
+ * This class is conditionally enabled based on the presence of the JdbcTemplate class and the value of the "common-lib.jdbc-template.disabled" property. It is auto-configured and
+ *  enables the use of JdbcProperties and JdbcTemplateProperties for configuration.
+ */
 @ConditionalOnClass(JdbcTemplate::class)
 @ConditionalOnProperty(prefix = "common-lib.jdbc-template", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 @AutoConfiguration
 @EnableConfigurationProperties(JdbcProperties::class, JdbcTemplateProperties::class)
 class JdbcTemplateConfig {
+    /**
+     * Creates an instance of LoggingNamedParameterJdbcTemplate.
+     *
+     * @param jdbcTemplate The JdbcTemplate instance to be used.
+     * @param*/
     @Bean
     fun namedParameterJdbcTemplate(
         jdbcTemplate: JdbcTemplate,
@@ -42,24 +53,44 @@ class JdbcTemplateConfig {
         return LoggingNamedParameterJdbcTemplate(
             jdbcTemplateProperties.loggingMaxBodySize,
             jdbcTemplate,
-            Level.parse(jdbcTemplateProperties.loggingQueryLevel),
-            Level.parse(jdbcTemplateProperties.loggingParametersLevel),
+            jdbcTemplateProperties.loggingQueryLevel.javaLevel,
+            jdbcTemplateProperties.loggingParametersLevel.javaLevel,
         )
     }
 
+    /**
+     * Creates an instance of LoggingWarningRowCallbackHandler.
+     *
+     * @param jdbcTemplateProperties The JdbcTemplateProperties instance to retrieve the logging warning level.
+     * @return The LoggingWarningRowCallbackHandler instance.
+     */
     @Bean
     fun jdbcLoggingWarningCallBackHandler(jdbcTemplateProperties: JdbcTemplateProperties): LoggingWarningRowCallbackHandler {
-        return LoggingWarningRowCallbackHandler(Level.parse(jdbcTemplateProperties.loggingWarningLevel))
+        return LoggingWarningRowCallbackHandler(jdbcTemplateProperties.loggingWarningLevel.javaLevel)
     }
 
+    /**
+     * Creates an instance of [LoggingResponseRowCallbackHandler].
+     *
+     * @param jdbcTemplateProperties The [JdbcTemplateProperties] instance to retrieve the logging max body size and response level.
+     * @return The created [LoggingResponseRowCallbackHandler] instance.
+     */
     @Bean
     fun jdbcLoggingResponseCallBackHandler(jdbcTemplateProperties: JdbcTemplateProperties): LoggingResponseRowCallbackHandler {
         return LoggingResponseRowCallbackHandler(
             jdbcTemplateProperties.loggingMaxBodySize,
-            Level.parse(jdbcTemplateProperties.loggingResponseLevel),
+            jdbcTemplateProperties.loggingResponseLevel.javaLevel,
         )
     }
 
+    /**
+     * Creates an instance of JdbcTemplate.
+     *
+     * @param callbacks The list of RowCallbackHandlers to be applied to the ResultSet.
+     * @param dataSource The DataSource instance to be used.
+     * @param properties The JdbcProperties instance to retrieve the template configuration.
+     * @return The created JdbcTemplate instance.
+     */
     @Bean
     fun jdbcTemplate(
         callbacks: List<RowCallbackHandler>,
@@ -76,6 +107,12 @@ class JdbcTemplateConfig {
         return jdbcTemplate
     }
 
+    /**
+     * Creates an instance of JdbcClient.
+     *
+     * @param template The LoggingNamedParameterJdbcTemplate instance to be used.
+     * @return The created JdbcClient instance.
+     */
     @Bean
     @ConditionalOnClass(JdbcClient::class)
     fun JdbcClient(template: LoggingNamedParameterJdbcTemplate): JdbcClient {

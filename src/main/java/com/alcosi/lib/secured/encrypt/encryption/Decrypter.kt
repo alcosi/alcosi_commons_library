@@ -17,7 +17,17 @@
 
 package com.alcosi.lib.secured.encrypt.encryption
 
+/**
+ * This interface represents a decrypter that can be used to decrypt byte arrays.
+ */
 interface Decrypter {
+    /**
+     * Decrypts the provided value using the given key.
+     *
+     * @param value The encrypted data to be decrypted, represented as a ByteArray. Can be null.
+     * @param key The key used for decryption, represented as a ByteArray.
+     * @return The decrypted data as a ByteArray, or null if the provided value is null.
+     */
     fun decrypt(
         value: ByteArray?,
         key: ByteArray,

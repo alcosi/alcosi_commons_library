@@ -23,7 +23,16 @@ import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
 
+/**
+ * RabbitLoggingMessagePostProcessor is an interface that extends the MessagePostProcessor interface.
+ * It provides methods to perform logging-related post-processing on RabbitMQ messages.
+ */
 interface RabbitLoggingMessagePostProcessor : MessagePostProcessor {
+    /**
+     * Converts the message properties to a compact string representation.
+     *
+     * @return A string representation of the message properties in a compact format.
+     */
     fun MessageProperties.toCompactString(): String {
         val string =
             PROPERTIES_FIELDS
@@ -36,14 +45,37 @@ interface RabbitLoggingMessagePostProcessor : MessagePostProcessor {
     }
 
     companion object {
+        /**
+         * A private constant variable representing a random number generator.
+         * This variable is used to generate random numbers and random strings.
+         */
         private val RANDOM = Random()
 
+        /**
+         * Generates a unique identifier string.
+         *
+         * @return A string representing a unique identifier.
+         */
         fun getIdString(): String {
             val integer = RANDOM.nextInt(10000000)
             val leftPad = integer.toString().padStart(7, '0')
             return leftPad.substring(0, 4) + '-' + leftPad.substring(5)
         }
 
+        /**
+         * PROPERTIES_FIELDS is a constant variable of type List<Pair<String, Field?>>.
+         * It contains the list of properties defined in the MessageProperties class, excluding the "headers" property and properties starting with "target".
+         * Each element in the list is a Pair of the property name (String) and the corresponding Field object (Field?).
+         * The Field object represents the Java field corresponding to the property.
+         *
+         * Usage example:
+         * Inside the toCompactString() function of the RabbitLoggingMessagePostProcessor class, PROPERTIES_FIELDS is used to iterate over the properties and retrieve their values
+         *  from the MessageProperties object.
+         * The values are then concatenated into a compact string representation of the message properties.
+         *
+         * To access the properties and fields in PROPERTIES_FIELDS, you can iterate over the list like this:
+         * for ((name, field) in PROPERTIES_FIELDS) {
+         *    */
         val PROPERTIES_FIELDS =
             MessageProperties::class.declaredMemberProperties.asSequence()
                 .filter { it.name != "headers" }

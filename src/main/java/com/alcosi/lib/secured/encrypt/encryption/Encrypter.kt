@@ -17,7 +17,17 @@
 
 package com.alcosi.lib.secured.encrypt.encryption
 
+/**
+ * Interface representing an Encrypter.
+ */
 interface Encrypter {
+    /**
+     * Encrypts the provided value using the given key.
+     *
+     * @param value The data to be encrypted, represented as a ByteArray. Can be null.
+     * @param key The key used for encryption, represented as a ByteArray.
+     * @return The encrypted data as a ByteArray, or null if the provided value is null.
+     */
     fun encrypt(
         value: ByteArray?,
         key: ByteArray,

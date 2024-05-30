@@ -20,8 +20,8 @@ package com.alcosi.lib.filters.servlet.principalAuth
 import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
-import com.alcosi.lib.objectMapper.MappingHelper
 import com.alcosi.lib.secured.encrypt.SensitiveComponent
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -33,6 +33,17 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
 
+/**
+ * The PrincipalAuthFilterConfig class is responsible for configuring and creating a bean of type PrincipalAuthFilter.
+ * It is annotated with @AutoConfigureAfter and @ConditionalOnBean, ensuring that it is automatically configured after
+ * the FilterConfig class is present in the application context.
+ *
+ * The class is also annotated with @ConditionalOnProperty, which checks whether the property "common-lib.filter.principal-auth.disabled"
+ * is set to false (default is true).
+ *
+ * The class is also annotated with @EnableConfigurationProperties, which enables the injection of PrincipalAuthFilterProperties into
+ * PrincipalAuthFilterConfig.
+ */
 @AutoConfigureAfter(FilterConfig::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
@@ -43,6 +54,16 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(PrincipalAuthFilterProperties::class)
 open class PrincipalAuthFilterConfig {
+    /**
+     * Creates a FilterRegistrationBean for the PrincipalAuthFilter.
+     *
+     * @param properties The PrincipalAuthFilterProperties object containing the filter properties.
+     * @param servletProperties The ServletFilterProperties object containing servlet filter properties.
+     * @param sensitiveComponent The SensitiveComponent object used for handling sensitive data.
+     * @param mappingHelper The ObjectMapper object used for mapping user details or account details.
+     * @param threadContext The ThreadContext object used for setting the authentication principal.
+     * @return The created FilterRegistrationBean for the PrincipalAuthFilter.
+     */
     @Bean(name = ["principalAuthFilter"], value = ["principalAuthFilter"])
     @ConditionalOnClass(ServletWebServerFactory::class)
     @ConditionalOnMissingFilterBean(PrincipalAuthFilter::class)
@@ -51,7 +72,7 @@ open class PrincipalAuthFilterConfig {
         properties: PrincipalAuthFilterProperties,
         servletProperties: ServletFilterProperties,
         sensitiveComponent: SensitiveComponent,
-        mappingHelper: MappingHelper,
+        mappingHelper: ObjectMapper,
         threadContext: ThreadContext,
     ): FilterRegistrationBean<PrincipalAuthFilter> {
         val registrationBean = FilterRegistrationBean<PrincipalAuthFilter>()

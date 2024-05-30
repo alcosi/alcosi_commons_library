@@ -20,6 +20,12 @@ package com.alcosi.lib.crypto.dto
 import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * The CryptoContractId class represents the ID of a crypto contract. It contains the address and chain ID.
+ *
+ * @property address The address of the contract.
+ * @property chainId The chain ID of the contract.
+ */
 @JvmRecord
 data class CryptoContractId(
     @JsonProperty("address") val address: String,

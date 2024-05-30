@@ -19,8 +19,15 @@ package com.alcosi.lib.filters.router;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Configuration properties for RouterFilter.
+ * Defines properties for enabling or disabling the router filter*/
 @ConfigurationProperties("common-lib.router-filter.all")
 public class RouterFilterProperties {
+    /**
+     * Determines if the functionality related to the router filter is disabled.
+     * This property can be used to enable or disable the router filter.
+     */
     private Boolean disabled=false;
 
     public Boolean getDisabled() {

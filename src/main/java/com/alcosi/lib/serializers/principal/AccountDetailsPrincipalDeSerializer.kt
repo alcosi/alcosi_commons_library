@@ -19,7 +19,19 @@ package com.alcosi.lib.serializers.principal
 
 import com.alcosi.lib.security.AccountDetails
 
+/**
+ * AccountDetailsPrincipalDeSerializer is a class that extends UniversalPrincipalDetailsDeSerializer and is responsible for deserializing
+ * AccountDetails objects from JSON.
+ *
+ * @constructor Creates an instance of AccountDetailsPrincipalDeSerializer.
+ */
 open class AccountDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSerializer<UniversalPrincipalDetailsDeSerializer.PrincipalSerializationObject>(AccountDetails::class.java) {
+    /**
+     * Converts a PrincipalSerializationObject to an AccountDetails object.
+     *
+     * @param serializationObject The object to be converted.
+     * @return The converted AccountDetails object.
+     */
     override fun returnRealObject(serializationObject: PrincipalSerializationObject): AccountDetails {
         return AccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.className)
     }

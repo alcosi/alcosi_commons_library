@@ -17,17 +17,23 @@
 
 package com.alcosi.lib.objectMapper;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.util.Map;
-
+/**
+ * This class represents the configuration properties for the MappingHelper class.
+ * It is annotated with @ConfigurationProperties to specify the prefix of the properties to bind.
+ * The prefix used is "common-lib.mapping-helper".
+ */
 @ConfigurationProperties("common-lib.mapping-helper")
 public class MappingHelperProperties {
-
+    /**
+     * The `disabled` variable represents the current state of the disable feature.
+     *
+     * - It is a private variable of type `Boolean`.
+     * - The default value is `false`.
+     * - It is used within the `MappingHelperProperties` class.
+     * - It can be accessed using the `getDisabled()` method to retrieve its value.
+     * - To modify its value, use the `setDisabled(Boolean disabled)` method.
+     */
     private Boolean disabled = false;
 
     public Boolean getDisabled() {

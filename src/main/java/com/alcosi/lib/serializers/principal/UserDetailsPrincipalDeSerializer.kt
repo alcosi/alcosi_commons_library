@@ -18,8 +18,18 @@
 package com.alcosi.lib.serializers.principal
 
 import com.alcosi.lib.security.UserDetails
-
+/**
+ * UserDetailsPrincipalDeSerializer is a class that extends UniversalPrincipalDetailsDeSerializer. It provides deserialization for UserDetails objects.
+ *
+ * @constructor Creates an instance of UserDetailsPrincipalDeSerializer.
+ */
 open class UserDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSerializer<UniversalPrincipalDetailsDeSerializer.PrincipalSerializationObject>(UserDetails::class.java) {
+    /**
+     * Returns a UserDetails object based on the provided PrincipalSerializationObject.
+     *
+     * @param serializationObject The object used for serialization.
+     * @return The UserDetails object created from serializationObject.
+     */
     override fun returnRealObject(serializationObject: PrincipalSerializationObject): UserDetails {
         return UserDetails(serializationObject.id, serializationObject.className)
     }

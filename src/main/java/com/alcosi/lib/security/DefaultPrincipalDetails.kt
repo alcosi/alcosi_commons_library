@@ -21,6 +21,14 @@ import com.alcosi.lib.serializers.principal.DefaultPrincipalDetailsDeSerializer
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+/**
+ * This class represents default principal details for an authenticated user.
+ *
+ * @param id The identifier of the user.
+ * @param authorities The list of authorities associated with the user.
+ * @param className The name of the class representing the user.
+ * @param type The type of the user.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonDeserialize(using = DefaultPrincipalDetailsDeSerializer::class)
 open class DefaultPrincipalDetails(

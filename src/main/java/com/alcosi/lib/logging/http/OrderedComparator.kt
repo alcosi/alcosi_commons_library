@@ -20,7 +20,32 @@ package com.alcosi.lib.logging.http
 import org.springframework.core.Ordered
 import org.springframework.core.PriorityOrdered
 
+/**
+ * A comparator that orders objects based on their priority and order values.
+ *
+ * This comparator is used to sort objects that implement the [PriorityOrdered] or [Ordered] interface.
+ * Objects that implement the [PriorityOrdered] interface are ordered based on their [PriorityOrdered.order] value,
+ * with lower values indicating higher priority. If two objects have the same [PriorityOrdered.order] value,
+ * then the comparison falls back to the [Ordered] interface, where objects are ordered based on their [Ordered.order] value.
+ * If an object does not implement either interface, it is considered to have the lowest priority.
+ *
+ * If two objects have the same highest priority, the comparison falls back to the simple class name comparison.
+ *
+ * @see PriorityOrdered
+ * @see Ordered
+ *
+ * Usage Example:
+ *
+ **/
 object OrderedComparator : Comparator<Any?> {
+    /**
+     * Compares two objects based on their priority, order, and class name.
+     *
+     * @param a The first object to be compared.
+     * @param b The second object to be compared.
+     * @return Zero if the objects are equal. A negative value if `a` is less than `b`,
+     *    or a positive value if `a` is greater than `b`.
+     */
     override fun compare(
         a: Any?,
         b: Any?,

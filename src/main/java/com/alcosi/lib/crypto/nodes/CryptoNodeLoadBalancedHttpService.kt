@@ -27,11 +27,25 @@ import org.web3j.protocol.http.HttpService
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
+/**
+ * A class representing a load-balanced HTTP service for performing IO operations using Crypto Nodes.
+ *
+ * @param chainId The ID of the Crypto Node chain.
+ * @param cryptoNodesLoadBalancer The load balancer for selecting the actual URL of the Crypto Node.
+ * @param okHttpClientRaw The raw OkHttpClient instance for making HTTP requests.
+ */
 open class CryptoNodeLoadBalancedHttpService(
     val chainId: Int,
     val cryptoNodesLoadBalancer: CryptoNodesLoadBalancer,
     val okHttpClientRaw: OkHttpClient,
 ) : HttpService(okHttpClientRaw) {
+    /**
+     * Performs an IO operation by making an HTTP POST request with the given request string.
+     *
+     * @param request The request string to be sent in the HTTP POST request.
+     * @return An InputStream containing the response body if the request is successful, else null.
+     * @throws ClientConnectionException if the response received is not successful.
+     */
     override fun performIO(request: String): InputStream? {
         val requestBody = request.toRequestBody(JSON_MEDIA_TYPE)
         val headersOkHttp = headers.toHeaders()
@@ -52,6 +66,12 @@ open class CryptoNodeLoadBalancedHttpService(
         }
     }
 
+    /**
+     * Builds an input stream from the provided response body.
+     *
+     * @param responseBody The response body from which to build the input stream.
+     * @return The input stream built from the response body.
+     */
     protected open fun buildInputStream(responseBody: ResponseBody): InputStream {
         return ByteArrayInputStream(responseBody.bytes())
     }

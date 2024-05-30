@@ -22,13 +22,35 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.commons.codec.binary.Hex
 import java.util.regex.Pattern
 
+/**
+ * A class that represents a sensitive component for handling sensitive data.
+ *
+ * @param objectMapper The ObjectMapper used for JSON serialization and deserialization.
+ * @param sensitiveDataPattern The regex pattern used to identify sensitive data in a string.
+ */
 open class SensitiveComponent(
     val objectMapper: ObjectMapper,
     protected val sensitiveDataPattern: String = "(<SensitiveData>)(([\\da-fA-F]*)|(null))(</{1,2}SensitiveData>)",
 ) {
+    /**
+     * Regular expression used to match sensitive data pattern.
+     */
     open val regex = Regex(sensitiveDataPattern)
+    /**
+     * Regular expression pattern for matching sensitive data within curly braces.
+     *
+     * The pattern matches the substring within curly braces that contains sensitive data.
+     *
+     * @see Pattern
+     */
     open val regexPattern = Pattern.compile("(\\{[^{}]*)$sensitiveDataPattern([^{}]*})")
-
+    /**
+     * Deserializes a string value to a byte array.
+     *
+     * @param value The string value to be deserialized.
+     * @return The deserialized byte array, or null if the value is null.
+     * @throws IllegalArgumentException If the encoded json value format is incorrect.
+     */
     open fun deserialize(value: String?): ByteArray? {
         if (value == null) {
             return null
@@ -47,14 +69,23 @@ open class SensitiveComponent(
             }
         }
     }
-
+    /**
+     * Serializes a byte array into a string representation.
+     *
+     * @param value The byte array to be serialized. If null, returns "<SensitiveData>null*/
     open fun serialize(value: ByteArray?): String? {
         if (value == null) {
             return "<SensitiveData>null</SensitiveData>"
         }
         return "<SensitiveData>${Hex.encodeHexString(value)}</SensitiveData>"
     }
-
+    /**
+     * Decrypts a given value using the provided key.
+     *
+     * @param value The value to decrypt.
+     * @param key The key used for decryption.
+     * @return The decrypted value if successful, or null if the input value is null or an error occurred during decryption.
+     */
     open fun decrypt(
         value: String?,
         key: ByteArray,

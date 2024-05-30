@@ -23,16 +23,39 @@ import java.security.KeyFactory
 import java.security.Security
 import javax.crypto.Cipher
 
+/**
+ * Rsa is a utility object that provides methods for RSA encryption and decryption.
+ */
 object Rsa {
     init {
         Security.addProvider(BouncyCastleProvider())
     }
-
+    /**
+     * Represents the algorithm used for encryption.
+     * This variable should contain the name of the algorithm used for encryption.
+     *
+     * @see <a href="https*/
     val ALGORITHM = "RSA"
+    /**
+     * The TRANSFORMATION variable represents the transformation algorithm used for encryption and decryption.
+     *
+     * The value of TRANSFORMATION is set to "RSA".
+     */
     val TRANSFORMATION = "RSA"
+    /**
+     * This variable represents an instance of the KeyFactory class obtained by calling the getInstance method with a specified algorithm.
+     * The algorithm used to obtain the instance must be provided as a string value.
+     * @see KeyFactory
+     */
     val keyFactory = KeyFactory.getInstance(ALGORITHM,)
 
-
+    /**
+     * Creates a new instance of the Cipher class using the specified transformation algorithm.
+     *
+     * @return A new instance of [Cipher] class.
+     * @throws NoSuchAlgorithmException If the requested transformation algorithm is not available.
+     * @throws NoSuchPaddingException If the requested padding mechanism is not available.
+     */
     fun createCipher(): Cipher {
         return Cipher.getInstance(TRANSFORMATION)
     }

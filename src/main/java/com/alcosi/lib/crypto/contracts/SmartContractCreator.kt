@@ -19,8 +19,9 @@ package com.alcosi.lib.crypto.contracts
 
 import com.alcosi.lib.crypto.dto.CryptoContractId
 import com.alcosi.lib.crypto.nodes.CryptoNodesAdminServiceHolder
-import com.alcosi.lib.executors.SchedulerTimer
 import com.alcosi.lib.utils.PrepareHexService
+import io.github.breninsul.javatimerscheduler.registry.SchedulerType
+import io.github.breninsul.javatimerscheduler.registry.TaskSchedulerRegistry
 import org.web3j.crypto.Credentials
 import org.web3j.protocol.Web3j
 import org.web3j.tx.Contract
@@ -33,6 +34,25 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.stream.Collectors
 
+/**
+ * The SmartContractCreator class is responsible for creating and managing
+ * smart contract instances.
+ *
+ * @property lifetime The duration for which a smart contract instance
+ *     remains active.
+ * @property pk The private key used for creating and accessing smart
+ *     contracts.
+ * @property clearDelay The duration after which inactive smart contract
+ *     instances are cleared.
+ * @property gasProvider The gas provider used for contract deployments and
+ *     transactions.
+ * @property prepareWalletComponent The service used for validating and
+ *     preparing wallet addresses.
+ * @property nodesAdminService The service holder for accessing admin
+ *     nodes.
+ * @property contractMap The map storing the created smart contract
+ *     instances.
+ */
 open class SmartContractCreator(
     val lifetime: Duration,
     val pk: String,
@@ -42,7 +62,18 @@ open class SmartContractCreator(
     val nodesAdminService: CryptoNodesAdminServiceHolder,
 ) {
     val contractMap: MutableMap<ContractKey, ContractPair> = HashMap()
+    init {
+        TaskSchedulerRegistry.registerTypeTask(SchedulerType.VIRTUAL_WAIT, "ClearContracts", clearDelay, clearDelay, this::class, Level.FINEST) { clearContracts() }
+    }
 
+    /**
+     * The ContractKey class represents a key used for identifying a contract.
+     *
+     * @property credentials The credentials used for contract interaction.
+     * @property address The address of the contract.
+     * @property chainId The chain ID of the contract.
+     * @property contractType The type of the contract.
+     */
     @JvmRecord
     data class ContractKey(
         val credentials: Credentials,
@@ -51,9 +82,31 @@ open class SmartContractCreator(
         val contractType: Class<*>,
     )
 
+    /**
+     * The ContractPair class represents a pair of a contract and the time it
+     * was used.
+     *
+     * @param contract The contract instance.
+     * @param usedTime The time the contract was used. Default value is the
+     *     current system time.
+     * @property contract The contract instance.
+     * @property usedTime The time the contract was used. Default value is the
+     *     current system time when the ContractPair object is created.
+     */
     @JvmRecord
     data class ContractPair(val contract: Contract, val usedTime: LocalDateTime = LocalDateTime.now())
 
+    /**
+     * Builds a contract instance of type T using the specified contract ID and
+     * class.
+     *
+     * @param contractId The CryptoContractId representing the contract ID.
+     * @param c The class representing the contract type.
+     * @return An instance of type T representing the built contract.
+     * @throws RuntimeException if the contract cannot be built.
+     * @throws IllegalArgumentException if the contractId or c parameters are
+     *     null.
+     */
     open fun <T : Contract> build(
         contractId: CryptoContractId,
         c: Class<T>,
@@ -67,6 +120,16 @@ open class SmartContractCreator(
         )
     }
 
+    /**
+     * Retrieves a contract instance of type T using the specified chain ID,
+     * address, credentials, and class.
+     *
+     * @param chainId The chain ID of the contract.
+     * @param address The address of the contract.
+     * @param credential The credentials used for contract interaction.
+     * @param c The class representing the contract type.
+     * @return An instance of type T representing the contract.
+     */
     protected open fun <T : Contract> getContract(
         chainId: Int,
         address: String,
@@ -98,6 +161,14 @@ open class SmartContractCreator(
         }
     }
 
+    /**
+     * Retrieves a TransactionManager instance for the given chain ID and
+     * credentials.
+     *
+     * @param credentials The credentials used for contract interaction.
+     * @param chainId The chain ID of the contract.
+     * @return The TransactionManager instance.
+     */
     open fun getTM(
         credentials: Credentials,
         chainId: Int,
@@ -105,31 +176,37 @@ open class SmartContractCreator(
         return RawTransactionManager(nodesAdminService[chainId], credentials, chainId.toLong())
     }
 
-    protected open val scheduler =
-        object : SchedulerTimer(clearDelay, "ClearContracts", Level.FINEST) {
-            override fun startBatch() {
-                val now = LocalDateTime.now()
-                val old =
-                    contractMap.entries
-                        .filter { (key, value) ->
-                            value
-                                .usedTime
-                                .plus(lifetime)
-                                .isBefore(now)
-                        }.map { it.key }
-                val removed =
-                    old
-                        .stream()
-                        .map { key: ContractKey -> key to contractMap.remove(key) }
-                        .map { p -> "${p.first}:${p.second}" }
-                        .collect(Collectors.joining(";"))
-                if (removed.isNotBlank()) {
-                    Companion.logger.warning("Smart contract for $removed removed ")
-                }
-            }
+    /**
+     * Clears the expired contracts from the contract map.
+     */
+    protected open fun clearContracts() {
+        val now = LocalDateTime.now()
+        val old =
+            contractMap.entries
+                .filter { (key, value) ->
+                    value
+                        .usedTime
+                        .plus(lifetime)
+                        .isBefore(now)
+                }.map { it.key }
+        val removed =
+            old
+                .stream()
+                .map { key: ContractKey -> key to contractMap.remove(key) }
+                .map { p -> "${p.first}:${p.second}" }
+                .collect(Collectors.joining(";"))
+        if (removed.isNotBlank()) {
+            logger.warning("Smart contract for $removed removed ")
         }
+    }
 
+    /**
+     * The Companion class is responsible for providing a logger instance.
+     */
     companion object {
+        /**
+         * The logger variable is an instance of the Logger class used for logging messages.
+         */
         val logger = Logger.getLogger(this::class.java.name)
     }
 }

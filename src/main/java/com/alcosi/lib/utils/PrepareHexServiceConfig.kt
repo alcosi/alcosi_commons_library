@@ -20,10 +20,22 @@ package com.alcosi.lib.utils
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
-
+/**
+ * Provides the configuration for the PrepareHexService.
+ * This class is responsible for creating a bean instance of the PrepareHexService
+ * if there is no existing bean for the same type.
+ */
 @AutoConfiguration
 @ConditionalOnMissingBean(PrepareHexService::class)
 class PrepareHexServiceConfig {
+    /**
+     * Gets the PrepareHexService instance.
+     *
+     * If a custom implementation of PrepareHexService is already registered as a bean,
+     * returns the existing instance. Otherwise, creates a new instance of PrepareHexService.
+     *
+     * @return The PrepareHexService instance.
+     */
     @Bean
     @ConditionalOnMissingBean(PrepareHexService::class)
     fun getPrepareHexService(): PrepareHexService {

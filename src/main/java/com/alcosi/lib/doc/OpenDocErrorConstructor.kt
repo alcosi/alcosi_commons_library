@@ -20,10 +20,32 @@ package com.alcosi.lib.doc
 import com.alcosi.lib.dto.APIError
 import org.springframework.web.servlet.function.ServerResponse
 
+/**
+ * Represents an interface for constructing error responses in an OpenDoc system.
+ * Implementing classes are responsible for constructing the error response based on the given throwable object.
+ */
 interface OpenDocErrorConstructor {
+    /**
+     * Constructs an error response based on the given throwable.
+     *
+     * @param t The throwable.
+     * @return The constructed server response.
+     */
     fun constructError(t: Throwable): ServerResponse
 
-    class Default : OpenDocErrorConstructor {
+    /**
+     * Default Class
+     *
+     * This class is responsible for constructing an error response
+     * when an exception occurs.
+     */
+    open class Default : OpenDocErrorConstructor {
+        /**
+         * Constructs an error response based on the given throwable.
+         *
+         * @param t The throwable object that caused the error.
+         * @return The constructed server response representing the error.
+         */
         override fun constructError(t: Throwable): ServerResponse {
             val error = APIError(t.message ?: "", 404000, t.javaClass.simpleName)
             return ServerResponse.status(error.httpCode).body(error)

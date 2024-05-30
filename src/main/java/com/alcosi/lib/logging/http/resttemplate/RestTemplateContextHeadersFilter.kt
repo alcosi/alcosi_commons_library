@@ -24,11 +24,24 @@ import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.ClientHttpResponse
 
+/**
+ * A client HTTP request interceptor that adds context headers to the request.
+ *
+ * @property headerHelper The HeaderHelper instance used by the filter.
+ * @property order The order in which the filter should be applied. Default is 0.
+ */
 open class RestTemplateContextHeadersFilter(
     val headerHelper: HeaderHelper,
     private val order: Int = 0,
-) :
-    ClientHttpRequestInterceptor, Ordered {
+) : ClientHttpRequestInterceptor, Ordered {
+    /**
+     * Intercepts a client HTTP request and adds context headers to the request.
+     *
+     * @param request The original HTTP request.
+     * @param body The request body as a byte array.
+     * @param execution The `ClientHttpRequestExecution` object used to execute the request.
+     * @return The response to the intercepted request.
+     */
     override fun intercept(
         request: HttpRequest,
         body: ByteArray,
@@ -37,6 +50,12 @@ open class RestTemplateContextHeadersFilter(
         return execution.execute(addHeaders(request), body)
     }
 
+    /**
+     * Adds headers to the given HttpRequest.
+     *
+     * @param request The HttpRequest to add headers to.
+     * @return The modified HttpRequest with added headers.
+     */
     protected open fun addHeaders(request: HttpRequest): HttpRequest {
         headerHelper.createRequestHeadersMap()
             .forEach {
@@ -45,6 +64,11 @@ open class RestTemplateContextHeadersFilter(
         return request
     }
 
+    /**
+     * Returns the order in which the filter should be applied.
+     *
+     * @return The order of the filter.
+     */
     override fun getOrder(): Int {
         return order
     }

@@ -20,7 +20,17 @@ package com.alcosi.lib.executors
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
+/**
+ * A class that implements the Thread.UncaughtExceptionHandler interface to handle uncaught exceptions
+ * in threads.
+ */
+open class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
+    /**
+     * Handles uncaught exceptions in threads.
+     *
+     * @param t The thread that caused the exception.
+     * @param e The uncaught exception that occurred.
+     */
     override fun uncaughtException(
         t: Thread?,
         e: Throwable?,
@@ -28,6 +38,11 @@ class UncaughtExceptionHandler : Thread.UncaughtExceptionHandler {
         logger.log(Level.SEVERE, "Error in thread $t: ", e)
     }
 
+    /**
+     * The Companion class contains a logger object for logging information and errors.
+     *
+     * @property logger The logger object used for logging.
+     */
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
     }

@@ -33,10 +33,21 @@ import org.web3j.protocol.admin.Admin
 import org.web3j.tx.gas.ContractGasProvider
 import org.web3j.tx.gas.DefaultGasProvider
 import java.time.Duration
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.logging.Level
 
+/**
+ * This class represents the configuration for Crypto Nodes.
+ *
+ * It is annotated with `@ConditionalOnClass` and `@ConditionalOnProperty` to ensure that the class is loaded
+ * only if the required classes and properties are present. It is also annotated with `@EnableConfigurationProperties`
+ * to enable the usage of `CryptoNodeProperties` as a configuration property class.
+ *
+ * The class contains several bean methods annotated with `@Bean` to create and configure beans.
+ *
+ * @property cryptoNodeProperties The configuration properties for Crypto Nodes.
+ * @constructor Creates a CryptoNodesConfig instance.
+ */
 @ConditionalOnClass(Scheduled::class, Admin::class)
 @ConditionalOnProperty(
     prefix = "common-lib.crypto.node",
@@ -47,6 +58,13 @@ import java.util.logging.Level
 @EnableConfigurationProperties(CryptoNodeProperties::class)
 @AutoConfiguration
 class CryptoNodesConfig {
+    /**
+     * Creates an instance of OkHttpClient with the given parameters.
+     *
+     * @param cryptoNodeProperties The instance of CryptoNodeProperties.
+     * @param headerHelper The instance of HeaderHelper.
+     * @return The created OkHttpClient with configured timeouts and logging interceptor.
+     */
     @Bean("cryptoNodeHttpClient")
     fun createOkHttpClient(
         cryptoNodeProperties: CryptoNodeProperties,
@@ -57,7 +75,7 @@ class CryptoNodesConfig {
             builder,
             OKLoggingInterceptor(
                 cryptoNodeProperties.nodesLoggingMaxBody,
-                Level.parse(cryptoNodeProperties.nodesLoggingLevel),
+                cryptoNodeProperties.nodesLoggingLevel.javaLevel,
                 headerHelper,
                 0,
             ),
@@ -66,7 +84,14 @@ class CryptoNodesConfig {
         return builder.build()
     }
 
-    protected fun configureTimeouts(
+    /**
+     * Configures the timeouts for the OkHttpClient builder using the specified nodeTimeout duration.
+     *
+     * @param builder The OkHttpClient builder to configure timeouts for.
+     * @param interceptor The OKLoggingInterceptor instance to add as an interceptor.
+     * @param nodeTimeout The duration for the timeouts.
+     */
+    protected open fun configureTimeouts(
         builder: OkHttpClient.Builder,
         interceptor: OKLoggingInterceptor,
         nodeTimeout: Duration,
@@ -77,26 +102,46 @@ class CryptoNodesConfig {
         builder.addInterceptor(interceptor)
     }
 
+    /**
+     * Returns the default gas provider for the contract.
+     *
+     * @return The ContractGasProvider instance.
+     */
     @Bean
     @ConditionalOnMissingBean(ContractGasProvider::class)
     fun gasProvider(): ContractGasProvider {
         return DefaultGasProvider()
     }
 
+    /**
+     * Retrieves a HealthCheckerNormalThreadPoolExecutor instance with the given CryptoNodeProperties.
+     *
+     * @param cryptoNodeProperties The properties related to the crypto node services.
+     *
+     * @return The HealthCheckerNormalThreadPoolExecutor instance.
+     */
     @Bean("healthCheckerNormalThreadPoolExecutor")
-    fun getHealthCheckerNormalThreadPoolExecutor(cryptoNodeProperties: CryptoNodeProperties): NormalThreadPoolExecutor {
-        return NormalThreadPoolExecutor.build(cryptoNodeProperties.health.threads, "crypto-health-check", Duration.ofDays(1))
+    fun getHealthCheckerNormalThreadPoolExecutor(cryptoNodeProperties: CryptoNodeProperties): ExecutorService {
+        return NormalThreadPoolExecutor.build(cryptoNodeProperties.health.threads, "crypto-health-check")
     }
 
+    /**
+     * Retrieves the CryptoNodeHealthActualizer instance.
+     *
+     * @param cryptoNodeProperties The properties related to the crypto node services.
+     * @param executor The executor service for running health check tasks.
+     * @param httpClient The OkHttpClient for making HTTP requests.
+     * @return The CryptoNodeHealthActualizer instance
+     */
     @Bean
     @ConditionalOnMissingBean(CryptoNodeHealthActualizer::class)
     fun getCryptoNodeHealthActualizer(
         cryptoNodeProperties: CryptoNodeProperties,
-        @Qualifier("healthCheckerNormalThreadPoolExecutor") executor: ThreadPoolExecutor,
+        @Qualifier("healthCheckerNormalThreadPoolExecutor") executor: ExecutorService,
         @Qualifier("cryptoNodeHttpClient") httpClient: OkHttpClient,
     ): CryptoNodeHealthActualizer {
         return CryptoNodeHealthActualizer(
-            Level.parse(cryptoNodeProperties.health.nodesLoggingLevel),
+            cryptoNodeProperties.health.nodesLoggingLevel.javaLevel,
             cryptoNodeProperties,
             executor,
             CryptoNodeHealthChecker(httpClient),
@@ -104,11 +149,26 @@ class CryptoNodesConfig {
         )
     }
 
+    /**
+     * Returns the default gas provider for contracts.
+     *
+     * If there is no existing bean of type `ContractGasProvider`, this method will return a new instance of `DefaultGasProvider`.
+     *
+     * @return the default gas provider
+     */
     @ConditionalOnMissingBean(ContractGasProvider::class)
     fun getDefaultGasProvider(): ContractGasProvider {
         return DefaultGasProvider()
     }
 
+    /**
+     * Generates the configuration for Crypto Nodes admin service.
+     *
+     * @param properties The properties for Crypto Nodes.
+     * @param httpClient The OkHttpClient for making HTTP requests.
+     * @param cryptoNodesLoadBalancer The load balancer for selecting the actual URL of the Crypto Node.
+     * @return The holder for the admin services with the generated configuration.
+     */
     @Bean
     @ConditionalOnMissingBean(CryptoNodesAdminServiceHolder::class)
     fun genNodesConfig(
@@ -132,6 +192,13 @@ class CryptoNodesConfig {
         return CryptoNodesAdminServiceHolder(map)
     }
 
+    /**
+     * Retrieves the CryptoNodesLoadBalancer instance.
+     *
+     * @param cryptoNodesHealthActualizer The CryptoNodeHealthActualizer instance.
+     * @param properties The CryptoNodeProperties instance.
+     * @return The CryptoNodesLoadBalancer instance.
+     */
     @Bean
     @ConditionalOnMissingBean(CryptoNodesLoadBalancer::class)
     fun getCryptoNodesLoadBalancer(

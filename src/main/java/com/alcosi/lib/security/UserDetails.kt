@@ -21,6 +21,19 @@ import com.alcosi.lib.serializers.principal.UserDetailsPrincipalDeSerializer
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+/**
+ * UserDetails is a class that represents user details.
+ *
+ * @property id The identifier of the user.
+ * @property className The name of the class representing the user. Default value is the name of UserDetails class.
+ *
+ * @constructor Creates an instance of UserDetails.
+ * @param id The identifier of the user.
+ * @param className The name of the class representing the user. Default value is the name of UserDetails class.
+ *
+ * @see OneAuthorityPrincipal
+ * @see UserDetailsPrincipalDeSerializer
+ */
 @JsonDeserialize(using = UserDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 class UserDetails(

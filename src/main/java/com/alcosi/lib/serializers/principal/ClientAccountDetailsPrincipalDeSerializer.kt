@@ -22,8 +22,23 @@ import com.alcosi.lib.security.ClientAccountDetails
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
-
+/**
+ * ClientAccountDetailsPrincipalDeSerializer is a class that extends UniversalPrincipalDetailsDeSerializer and is responsible for deserializing
+ * ClientAccountDetails objects from JSON.
+ *
+ * @constructor Creates an instance of ClientAccountDetailsPrincipalDeSerializer.
+ */
 open class ClientAccountDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSerializer<ClientAccountDetailsPrincipalDeSerializer.ClientAccountDetailsSerializationObject>(ClientAccountDetails::class.java) {
+    /**
+     * ClientAccountDetailsSerializationObject is a class that represents the serialization object for ClientAccountDetails.
+     *
+     * @property clientId The client ID associated with the account.
+     * @constructor Creates an instance of ClientAccountDetailsSerializationObject.
+     * @param id The ID of the serialization object.
+     * @param authorities The list of authorities associated with the serialization object.
+     * @param className The class name of the serialization object.
+     * @param type The type of the serialization object.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     open class ClientAccountDetailsSerializationObject(
         id: String,
@@ -32,11 +47,22 @@ open class ClientAccountDetailsPrincipalDeSerializer : UniversalPrincipalDetails
         type: String,
         val clientId: String,
     ) : PrincipalSerializationObject(id, authorities, className, type)
-
+    /**
+     * Converts a ClientAccountDetailsSerializationObject to an AccountDetails object.
+     *
+     * @param serializationObject The object to be converted.
+     * @return The converted AccountDetails object.
+     */
     override fun returnRealObject(serializationObject: ClientAccountDetailsSerializationObject): AccountDetails {
         return ClientAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.clientId, serializationObject.className)
     }
-
+    /**
+     * Retrieves the internal type object from the given JSON node using the provided DeserializationContext.
+     *
+     * @param ctxt The DeserializationContext to use.
+     * @param node The JSON node to deserialize.
+     * @return The internal type object.
+     */
     override fun getInternalTypeObject(
         ctxt: DeserializationContext,
         node: JsonNode,

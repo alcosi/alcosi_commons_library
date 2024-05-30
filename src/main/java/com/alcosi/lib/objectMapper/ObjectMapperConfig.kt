@@ -30,11 +30,34 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 
+/**
+ * This class provides configuration for ObjectMapper, a library that provides functionality
+ * for converting between JSON and Java objects.
+ *
+ * The configuration is conditional based on the presence of the ObjectMapper class and certain property values.
+ * If the "common-lib.object-mapper.disabled" property is missing or set to "false", the configuration will be enabled.
+ * Otherwise, it will be disabled.
+ *
+ * The class is annotated with @AutoConfiguration, indicating that it is a configuration class that should be processed
+ * during the auto-configuration phase of application startup.
+ *
+ * The class is also annotated with @EnableConfigurationProperties, indicating that it enables the use of
+ * configuration properties defined in the ObjectMapperProperties class.
+ *
+ * @see ObjectMapper
+ * @see ConditionalOnClass
+ * @see ConditionalOnProperty
+ * @see AutoConfiguration
+ * @see EnableConfigurationProperties
+ */
 @ConditionalOnClass(ObjectMapper::class)
 @ConditionalOnProperty(prefix = "common-lib.object-mapper", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 @AutoConfiguration
 @EnableConfigurationProperties(ObjectMapperProperties::class)
 class ObjectMapperConfig {
+    /**
+     * Retrieves an instance of ObjectMapper with the given configurations.
+     */
     @Bean
     @ConditionalOnMissingBean(ObjectMapper::class)
     fun getObjectMapper(
@@ -67,6 +90,12 @@ class ObjectMapperConfig {
         return mapper
     }
 
+    /**
+     * Retrieves an instance of JsonFactory with the given configurations.
+     *
+     * @param props The ObjectMapperProperties object containing the configuration properties.
+     * @return The JsonFactory instance.
+     */
     @Bean
     @ConditionalOnMissingBean(JsonFactory::class)
     fun getJsonFactory(props: ObjectMapperProperties): JsonFactory {

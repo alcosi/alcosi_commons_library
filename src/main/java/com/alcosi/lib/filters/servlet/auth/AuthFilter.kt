@@ -26,6 +26,19 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
 import org.springframework.web.filter.OncePerRequestFilter
 
+/**
+ * AuthFilter is a servlet filter responsible for authentication and authorization.
+ *
+ * @property accessKey The access key used for authentication.
+ * @property helper The instance of the HeaderHelper used for handling request headers.
+ * @property objectMapper The instance of the ObjectMapper used for serializing/deserializing JSON.
+ * @property wrongEnvErrorCode The error code to be returned when the environment header is incorrect.
+ * @property wrongAccessKeyErrorCode The error code to be returned when the access key is incorrect.
+ * @property noAccessKeyErrorCode The error code to be returned when no access key is provided.
+ *
+ * @constructor Creates an AuthFilter instance with the given accessKey, helper, objectMapper, wrongEnvErrorCode,
+ * wrongAccessKeyErrorCode, and noAccessKeyErrorCode.
+ */
 open class AuthFilter(
     protected val accessKey: String,
     protected val helper: HeaderHelper,
@@ -34,6 +47,16 @@ open class AuthFilter(
     protected val wrongAccessKeyErrorCode: Int,
     protected val noAccessKeyErrorCode: Int,
 ) : OncePerRequestFilter() {
+    /**
+     * Applies the authentication and authorization logic for an incoming request.
+     * If the request's environment header does not match the configured environment, an error response is written.
+     * If the microservice access key in the request's header does not match the configured access key, an error response is written.
+     * Otherwise, the request is passed to the next filter in the filter chain.
+     *
+     * @param request The incoming HttpServletRequest object.
+     * @param response The outgoing HttpServletResponse object.
+     * @param filterChain The FilterChain object representing the remaining filters in the chain.
+     */
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -63,6 +86,12 @@ open class AuthFilter(
         filterChain.doFilter(request, response)
     }
 
+    /**
+     * Writes an error response to the HttpServletResponse.
+     *
+     * @param response the HttpServletResponse object to write the error response to
+     * @param error the APIError object containing the error details
+     */
     protected fun writeError(
         response: HttpServletResponse,
         error: APIError,

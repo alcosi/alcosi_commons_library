@@ -20,6 +20,14 @@ package com.alcosi.lib.serializers
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * SecuredDataContainerSerializationDTO is a data class representing a serialized version of a SecuredDataContainer object.
+ * It is used for serialization and deserialization of SecuredDataContainer objects to and from JSON.
+ *
+ * @property type The type of the SecuredDataContainer, which can be either BYTE_ARRAY or STRING.
+ * @property value The encrypted value of the SecuredDataContainer as a String.
+ * @property originalLength The original length of the encrypted value before encryption.
+ */
 data class SecuredDataContainerSerializationDTO
     @JsonCreator
     constructor(
@@ -27,7 +35,10 @@ data class SecuredDataContainerSerializationDTO
         @JsonProperty("value") val value: String,
         @JsonProperty("originalLength") val originalLength: Int,
     ) {
-        enum class TYPE {
+    /**
+     * Enum representing the type of a SecuredDataContainer.
+     */
+    enum class TYPE {
             BYTE_ARRAY,
             STRING,
         }

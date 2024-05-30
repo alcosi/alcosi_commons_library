@@ -24,7 +24,22 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.NullNode
 import java.math.BigInteger
 
+/**
+ * HexBigIntDeSerializer is a class that provides deserialization of JSON strings into BigInteger objects.
+ *
+ * This class extends the StdDeserializer class and specifically handles deserialization for BigInteger objects.
+ *
+ * @constructor Creates an instance of HexBigIntDeSerializer
+ * @param type The type of the object to be deserialized (in this case, BigInteger)
+ */
 class HexBigIntDeSerializer : StdDeserializer<BigInteger>(BigInteger::class.java) {
+    /**
+     * Deserializes a JSON string into a BigInteger object.
+     *
+     * @param p The JSONParser object used to parse the JSON input.
+     * @param ctxt The DeserializationContext object for the deserialization process.
+     * @return The deserialized BigInteger object, or null if the JSON input is null.
+     */
     override fun deserialize(
         p: JsonParser?,
         ctxt: DeserializationContext?,
@@ -41,6 +56,11 @@ class HexBigIntDeSerializer : StdDeserializer<BigInteger>(BigInteger::class.java
     }
 
     companion object {
+        /**
+         * Sets the PrepareHexService used by the HexBigIntDeSerializer class.
+         *
+         * @param prepareArgsService The PrepareHexService object to be set.
+         */
         fun setPrepareArgsService(prepareArgsService: PrepareHexService?) {
             Companion.prepareArgsService = prepareArgsService
         }

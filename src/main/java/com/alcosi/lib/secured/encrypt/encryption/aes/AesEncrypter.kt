@@ -20,7 +20,17 @@ package com.alcosi.lib.secured.encrypt.encryption.aes
 import com.alcosi.lib.secured.encrypt.encryption.Encrypter
 import javax.crypto.Cipher
 
+/**
+ * AesEncrypter is a class that implements the Encrypter interface to provide AES encryption functionality.
+ */
 open class AesEncrypter : Encrypter {
+    /**
+     * Encrypts the provided value using the given key.
+     *
+     * @param value The data to be encrypted, represented as a ByteArray. Can be null.
+     * @param key The key used for encryption, represented as a ByteArray.
+     * @return The encrypted data as a ByteArray, or null if the provided value is null.
+     */
     override fun encrypt(
         value: ByteArray?,
         key: ByteArray,

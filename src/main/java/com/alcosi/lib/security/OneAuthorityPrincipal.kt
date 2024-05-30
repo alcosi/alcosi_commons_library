@@ -19,6 +19,15 @@ package com.alcosi.lib.security
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
+/**
+ * OneAuthorityPrincipal is an abstract class that represents a principal with a single authority.
+ * It extends DefaultPrincipalDetails and provides a common implementation for principals with a single authority.
+ *
+ * @param id The identifier of the user.
+ * @param authority The authority associated with the user.
+ * @param className The name of the class representing the user.
+ * @param type The type of the user.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class OneAuthorityPrincipal(
     id: String,

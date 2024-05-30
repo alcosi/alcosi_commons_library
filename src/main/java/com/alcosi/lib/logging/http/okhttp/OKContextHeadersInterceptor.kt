@@ -21,12 +21,28 @@ import com.alcosi.lib.filters.servlet.HeaderHelper
 import okhttp3.*
 import org.springframework.core.Ordered
 
-open class OKContextHeadersInterceptor(val headerHelper: HeaderHelper, private val order: Int) : Interceptor, Ordered {
+/**
+ * Interceptor for adding context headers to the OkHttp request.
+ *
+ * @property headerHelper The HeaderHelper object used to create request headers
+ * @property order The order of this interceptor in the chain
+ */
+open class OKContextHeadersInterceptor(protected val headerHelper: HeaderHelper, private val order: Int) : Interceptor, Ordered {
+    /**
+     * Intercepts the OkHttp chain and adds request headers using the provided HeaderHelper object.
+     *
+     * @param chain The*/
     override fun intercept(chain: Interceptor.Chain): Response {
         return chain.proceed(addRequestHeaders(chain))
     }
 
-    private fun addRequestHeaders(chain: Interceptor.Chain): Request {
+    /**
+     * Adds missing request headers to the given Interceptor Chain's request.
+     *
+     * @param chain The Interceptor Chain.
+     * @return The modified Request with added headers.
+     */
+    protected open fun addRequestHeaders(chain: Interceptor.Chain): Request {
         val httpRequestBuilder = chain.request().newBuilder()
         headerHelper.createRequestHeadersMap()
             .filter { chain.request().headers[it.key] == null }
@@ -37,6 +53,11 @@ open class OKContextHeadersInterceptor(val headerHelper: HeaderHelper, private v
         return httpRequest
     }
 
+    /**
+     * Returns the order of this interceptor in the chain.
+     *
+     * @return The order of this interceptor
+     */
     override fun getOrder(): Int {
         return order
     }

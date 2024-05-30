@@ -24,16 +24,28 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 
+/**
+ * Configuration class for Aspects*/
 @ConditionalOnClass(Aspect::class)
 @ConditionalOnProperty(prefix = "common-lib.aspect", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 @AutoConfiguration
 @EnableConfigurationProperties(AspectProperties::class)
 class AspectsConfig {
+    /**
+     * Retrieve the logging error aspect instance.
+     *
+     * @return An instance of LoggingErrorAspect.
+     */
     @Bean
     fun getLoggingErrorAspect(): LoggingErrorAspect {
         return LoggingErrorAspect()
     }
 
+    /**
+     * Retrieves the logging time aspect.
+     *
+     * @return An instance of LoggingTimeAspect.
+     */
     @Bean
     fun getLoggingTimeAspect(): LoggingTimeAspect {
         return LoggingTimeAspect()

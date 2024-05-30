@@ -27,9 +27,26 @@ import java.util.logging.Level.SEVERE
 import java.util.logging.Logger
 import kotlin.io.path.listDirectoryEntries
 
+
+/**
+ * The `ExternalJarLoad` class provides functionality to dynamically load external JAR files and their classes
+ * into the current application.
+ *
+ * @property logger The logger used for logging messages.
+ */
 open class ExternalJarLoad {
     val logger = Logger.getLogger(this.javaClass.name)
 
+    /**
+     * Loads a dependency from the given list of paths and returns the class loader.
+     *
+     * @param paths The list of paths specifying the location of the dependency.
+     * @param setCurrentClassLoader Flag indicating whether to set the current thread's context class loader to the
+     * class loader of the loaded dependency. Default value is false.
+     * @param classLoader The parent class loader to use for loading the dependency. Default value is the class loader
+     * of the calling class.
+     * @return The class loader for the loaded dependency.
+     */
     open fun loadDependency(
         paths: List<Path>,
         setCurrentClassLoader: Boolean = false,
@@ -67,6 +84,12 @@ open class ExternalJarLoad {
         return child
     }
 
+    /**
+     * Retrieves the names of all classes within a JAR file.
+     *
+     * @param jarFile A JarInputStream representing the JAR file.
+     * @return An ArrayList of class names found within the JAR file.
+     */
     protected open fun getClassNamesFromJar(jarFile: JarInputStream): ArrayList<String> {
         val classNames = ArrayList<String>()
         try {
@@ -88,6 +111,12 @@ open class ExternalJarLoad {
         return classNames
     }
 
+    /**
+     * Retrieves the names of all classes within a JAR file.
+     *
+     * @param jarPath The path of the JAR file.
+     * @return An ArrayList of class names found within the JAR file.
+     */
     protected open fun getClassNamesFromJar(jarPath: String): ArrayList<String> {
         return getClassNamesFromJar(JarInputStream(FileInputStream(jarPath)))
     }

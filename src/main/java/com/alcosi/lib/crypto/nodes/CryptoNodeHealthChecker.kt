@@ -27,9 +27,24 @@ import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * The CryptoNodeHealthChecker class is responsible for checking the health status of a crypto node.
+ *
+ * @property client OkHttpClient instance used for making HTTP requests.
+ */
 open class CryptoNodeHealthChecker(val client: OkHttpClient) {
+    /**
+     * Represents the request body used for checking the health status of a crypto node.
+     *
+     * The `body` property is created by calling*/
     val body = createBody()
 
+    /**
+     * Represents the health status of a crypto node.
+     *
+     * @property status The status of the crypto node.
+     * @property timeout The time taken for the health check in milliseconds.
+     */
     @JvmRecord
     data class HeathStatus(val status: Boolean, val timeout: Long) {
         override fun toString(): String {
@@ -37,18 +52,36 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient) {
         }
     }
 
+    /**
+     * Creates the request body for checking the health status of a crypto node.
+     *
+     * @return An instance of [RequestBody] representing the request body.
+     */
     protected open fun createBody(): RequestBody {
         val currentBlockRequest =
             """{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":"ethBlockNumberPing${UUID.randomUUID()}"}"""
         return currentBlockRequest.toRequestBody("application/json".toMediaTypeOrNull())
     }
 
+    /**
+     * Checks the health status of a given URL.
+     *
+     * @param url The URL to check.
+     *
+     * @return The health status of the URL.
+     */
     open fun check(url: URL): HeathStatus {
         val time = System.currentTimeMillis()
         val status = checkStatus(url)
         return HeathStatus(status, System.currentTimeMillis() - time)
     }
 
+    /**
+     * Checks the status of a given URL.
+     *
+     * @param url The URL to check the status of.
+     * @return True if the status check is successful, false otherwise.
+     */
     protected open fun checkStatus(url: URL): Boolean {
         try {
             val request =
@@ -64,7 +97,18 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient) {
         }
     }
 
+    /**
+     * This class contains a companion object with a single property, `logger`, defined as a `Logger` object.
+     * The `logger` is used to log messages related to the `CryptoNodeHealthChecker` class.
+     *
+     * @property logger A `Logger` object used for logging messages.
+     */
     companion object {
+        /**
+         * Logger - A variable representing a logger instance for logging purposes.
+         *
+         * @property logger The logger instance.
+         */
         val logger = Logger.getLogger(this::class.java.name)
     }
 }

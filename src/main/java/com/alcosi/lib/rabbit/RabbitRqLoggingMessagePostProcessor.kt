@@ -20,9 +20,24 @@ package com.alcosi.lib.rabbit
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageProperties
 import java.nio.charset.StandardCharsets
+import java.util.logging.Level
 import java.util.logging.Logger
 
-open class RabbitRqLoggingMessagePostProcessor(val maxBodySize: Int) : RabbitLoggingMessagePostProcessor {
+/**
+ * RabbitRqLoggingMessagePostProcessor is a class that implements the RabbitLoggingMessagePostProcessor interface.
+ * It is responsible for logging the request message before it is sent to the RabbitMQ server.
+ * @param loggingLevel Level of message in log
+ * @param maxBodySize The maximum size of the message body that will be logged.
+ *
+ * @constructor Creates an instance of RabbitRqLoggingMessagePostProcessor with the specified maxBodySize.
+ */
+open class RabbitRqLoggingMessagePostProcessor(val loggingLevel:Level,val maxBodySize: Int) : RabbitLoggingMessagePostProcessor {
+    /**
+     * Performs post-processing on the given message.
+     *
+     * @param message The original message to process.
+     * @return The processed message.
+     */
     override fun postProcessMessage(message: Message): Message {
         val time = System.currentTimeMillis()
         val properties = message.messageProperties
@@ -38,11 +53,21 @@ open class RabbitRqLoggingMessagePostProcessor(val maxBodySize: Int) : RabbitLog
                 String(message.body, StandardCharsets.UTF_8)
             }
         val logBody = constructRqBody(id, properties, headers, propsString, body)
-        logger.info(logBody)
+        logger.log(loggingLevel,logBody)
         properties.correlationId = "$id;${properties.receivedExchange};${properties.receivedRoutingKey};${properties.consumerQueue};$time"
         return message
     }
 
+    /**
+     * Constructs the request body for logging purposes.
+     *
+     * @param id The unique identifier of the request.
+     * @param properties The message properties containing information about the request.
+     * @param headers The list of headers associated with the request.
+     * @param propsString A compact string representation of the message properties.
+     * @param body The body of the request.
+     * @return The constructed request body as a string.
+     */
     protected open fun constructRqBody(
         id: String,
         properties: MessageProperties,

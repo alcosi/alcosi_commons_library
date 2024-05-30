@@ -18,5 +18,10 @@
 package com.alcosi.lib.serializers.principal
 
 import com.alcosi.lib.security.DefaultPrincipalDetails
-
+/**
+ * This class is a deserializer for DefaultPrincipalDetails. It extends the UniversalPrincipalDetailsDeSerializer
+ * class and provides the implementation for deserializing DefaultPrincipalDetails objects from JSON.
+ *
+ * @param claszz The class object for DefaultPrincipalDetails
+ */
 open class DefaultPrincipalDetailsDeSerializer() : UniversalPrincipalDetailsDeSerializer<UniversalPrincipalDetailsDeSerializer.PrincipalSerializationObject>(DefaultPrincipalDetails::class.java)

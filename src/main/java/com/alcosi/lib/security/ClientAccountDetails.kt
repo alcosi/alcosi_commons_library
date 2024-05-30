@@ -21,6 +21,15 @@ import com.alcosi.lib.serializers.principal.ClientAccountDetailsPrincipalDeSeria
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+/**
+ * ClientAccountDetails is a class that represents the details of a client account.
+ *
+ * @param id The ID of the account.
+ * @param authorities The list of authorities associated with the account.
+ * @param clientId The client ID associated with the account.
+ * @param className The class name of the account.
+ * @constructor Creates an instance of ClientAccountDetails.
+ */
 @JsonDeserialize(using = ClientAccountDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class ClientAccountDetails(

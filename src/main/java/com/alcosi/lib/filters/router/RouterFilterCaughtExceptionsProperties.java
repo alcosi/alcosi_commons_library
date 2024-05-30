@@ -19,10 +19,26 @@ package com.alcosi.lib.filters.router;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Configuration properties for the RouterFilterCaughtExceptionsProperties class.
+ */
 @ConfigurationProperties("common-lib.router-filter.caught-exception")
 public class RouterFilterCaughtExceptionsProperties {
+    /**
+     * Indicates whether the feature is disabled or not.
+     * The default value is false.
+     */
     private Boolean disabled = false;
-
+    /**
+     * The errorCode used for message conversion errors.
+     * The default value is 400000.
+     */
+    private Integer messageConversionErrorCode = 400000;
+    /**
+     * Represents the unknown error code used in the RouterFilterCaughtExceptionsProperties class.
+     * The default value is 500000.
+     */
+    private Integer unknownErrorCode = 500000;
     public Boolean getDisabled() {
         return disabled;
     }
@@ -47,6 +63,4 @@ public class RouterFilterCaughtExceptionsProperties {
         this.unknownErrorCode = unknownErrorCode;
     }
 
-    private Integer messageConversionErrorCode = 400000;
-    private Integer unknownErrorCode = 500000;
 }

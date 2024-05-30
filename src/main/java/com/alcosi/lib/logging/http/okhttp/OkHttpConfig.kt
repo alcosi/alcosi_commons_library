@@ -32,11 +32,29 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import java.util.logging.Level
 
+/**
+ * The OkHttpConfig class is a configuration class that provides beans related to OkHttp library.
+ *
+ * It is annotated with [AutoConfiguration], [ConditionalOnClass], and [EnableConfigurationProperties] annotations
+ * to ensure that it is automatically configured when the `Interceptor` class is available in the classpath,
+ * and the configuration properties class `OkHttpLoggingProperties` is enabled.
+ *
+ *
+ * @see OKLoggingInterceptor
+ *
+ * @property properties The configuration properties for OkHttp.
+ * @property headerHelper An instance of the HeaderHelper class.
+ */
 @AutoConfiguration
 @ConditionalOnClass(Interceptor::class)
 @EnableConfigurationProperties(OkHttpLoggingProperties::class)
 @ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 class OkHttpConfig {
+    /**
+     * Retrieves an instance of the OKLoggingInterceptor class.
+     *
+     * @param properties The OkHttpLoggingProperties object that holds the logging configuration properties.
+     */
     @Bean
     @ConditionalOnMissingBean(OKLoggingInterceptor::class)
     @ConditionalOnBean(HeaderHelper::class)
@@ -45,9 +63,14 @@ class OkHttpConfig {
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
     ): OKLoggingInterceptor {
-        return OKLoggingInterceptor(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper, 1)
+        return OKLoggingInterceptor(properties.maxLogBodySize, properties.loggingLevel.javaLevel, headerHelper, 1)
     }
 
+    /**
+     * Retrieves an instance of the OKContextHeadersInterceptor class.
+     *
+     * @param headerHelper The HeaderHelper object used to create request headers.
+     **/
     @Bean
     @ConditionalOnMissingBean(OKContextHeadersInterceptor::class)
     @ConditionalOnBean(HeaderHelper::class)
@@ -56,6 +79,10 @@ class OkHttpConfig {
         return OKContextHeadersInterceptor(headerHelper, 0)
     }
 
+    /**
+     * Creates an instance of OkHttpClient with the provided configurations.
+     *
+     * @param properties The OkHttpLoggingProperties*/
     @Bean("okHttpClient")
     @Primary
     fun createOkHttpClient(
@@ -72,6 +99,13 @@ class OkHttpConfig {
         return builder.build()
     }
 
+    /**
+     * Configures the timeouts for the OkHttpClient builder.
+     *
+     * @param builder        The OkHttpClient.Builder object to configure.
+     * @param interceptors   The list of Interceptors to add to the builder.
+     * @param properties     The OkHttpLoggingProperties object that holds the logging configuration properties.
+     */
     protected fun configureTimeouts(
         builder: OkHttpClient.Builder,
         interceptors: List<Interceptor>,

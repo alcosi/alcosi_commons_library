@@ -22,7 +22,22 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import java.math.BigInteger
 
-class HexBigIntSerializer : StdSerializer<BigInteger>(BigInteger::class.java) {
+/**
+ * This class is a serializer for converting BigInteger objects to hexadecimal strings.
+ *
+ * @param T The type of objects that this serializer can serialize. In this case, it is BigInteger.
+ * @property value The BigInteger object to serialize.
+ * @property gen The JsonGenerator used for writing JSON content.
+ * @property provider The SerializerProvider used for accessing serialization context.
+ */
+open class HexBigIntSerializer : StdSerializer<BigInteger>(BigInteger::class.java) {
+    /**
+     * Serializes a BigInteger object to a hexadecimal string representation.
+     *
+     * @param value The BigInteger object to serialize. It can be null.
+     * @param gen The JsonGenerator used for writing JSON content.
+     * @param provider The SerializerProvider used for accessing serialization context.
+     */
     override fun serialize(
         value: BigInteger?,
         gen: JsonGenerator,

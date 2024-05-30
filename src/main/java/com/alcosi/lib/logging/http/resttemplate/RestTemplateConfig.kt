@@ -41,11 +41,21 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import java.util.logging.Level
 
+/**
+ * This class configures the RestTemplate for making HTTP requests.
+ */
 @AutoConfiguration
 @AutoConfigureBefore(RestClientAutoConfiguration::class, RestTemplateAutoConfiguration::class)
 @EnableConfigurationProperties(RestTemplateProperties::class)
 @ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 class RestTemplateConfig {
+    /**
+     * Retrieves the `RestTemplateLogRequestResponseFilter` instance.
+     *
+     * @param properties The properties for configuring the filter.
+     * @param headerHelper The HeaderHelper instance used by the filter.
+     * @return The RestTemplateLogRequestResponseFilter instance.
+     */
     @Bean
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplateLogRequestResponseFilter::class)
@@ -55,9 +65,15 @@ class RestTemplateConfig {
         properties: RestTemplateProperties,
         headerHelper: HeaderHelper,
     ): RestTemplateLogRequestResponseFilter {
-        return RestTemplateLogRequestResponseFilter(properties.maxLogBodySize, Level.parse(properties.loggingLevel), headerHelper, 1)
+        return RestTemplateLogRequestResponseFilter(properties.maxLogBodySize, properties.loggingLevel.javaLevel, headerHelper, 1)
     }
 
+    /**
+     * Retrieves the `RestTemplateContextHeadersFilter` instance.
+     *
+     * @param headerHelper The HeaderHelper instance used by the filter.
+     * @return The RestTemplateContextHeadersFilter instance.
+     */
     @Bean
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplateContextHeadersFilter::class)
@@ -66,7 +82,12 @@ class RestTemplateConfig {
     fun getRestTemplateContextFilter(headerHelper: HeaderHelper): RestTemplateContextHeadersFilter {
         return RestTemplateContextHeadersFilter(headerHelper, 0)
     }
-
+    /**
+     * Retrieves a SimpleClientHttpRequestFactory instance with configured connection and read timeouts.
+     *
+     * @param properties The properties used to configure the SimpleClientHttpRequestFactory.
+     * @return The SimpleClientHttpRequestFactory instance.
+     */
     @Bean("clientHttpRequestFactory")
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(ClientHttpRequestFactory::class)
@@ -77,7 +98,14 @@ class RestTemplateConfig {
         val factory = BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory)
         return factory
     }
-
+    /**
+     * Retrieves the RestTemplateBuilder instance with configured filters, request factory, and configurer.
+     *
+     * @param filters Provider of ClientHttpRequestInterceptor filters.
+     * @param factory ClientHttpRequestFactory instance.
+     * @param configurer Provider of RestTemplateBuilderConfigurer instances.
+     * @return The RestTemplateBuilder instance.
+     */
     @Bean("restTemplateBuilder")
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplate::class)
@@ -93,7 +121,12 @@ class RestTemplateConfig {
         configurer.stream().forEach { it.configure(builder) }
         return builder
     }
-
+    /**
+     * Retrieves the RestTemplate instance.
+     *
+     * @param builder The RestTemplateBuilder instance used to build the RestTemplate.
+     * @return The RestTemplate instance.
+     */
     @Bean("restTemplate")
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplate::class)
@@ -101,6 +134,14 @@ class RestTemplateConfig {
         return builder.build()
     }
 
+    /**
+     * Retrieves the RestClient instance.
+     *
+     * @param filters The ObjectProvider of ClientHttpRequestInterceptor filters.
+     * @param configurer The ObjectProvider of RestClientBuilderConfigurer.
+     * @param factory The ClientHttpRequestFactory for creating ClientHttpRequests.
+     * @return The RestClient instance.
+     */
     @Bean("restClient")
     @ConditionalOnClass(RestClient::class)
     @ConditionalOnMissingBean(RestClient::class)

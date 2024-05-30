@@ -30,18 +30,32 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 @AutoConfiguration
 @AutoConfigureAfter(PrepareHexServiceConfig::class)
 class SerializersConfig {
+    /**
+     * Configures the HexStringDeSerializer by setting the PrepareHexService.
+     *
+     * @param prepareArgsService The PrepareHexService instance to be*/
     @Autowired
     @ConditionalOnBean(PrepareHexService::class)
     fun configureHexDeSerializer(prepareArgsService: PrepareHexService) {
         HexStringDeSerializer.setPrepareArgsService(prepareArgsService)
     }
 
+    /**
+     * Configures the HexStringSerializer by setting the PrepareHexService.
+     *
+     * @param prepareArgsService The PrepareHexService instance to be set.
+     */
     @Autowired
     @ConditionalOnBean(PrepareHexService::class)
     fun configureHexSerializer(prepareArgsService: PrepareHexService) {
         HexStringSerializer.setPrepareArgsService(prepareArgsService)
     }
 
+    /**
+     * Configures the HexBigIntDeSerializer by setting the PrepareHexService.
+     *
+     * @param prepareArgsService The PrepareHexService instance to be set. Cannot be null.
+     */
     @Autowired
     @ConditionalOnBean(PrepareHexService::class)
     fun configureHexBigIntDeSerializer(prepareArgsService: PrepareHexService) {

@@ -22,12 +22,35 @@ import com.alcosi.lib.serializers.SecuredDataContainerSerializer
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
+/**
+ * Represents a secured data container.
+ *
+ * @param T The type of data contained in the secured data container.
+ */
 @JsonSerialize(using = SecuredDataContainerSerializer::class)
 @JsonDeserialize(using = SecuredDataContainerDeSerializer::class)
 interface SecuredDataContainer<T> {
+    /**
+     * Represents the name of a class.
+     */
     val className: String
+    /**
+     * The original length of a variable.
+     *
+     * @property originalLength The length of the variable.
+     */
     val originalLength: Int
+    /**
+     * Represents encrypted data in the form of a byte array.
+     *
+     * @property encrypted The encrypted data stored as a byte array.
+     */
     val encrypted: ByteArray
-
+    /**
+     * Decodes the given key.
+     *
+     * @param key The key to be decoded as a ByteArray.
+     * @return The decoded key as type T.
+     */
     fun decoded(key: ByteArray): T
 }

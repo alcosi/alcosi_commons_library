@@ -20,6 +20,17 @@ package com.alcosi.lib.exception
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.server.ResponseStatusException
 
+/**
+ * Represents an exception that occurs during API processing.
+ *
+ * @property code The error code associated with the exception.
+ * @property messageOriginal The original error message associated with the exception.
+ * @property httpCode The HTTP status code associated with the exception.
+ * @constructor Creates an [ApiException] instance with the specified code, original message, and HTTP status code.
+ * @param code The error code associated with the exception.
+ * @param messageOriginal The original error message associated with the exception.
+ * @param httpCode The HTTP status code associated with the exception. Default value is derived from the error code.
+ */
 open class ApiException(
     val code: Long,
     messageOriginal: String,

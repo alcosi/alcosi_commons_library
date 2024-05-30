@@ -23,9 +23,21 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.NullNode
 
-class HexStringDeSerializer : StdDeserializer<String?>(
+/**
+ * HexStringDeSerializer class is a custom deserializer that converts a hexadecimal string representation
+ * into a String object. It extends the StdDeserializer class and overrides the deserialize method.
+ * It also provides a companion object for setting the PrepareHexService dependency.
+ */
+open class HexStringDeSerializer : StdDeserializer<String?>(
     Any::class.java,
 ) {
+    /**
+     * Deserializes a JSON node into a String object.
+     *
+     * @param p The JsonParser object. Must not be null.
+     * @param ctxt The DeserializationContext object. Must not be null.
+     * @return The deserialized String object, or null if the JSON node is null.
+     */
     override fun deserialize(
         p: JsonParser?,
         ctxt: DeserializationContext?,
@@ -42,10 +54,18 @@ class HexStringDeSerializer : StdDeserializer<String?>(
     }
 
     companion object {
+        /**
+         * Sets the PrepareHexService for the HexStringDeSerializer.
+         *
+         * @param prepareArgsService The PrepareHexService to be set. Can be null.
+         */
         fun setPrepareArgsService(prepareArgsService: PrepareHexService?) {
             Companion.prepareArgsService = prepareArgsService
         }
 
+        /**
+         * Reference to the PrepareHexService instance used for preparing arguments.
+         */
         private var prepareArgsService: PrepareHexService? = null
     }
 }

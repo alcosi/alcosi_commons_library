@@ -28,6 +28,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.scheduling.annotation.Scheduled
 
+/**
+ * The CacheFilterConfig class is responsible for configuring and creating beans related to the caching filter.
+ * It is annotated with @AutoConfigureAfter and @ConditionalOnBean to ensure that it is automatically configured after the FilterConfig class
+ * and if the FilterConfig bean is present in the application context.
+ *
+ * The class is also annotated with @ConditionalOnProperty, which checks whether the property "common-lib.filter.cache.disabled"
+ */
 @AutoConfigureAfter(FilterConfig::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
@@ -38,6 +45,15 @@ import org.springframework.scheduling.annotation.Scheduled
 )
 @EnableConfigurationProperties(CacheFilterProperties::class)
 open class CacheFilterConfig {
+    /**
+     * Configures and creates a caching FilterRegistrationBean. This method is annotated with @ConditionalOnClass to ensure that it is only
+     * executed if the Scheduled class is present in the classpath. It is also annotated with @Bean to indicate that it should be considered
+     * as a bean by the Spring container and @ConditionalOnProperty to check whether the property "common-lib.filter.cache.disabled" is set to false (default is true).
+     *
+     * @param servletFilterProperties The ServletFilterProperties instance.
+     * @param cacheFilterProperties The CacheFilterProperties instance.
+     * @return A FilterRegistrationBean that contains the configured CachingRqRsFilter.
+     */
     @ConditionalOnClass(Scheduled::class)
     @Bean(name = ["cachingRqRsFilterBean"], value = ["cachingRqRsFilterBean"])
     fun cachingFilter(

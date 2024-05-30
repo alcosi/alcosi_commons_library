@@ -22,9 +22,22 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 
-class HexStringSerializer : StdSerializer<String>(
+/**
+ * HexStringSerializer is a custom serializer for serializing Strings as hexadecimal values.
+ *
+ * @constructor Creates a HexStringSerializer.
+ */
+open class HexStringSerializer : StdSerializer<String>(
     String::class.java,
 ) {
+    /**
+     * Serializes a String value to JSON using the provided JsonGenerator and SerializerProvider.
+     *
+     * @param value The String value to be serialized.
+     * @param gen The JsonGenerator object to write the JSON output.
+     * @param provider The SerializerProvider object for accessing serializers.
+     * @throws IllegalStateException If the class of the value is not String.
+     */
     override fun serialize(
         value: String?,
         gen: JsonGenerator,
@@ -41,14 +54,26 @@ class HexStringSerializer : StdSerializer<String>(
         }
     }
 
-    private fun writeString(
+    /**
+     * Writes a String value into a JsonGenerator after preprocessing it with the getAddr() method.
+     *
+     * @param gen The JsonGenerator object to write the JSON output.
+     * @param a The String value to be written.
+     */
+    protected open fun writeString(
         gen: JsonGenerator,
         a: Any,
     ) {
         gen.writeString(getAddr(a as String))
     }
 
-    private fun getAddr(value: String): String {
+    /**
+     * Returns the formatted address based on the provided value.
+     *
+     * @param value the address value to be formatted
+     * @return the formatted address
+     */
+    protected open fun getAddr(value: String): String {
         return if (value.startsWith("0x") || value.startsWith("0X")) {
             value
         } else {
@@ -57,10 +82,19 @@ class HexStringSerializer : StdSerializer<String>(
     }
 
     companion object {
+        /**
+         * Sets the PrepareHexService instance for the HexStringSerializer class.
+         *
+         * @param prepareArgsService The PrepareHexService instance to be set.
+         */
         fun setPrepareArgsService(prepareArgsService: PrepareHexService?) {
             Companion.prepareArgsService = prepareArgsService
         }
 
+        /**
+         * Service for preparing arguments in hexadecimal format.
+         * This service object is responsible for preparing arguments to be in hexadecimal format.
+         */
         private var prepareArgsService: PrepareHexService? = null
     }
 }

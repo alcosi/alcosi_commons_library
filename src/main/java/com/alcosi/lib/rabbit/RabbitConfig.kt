@@ -31,11 +31,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 
+
+/**
+ * RabbitConfig is a configuration class for RabbitMQ.
+ **/
 @ConditionalOnClass(value = [RabbitAdmin::class, SimpleRabbitListenerContainerFactory::class])
 @ConditionalOnProperty(prefix = "common-lib.rabbit", name = ["disabled"], matchIfMissing = true, havingValue = "false")
 @AutoConfiguration
 @EnableConfigurationProperties(RabbitProperties::class)
-class RabbitConfig(val objectMapper: ObjectMapper) {
+class RabbitConfig {
+    /**
+     * Returns an instance of RabbitAdmin using the provided RabbitTemplate.
+     *
+     * @param template The RabbitTemplate instance to be used by RabbitAdmin.
+     * @return The RabbitAdmin instance.
+     */
     @Bean
     @ConditionalOnMissingBean(RabbitAdmin::class)
     fun getRabbitAdmin(template: RabbitTemplate): RabbitAdmin {
@@ -43,24 +53,43 @@ class RabbitConfig(val objectMapper: ObjectMapper) {
         return rabbitAdmin
     }
 
+    /**
+     * Returns an instance of RabbitListenerErrorHandler.
+     *
+     */
     @Bean("rabbitExHandler")
     @ConditionalOnMissingBean(RabbitListenerErrorHandler::class)
-    fun getRabbitHandler(): RabbitListenerErrorHandler {
+    fun getRabbitHandler( objectMapper: ObjectMapper): RabbitListenerErrorHandler {
         return RabbitErrorHandler(objectMapper)
     }
 
+    /**
+     * getRabbitRqLoggingMessagePostProcessor method returns an instance of RabbitRqLoggingMessagePostProcessor with the specified maxBodySize*/
     @Bean("rabbitRqLoggingMessagePostProcessor")
     @ConditionalOnMissingBean(RabbitRqLoggingMessagePostProcessor::class)
     fun getRabbitRqLoggingMessagePostProcessor(properties: RabbitProperties): RabbitRqLoggingMessagePostProcessor {
-        return RabbitRqLoggingMessagePostProcessor(properties.maxLogBodySize)
+        return RabbitRqLoggingMessagePostProcessor(properties.loggingLevel.javaLevel,properties.maxLogBodySize)
     }
 
+    /**
+     * getRabbitRsLoggingMessagePostProcessor is a method that returns an instance of RabbitRsLoggingMessagePostProcessor.
+     * This*/
     @Bean("rabbitRsLoggingMessagePostProcessor")
     @ConditionalOnMissingBean(RabbitRsLoggingMessagePostProcessor::class)
     fun getRabbitRsLoggingMessagePostProcessor(properties: RabbitProperties): RabbitRsLoggingMessagePostProcessor {
-        return RabbitRsLoggingMessagePostProcessor(properties.maxLogBodySize)
+        return RabbitRsLoggingMessagePostProcessor(properties.loggingLevel.javaLevel,properties.maxLogBodySize)
     }
 
+    /**
+     * Creates a SimpleRabbitListenerContainerFactory bean if a SimpleRabbitListenerContainerFactory bean is not already present.
+     *
+     * @param connectionFactory The CachingConnectionFactory instance to be used by the SimpleRabbitListenerContainerFactory.
+     * @param configurer The SimpleRabbitListenerContainerFactoryConfigurer instance used to configure the factory.
+     * @param rsLogger The RabbitRsLoggingMessagePostProcessor instance used for post-processing received messages.
+     * @param rqLogger The RabbitRqLoggingMessagePostProcessor instance used for pre-processing sent messages.
+     * @param errorHandler The RabbitListenerErrorHandler instance used to handle listener errors.
+     * @return A SimpleRabbitListenerContainerFactory instance.
+     */
     @Bean
     @ConditionalOnMissingBean(SimpleRabbitListenerContainerFactory::class)
     fun rabbitListenerContainerFactory(

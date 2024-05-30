@@ -17,41 +17,36 @@
 
 package com.alcosi.lib.executors
 
+import io.github.breninsul.javatimerscheduler.registry.SchedulerType
+import io.github.breninsul.javatimerscheduler.registry.TaskSchedulerRegistry
 import java.time.Duration
-import java.util.*
-import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Level
-import java.util.logging.Logger
 
+/**
+ * The base abstract class for a scheduler timer.
+ *
+ * @property delay The delay between each batch of tasks.
+ * @property name The name of the scheduler timer.
+ * @property loggingLevel The logging level for the scheduler timer.
+ * @property firstDelay The delay before the first batch of tasks.
+ */
+@Deprecated("Use TaskSchedulerRegistry or SpringDynamicScheduleRegistry", replaceWith = ReplaceWith("Use TaskSchedulerRegistry or SpringDynamicScheduleRegistry","io.github.breninsul.javatimerscheduler.registry.SpringDynamicScheduleRegistry","io.github.breninsul.javatimerscheduler.autoconfigure.SpringDynamicScheduleRegistry"))
 abstract class SchedulerTimer(
     val delay: Duration,
     val name: String = "SchedulerTimer",
     val loggingLevel: Level = Level.FINE,
     val firstDelay: Duration = delay,
 ) {
-    val logger = Logger.getLogger(this.javaClass.name)
-    val batchTimer: Timer = createTimer()
-    val counter = AtomicLong(1)
-
+    /**
+     * This method is called to start a batch of tasks.
+     * It is an abstract method, meaning it must be implemented by a subclass.
+     */
     abstract fun startBatch()
 
-    fun createTimer(): Timer {
-        val task =
-            object : TimerTask() {
-                override fun run() {
-                    val time = System.currentTimeMillis()
-                    val errorText =
-                        try {
-                            startBatch()
-                            ""
-                        } catch (t: Throwable) {
-                            " ${t.javaClass}:${t.message}"
-                        }
-                    logger.log(loggingLevel, "$name job №${counter.getAndIncrement()} took ${System.currentTimeMillis() - time}ms.$errorText")
-                }
-            }
-        val timer = Timer(name)
-        timer.scheduleAtFixedRate(task, firstDelay.toMillis(), delay.toMillis())
-        return timer
+    init {
+        /**
+         * Register task for startBatch function
+         */
+        TaskSchedulerRegistry.registerTypeTask(SchedulerType.VIRTUAL_WAIT, name, delay, firstDelay, this::class, loggingLevel, runnable = Runnable { startBatch() })
     }
 }

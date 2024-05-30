@@ -20,4 +20,9 @@ package com.alcosi.lib.filters.router
 import org.springframework.web.servlet.function.HandlerFilterFunction
 import org.springframework.web.servlet.function.ServerResponse
 
+/**
+ * Represents a filter for routing requests in a server.
+ *
+ * @param T the type of the request handler function.
+ */
 interface RouterFilter : HandlerFilterFunction<ServerResponse, ServerResponse>

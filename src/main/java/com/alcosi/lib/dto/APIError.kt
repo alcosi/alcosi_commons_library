@@ -17,6 +17,14 @@
 
 package com.alcosi.lib.dto
 
+/**
+ * Represents an API error with relevant information such as message, code, error class, and HTTP code.
+ *
+ * @property message The error message.
+ * @property code The error code.
+ * @property errorClass The error class.
+ * @property httpCode The HTTP code derived from the error code.
+ */
 @JvmRecord
 data class APIError(
     val message: String,
@@ -24,6 +32,14 @@ data class APIError(
     val errorClass: String,
     val httpCode: Int = code.toString().take(3).toInt(),
 ) {
+    /**
+     * Returns a string representation of the [APIError] instance.
+     *
+     * The string representation consists of the error class, error code, and error message
+     * concatenated with ":" as the separator.
+     *
+     * @return A string representation of the [APIError] instance.
+     */
     override fun toString(): String {
         return "$errorClass:$code:$message"
     }

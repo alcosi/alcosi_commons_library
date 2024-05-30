@@ -19,9 +19,39 @@ package com.alcosi.lib.filters.servlet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Configuration properties for ServletFilter.
+ */
 @ConfigurationProperties("common-lib.filter.all")
 public class ServletFilterProperties {
+    /**
+     * Indicates whether the disabled flag is set for the class.
+     *
+     * <p>
+     * The disabled flag is a boolean value that determines if the class is disabled or enabled.
+     * By default, the disabled flag is set to false, indicating that the class is enabled.
+     * </p>
+     *
+     * @return the disabled flag value
+     *
+     * @see ServletFilterProperties
+     * @see ServletFilterProperties#getDisabled()
+     * @see ServletFilterProperties#setDisabled(Boolean)
+     */
     private Boolean disabled = false;
+    /**
+     * The base order of the ServletFilter.
+     *
+     * <p>
+     * The base order controls the priority at which the ServletFilter is executed.
+     * A lower value indicates a higher priority. Integer.MIN_VALUE is used as the default
+     * base order value.
+     * </p>
+     *
+     * @see ServletFilterProperties
+     * @see ServletFilterProperties#getBaseOrder()
+     * @see ServletFilterProperties#setBaseOrder(Integer)
+     */
     private Integer baseOrder = Integer.MIN_VALUE;
 
     public Boolean getDisabled() {

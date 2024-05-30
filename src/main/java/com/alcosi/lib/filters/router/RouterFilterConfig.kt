@@ -25,6 +25,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.web.servlet.function.RouterFunction
 
+/**
+ * Configuration class for Router filters.
+ */
 @ConditionalOnClass(RouterFunction::class)
 @ConditionalOnProperty(
     prefix = "common-lib.router-filter.all",
@@ -35,6 +38,12 @@ import org.springframework.web.servlet.function.RouterFunction
 @EnableConfigurationProperties(RouterFilterCaughtExceptionsProperties::class, RouterFilterProperties::class)
 @AutoConfiguration
 class RouterFilterConfig {
+    /**
+     * Retrieves the CaughtExceptionRouterFilter instance based on the provided RouterFilterCaughtExceptionsProperties.
+     *
+     * @param props The properties for configuring the CaughtExceptionRouterFilter.
+     * @return The instantiated CaughtExceptionRouterFilter.
+     */
     @Bean
     @ConditionalOnProperty(
         prefix = "common-lib.router-filter.caught-exception",
@@ -47,6 +56,12 @@ class RouterFilterConfig {
         return CaughtExceptionRouterFilter(props.messageConversionErrorCode, props.unknownErrorCode)
     }
 
+    /**
+     * Retrieves a FilteredRouterBeanPostProcessor instance based on the provided list of RouterFilters.
+     *
+     * @param filters The list of RouterFilters used to filter RouterFunctions.
+     * @return A FilteredRouterBeanPostProcessor instance.
+     */
     @Bean
     @ConditionalOnMissingBean(FilteredRouterBeanPostProcessor::class)
     fun getFilteredRouterBeanPostProcessor(filters: List<RouterFilter>): FilteredRouterBeanPostProcessor {

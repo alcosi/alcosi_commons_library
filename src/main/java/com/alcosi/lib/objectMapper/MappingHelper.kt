@@ -23,90 +23,101 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
 
-class MappingHelper(protected val objectMapper: ObjectMapper) {
-    fun <T : Any> mapOne(
+/**
+ * @deprecated Use extension for object mapper
+ * @replace
+ */
+@Deprecated("Use extension for object mapper", replaceWith = ReplaceWith("Use extension for object mapper", "com.alcosi.lib.objectMapper.ObjectMapperExtension.kt"), level = DeprecationLevel.WARNING)
+open class MappingHelper(val objectMapper: ObjectMapper) {
+    /**
+     * Maps the given JSON string to an instance of the specified class.
+     *
+     * @param s The JSON string to map. Can be null.
+     * @param c The class to map to.
+     * @return The mapped instance of the class, or null if the JSON string is
+     *     null.
+     */
+    open fun <T : Any> mapOne(
         s: String?,
         c: Class<T>,
     ): T? {
-        return if (s == null) {
-            null
-        } else {
-            (objectMapper.readValue(s, c))
-        }
+        return objectMapper.mapOne(s, c)
     }
 
-    fun <T : Any> mapOneNode(
+    /**
+     * Maps a single JSON node to an object of the specified class.
+     *
+     * @param s The JSON node to map.
+     * @param c The class to map the JSON node to.
+     * @return An object of the specified class if the JSON node is not null, otherwise null.
+     */
+    open fun <T : Any> mapOneNode(
         s: JsonNode?,
         c: Class<T>,
     ): T? {
-        return if (s == null) {
-            null
-        } else {
-            objectMapper.treeToValue(s, c)
-        }
+        return objectMapper.mapOneNode(s, c)
     }
 
-    fun <T : Any> mapOne(
+    /**
+     * Maps a JSON string to an object of the specified type.
+     *
+     * @param s The JSON string to be mapped. Can be null.
+     * @param c The type reference of the object to be mapped to.
+     * @return The mapped object of type T, or null if the input string is null.
+     */
+    open fun <T : Any> mapOne(
         s: String?,
         c: TypeReference<T>,
     ): T? {
-        return if (s == null) {
-            null
-        } else {
-            (objectMapper.readValue(s, c))
-        }
+        return objectMapper.mapOne(s, c)
     }
 
-    fun <T : Any> mapOneNode(
+    /**
+     * Maps the given [JsonNode] to an instance of the specified class [T].
+     *
+     * @param s The [JsonNode] to map. Can be null.
+     * @param c The class to map to.
+     * @return The mapped
+     */
+    open fun <T : Any> mapOneNode(
         s: JsonNode?,
         c: JavaType,
     ): T? {
-        return if (s == null) {
-            null
-        } else {
-            objectMapper.treeToValue(s, c)
-        }
+        return objectMapper.mapOneNode(s, c)
     }
 
-    fun serialize(o: Any?): String? {
-        return if (o == null) {
-            null
-        } else {
-            objectMapper.writeValueAsString(o).replace("\u0000", "<0x00>")
-        }
+    /**
+     */
+    open fun serialize(o: Any?): String? {
+        return objectMapper.serialize(o)
     }
 
-    fun <T : Any> mapList(
+    /**
+     * Maps the given JSON string to a list of instances of the specified class.
+     *
+     * @param s The JSON string to map. Can be null.
+     * @param c The class to map to.
+     * @return The mapped list of*/
+    open fun <T : Any> mapList(
         s: String?,
         c: Class<T>,
     ): List<T> {
-        if (s == null) {
-            return emptyList()
-        }
-        val arrayType = c.arrayType()
-        val t = objectMapper.readValue(s, arrayType) as Array<*>
-        return Arrays
-            .stream(t)
-            .map { t -> t as T }
-            .toList()
+        return objectMapper.mapList(s, c)
     }
 
-    fun <T : Any> mapListNode(
+    /**
+     * Maps the given [JsonNode] to a list of instances of the specified class [T].
+     *
+     * @param s The [JsonNode] to map. Can be null.
+     * @param c The class to map to.
+     * @return The mapped list of instances of the class, or an empty list if the [JsonNode] is null.
+     */
+    open fun <T : Any> mapListNode(
         s: JsonNode?,
         c: Class<T>,
     ): List<T> {
-        return if (s == null) {
-            return emptyList()
-        } else {
-            val arrayType = c.arrayType()
-            val t = objectMapper.treeToValue(s, arrayType) as Array<*>
-            return mapArrayToList(t)
-        }
+        return objectMapper.mapListNode(s, c)
+
     }
 
-    private fun <T : Any> mapArrayToList(t: Array<*>): MutableList<T> =
-        Arrays
-            .stream(t)
-            .map { it as T }
-            .toList()
 }

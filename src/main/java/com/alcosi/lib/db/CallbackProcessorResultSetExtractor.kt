@@ -21,8 +21,19 @@ import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowCallbackHandler
 import java.sql.ResultSet
 
+/**
+ * Represents a ResultSetExtractor that wraps an existing ResultSetExtractor and applies a list of RowCallbackHandlers to the ResultSet before extracting the data.
+ *
+ * @param T The type of the extracted data.
+ * @property callbacks The list of RowCallbackHandlers to be applied to the ResultSet.
+ * @property extractor The ResultSetExtractor to extract the data from the ResultSet.
+ */
 @JvmRecord
 data class CallbackProcessorResultSetExtractor<T>(val callbacks: List<RowCallbackHandler>, val extractor: ResultSetExtractor<T>) : ResultSetExtractor<T> {
+    /**
+     * Extracts data from the provided ResultSet using the specified extractor.
+     *
+     * @param rs The ResultSet from which the data will*/
     override fun extractData(rs: ResultSet): T? {
         return extractor.extractData(LoggingResultSet(callbacks, rs))
     }

@@ -21,6 +21,16 @@ import com.alcosi.lib.serializers.principal.OrganisationAccountDetailsPrincipalD
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 
+/**
+ * OrganisationAccountDetails is an open class that represents the details of an organization account.
+ *
+ * @param id The ID of the account.
+ * @param authorities The list of authorities associated with the account.
+ * @param organisationId The ID of the organization.
+ * @param className The class name of the account.
+ * @constructor Creates an instance of OrganisationAccountDetails.
+ * @extends AccountDetails
+ */
 @JsonDeserialize(using = OrganisationAccountDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class OrganisationAccountDetails(

@@ -23,16 +23,48 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * The Aes object provides functionality for AES encryption and decryption.
+ */
 object Aes {
+    /**
+     * A constant string representing the provider used in the cryptographic operations.
+     */
     val PROVIDER = "BC"
+    /**
+     * The algorithm used for encryption and decryption.
+     *
+     * @property ALGORITHM The algorithm name.
+     */
     val ALGORITHM = "AES"
+    /**
+     * This constant variable defines the transformation algorithm used for encrypting and decrypting data.
+     * It specifies the encryption algorithm (AES), mode (CBC), and padding (PKCS5Padding).
+     */
     val TRANSFORMATION = "AES/CBC/PKCS5Padding"
+    /**
+     * Represents an initialization vector (IV) parameter specification for cryptographic operations.
+     *
+     * @property iv The byte array containing the IV.
+     */
     val ivParameterSpec = IvParameterSpec(ByteArray(16))
-
+    /**
+     * Creates a new instance of Cipher with the specified transformation and provider.
+     *
+     * @return the newly created Cipher object.
+     * @throws NoSuchAlgorithmException if the specified transformation is not available.
+     * @throws NoSuchProviderException if the specified provider is not available.
+     */
     fun createCipher(): Cipher {
         return Cipher.getInstance(TRANSFORMATION, PROVIDER)
     }
-
+    /**
+     * Initializes a Cipher object with the provided key and mode.
+     *
+     * @param key The key used for encryption or decryption, represented as a ByteArray.
+     * @param mode The mode of operation for the cipher. Should be one of Cipher.ENCRYPT_MODE or Cipher.DECRYPT_MODE.
+     * @return The initialized Cipher object.
+     */
     fun initCipher(
         key: ByteArray,
         mode: Int,

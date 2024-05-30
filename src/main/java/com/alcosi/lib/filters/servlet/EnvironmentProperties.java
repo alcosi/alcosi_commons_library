@@ -19,9 +19,22 @@ package com.alcosi.lib.filters.servlet;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * The EnvironmentProperties class represents the properties related to the environment in which the application is running.
+ * The properties can be configured using the @ConfigurationProperties annotation.
+ */
 @ConfigurationProperties("spring.application")
 public class EnvironmentProperties {
+    /**
+     * The name field represents the name of the environment.
+     * It is a private variable in the EnvironmentProperties class.
+     * The default value of the name field is "dev".
+     */
     private String name="dev";
+    /**
+     * The Environment variable represents the current environment in which the application is running.
+     * The environment indicates whether the application is running in development, test, or production.
+     */
     private String environment="dev";
 
     public String getEnvironment() {

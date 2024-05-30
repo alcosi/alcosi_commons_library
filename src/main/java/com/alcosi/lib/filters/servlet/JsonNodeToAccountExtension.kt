@@ -23,7 +23,15 @@ import com.alcosi.lib.security.AccountDetails
 import com.alcosi.lib.security.ClientAccountDetails
 import com.alcosi.lib.security.OrganisationAccountDetails
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 
+/**
+ * Maps the account details from a JsonNode using a MappingHelper.
+ *
+ * @param mappingHelper The MappingHelper used for mapping.
+ * @return The mapped AccountDetails object, or null if the JsonNode is null or the mapping fails.
+ */
+@Deprecated("Use objectMapper function")
 fun JsonNode?.mapAccountDetails(mappingHelper: MappingHelper): AccountDetails?  {
     return if (this == null) {
         null
@@ -33,5 +41,22 @@ fun JsonNode?.mapAccountDetails(mappingHelper: MappingHelper): AccountDetails?  
         mappingHelper.mapOneNode<OrganisationAccountDetails>(this)
     } else {
         mappingHelper.mapOneNode<AccountDetails>(this)
+    }
+}
+/**
+ * Maps the account details from a JsonNode using a ObjectMapper.
+ *
+ * @param mapper The ObjectMapper used for mapping.
+ * @return The mapped AccountDetails object, or null if the JsonNode is null or the mapping fails.
+ */
+fun JsonNode?.mapAccountDetails(mapper:ObjectMapper): AccountDetails?  {
+    return if (this == null) {
+        null
+    } else if (this.hasNonNull("clientId")) {
+        mapper.mapOneNode<ClientAccountDetails>(this)
+    } else if (this.hasNonNull("organisationId")) {
+        mapper.mapOneNode<OrganisationAccountDetails>(this)
+    } else {
+        mapper.mapOneNode<AccountDetails>(this)
     }
 }

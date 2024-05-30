@@ -19,10 +19,34 @@ package com.alcosi.lib.doc;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * This class represents the properties configuration for OpenAPI in the common-lib library.
+ * It provides access to various configurable properties related to OpenAPI.
+ */
 @ConfigurationProperties("common-lib.openapi")
 public class OpenAPIProperties {
+    /**
+     * Represents the disabled status of a feature.
+     *
+     * <p>
+     * The disabled status indicates whether the feature is enabled or disabled.
+     * If the value is {@code true}, the feature is disabled. If the value is
+     * {@code false} (default), the*/
     private Boolean disabled= false;
+    /**
+     * Represents the web path for the OpenAPI API endpoint.
+     */
     private String apiWebPath= "/openapi/{fileName}";
+    /**
+     * This variable represents the file path of the OpenAPI YAML file.
+     * The default value is "openapi.yaml".
+     *
+     * <p>
+     * The file path is used to locate the OpenAPI YAML file for generating
+     * the API documentation. It specifies the location of the file within
+     * the file system.
+     *
+     */
     private String filePath= "openapi.yaml";
 
     public Boolean getDisabled() {

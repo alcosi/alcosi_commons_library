@@ -30,6 +30,16 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Logger
 
+/**
+ * CryptoNodesLoadBalancer is a class that provides load balancing functionality for crypto node services.
+ *
+ * @property cryptoNodesHealthActualizer The CryptoNodeHealthActualizer instance used for retrieving the health status of crypto node services.
+ * @property balancerTimeout The timeout duration for the load balancer.
+ * @property logger The logger instance for logging events and messages.
+ * @property random The Random instance for generating random numbers.
+ * @property sleepTime The sleep duration for waiting between attempts to get a valid URL.
+ * @property executor The ExecutorService instance for running tasks.
+ */
 open class CryptoNodesLoadBalancer(
     val cryptoNodesHealthActualizer: CryptoNodeHealthActualizer,
     val balancerTimeout: Duration,
@@ -40,6 +50,13 @@ open class CryptoNodesLoadBalancer(
     val sleepTime = Duration.ofMillis(3000)
     protected val executor = Executors.newSingleThreadExecutor()
 
+    /**
+     * Represents a service chance that consists of a URL, chance, and range.
+     *
+     * @property url The URL associated with the service chance.
+     * @property chance The chance of the service being selected.
+     * @property range The range of possible values for selection.
+     */
     @JvmRecord
     data class ServiceChance(
         val url: URL,
@@ -47,6 +64,13 @@ open class CryptoNodesLoadBalancer(
         val range: LongRange,
     )
 
+    /**
+     * Retrieves the actual URL for the given chain ID with an optional timeout.
+     *
+     * @param chainId The chain ID for which to retrieve the actual URL.
+     * @param timeout The timeout duration in milliseconds. Default value is 0.
+     * @return A Future object representing the result of the URL retrieval.
+     */
     @LogTime
     open fun getActualUrl(
         chainId: Int,
@@ -55,6 +79,14 @@ open class CryptoNodesLoadBalancer(
         return executor.submit(Callable { internal(chainId, timeout) })
     }
 
+    /**
+     * Selects an internal URL for a given chain ID based on the health status and timeouts of available URLs.
+     *
+     * @param chainId The ID of the chain for which to select an internal URL.
+     * @param timeout The timeout value in milliseconds. Default is 0.
+     * @return The selected internal URL for the specified chain ID.
+     * @throws IllegalStateException if no valid URL is available within the timeout period.
+     */
     protected open fun internal(
         chainId: Int,
         timeout: Long = 0,

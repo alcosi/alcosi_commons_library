@@ -24,7 +24,19 @@ import java.security.spec.X509EncodedKeySpec
 import java.util.concurrent.Executors
 import javax.crypto.Cipher
 
+/**
+ * The RsaEncrypter class is an implementation of the Encrypter interface that uses RSA encryption to encrypt data.
+ *
+ * @constructor Creates an instance of the RsaEncrypter class.
+ */
 open class RsaEncrypter : Encrypter {
+    /**
+     * Encrypts the provided data using the given key.
+     *
+     * @param data The data to be encrypted, represented as a ByteArray. Can be null.
+     * @param key The key used for encryption, represented as a ByteArray.
+     * @return The encrypted data as a ByteArray, or null if the provided data is null.
+     */
     override fun encrypt(
         data: ByteArray?,
         key: ByteArray,
@@ -56,20 +68,34 @@ open class RsaEncrypter : Encrypter {
         results.map { it.get() }
         return result
     }
-
+    /**
+     * Encrypts a chunk of data using the provided ThreadLocal Cipher.
+     *
+     * @param data The chunk of data to be encrypted, represented as a ByteArray.
+     * @param tl The ThreadLocal object containing the Cipher instance used for encryption.
+     * @return The encrypted data as a ByteArray.
+     */
     protected open fun encryptChunck(
         data: ByteArray,
         tl: ThreadLocal<Cipher>
     ): ByteArray {
         return tl.get().doFinal(data)
     }
-
+    /**
+     * Creates a new instance of the Cipher class using the provided public key.
+     *
+     * @param pubKey The public key used for encryption.
+     * @return A new instance of [Cipher] class.
+     */
     protected open fun createCipher(pubKey: PublicKey): Cipher {
         val cipher = Rsa.createCipher()
         cipher.init(Cipher.ENCRYPT_MODE, pubKey)
         return cipher
     }
-
+    /**
+     * The `Companion` class represents a companion object that contains a protected open property and helper methods for encryption.
+     * It is used in conjunction with the `RsaEncrypter` class.
+     */
     companion object {
         protected open val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     }

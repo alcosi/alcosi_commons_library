@@ -29,6 +29,14 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.web3j.tx.Contract
 import org.web3j.tx.gas.ContractGasProvider
 
+/**
+ * The SmartContractCreatorConfig class is responsible for configuring and creating instances of SmartContractCreator.
+ *
+ * @property properties The properties for configuring SmartContractCreator.
+ * @property gasProvider The gas provider used for contract deployments and transactions.
+ * @property prepareWalletComponent The service used for validating and preparing wallet addresses.
+ * @property nodesAdminService The service holder for accessing admin nodes.
+ */
 @ConditionalOnClass(Scheduled::class, Contract::class)
 @ConditionalOnProperty(
     prefix = "common-lib.crypto.smart-contract-creator",
@@ -39,6 +47,15 @@ import org.web3j.tx.gas.ContractGasProvider
 @AutoConfiguration
 @EnableConfigurationProperties(SmartContractCreatorProperties::class)
 class SmartContractCreatorConfig {
+    /**
+     * Retrieves or creates an instance of SmartContractCreator.
+     *
+     * @param properties The properties for configuring SmartContractCreator.
+     * @param gasProvider The gas provider used for contract deployments and transactions.
+     * @param prepareWalletComponent The service used for validating and preparing wallet addresses.
+     * @param nodesAdminService The service holder for accessing admin nodes.
+     * @return An instance of SmartContractCreator.
+     */
     @Bean
     @ConditionalOnMissingBean(SmartContractCreator::class)
     fun getSmartContractCreator(

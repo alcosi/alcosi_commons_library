@@ -22,7 +22,18 @@ import java.sql.ResultSet
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class LoggingWarningRowCallbackHandler(private val logLevel: Level?) : RowCallbackHandler {
+/**
+ * This class is a RowCallbackHandler implementation that logs SQL warnings from a ResultSet.
+ *
+ * @property logLevel The logging level for the SQL warnings. If null or Level.OFF, no logging will be performed.
+ */
+open class LoggingWarningRowCallbackHandler(protected val logLevel: Level?) : RowCallbackHandler {
+    /**
+     * This method is called to process a single row of a ResultSet and log any SQL warnings.
+     * It is part of the LoggingWarningRowCallbackHandler class.
+     *
+     * @param rs The ResultSet containing the row to process.
+     */
     override fun processRow(rs: ResultSet) {
         if (logLevel == null || logLevel == Level.OFF) {
             return
@@ -34,7 +45,16 @@ class LoggingWarningRowCallbackHandler(private val logLevel: Level?) : RowCallba
         }
     }
 
+    /**
+     * The `Companion` class contains a single companion object with a logger property.
+     *
+     *
+     * @property logger The logger instance for this class.
+     */
     companion object {
+        /**
+         * The logger variable is used to log messages. It is an instance of the Logger class from the java.util.logging package.
+         */
         val logger = Logger.getLogger(this::class.java.name)
     }
 }

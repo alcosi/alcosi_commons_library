@@ -17,57 +17,46 @@
 
 package com.alcosi.lib.executors
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory
-import java.time.Duration
-import java.util.concurrent.*
-import java.util.logging.Level
+import io.github.breninsul.namedlimitedvirtualthreadexecutor.service.blocking.LimitedBackpressureBlockingExecutor
+import java.util.concurrent.ExecutorService
 import java.util.logging.Logger
 
+/**
+ * NormalThreadPoolExecutor is a class that extends ExecutorService and provides an implementation of a thread pool executor
+ * with limited backpressure and blocking behavior.
+ *
+ * @constructor Creates a NormalThreadPoolExecutor instance with the given delegate.
+ * @param delegate The delegate executor service.
+ *
+ * @property logger The logger for the NormalThreadPoolExecutor class.
+ *
+ * @see ExecutorService
+ */
 open class NormalThreadPoolExecutor protected constructor(
-    corePoolSize: Int,
-    maximumPoolSize: Int,
-    keepAliveTime: Duration,
-    workQueue: BlockingQueue<Runnable?>?,
-    threadFactory: ThreadFactory?,
-    handler: RejectedExecutionHandler?,
-) : ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime.toMillis(), TimeUnit.MILLISECONDS, workQueue, threadFactory, handler) {
-    override fun afterExecute(
-        r: Runnable?,
-        t: Throwable?,
-    ) {
-        if (t != null) {
-            logger.log(Level.SEVERE, "Exception in thread ${Thread.currentThread().name}.", t)
-        } else {
-            logger.log(Level.CONFIG, "Tsk ${Thread.currentThread().name} completed ")
-        }
-        super.afterExecute(r, t)
-    }
-
+    delegate: LimitedBackpressureBlockingExecutor,
+) : ExecutorService by delegate {
+    /**
+     * The Companion object of the NormalThreadPoolExecutor class.
+     * It provides a logger and a build() function for creating instances of NormalThreadPoolExecutor.
+     */
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
-        protected val UNCAUGHT_EXCEPTION_HANDLER = UncaughtExceptionHandler()
-        protected val WAITING_REJECTED_EXECUTOR = WaitingRejectedExecutor()
 
+        /**
+         * Builds a NormalThreadPoolExecutor instance with the given parameters.
+         *
+         * @param threads The number of threads in the thread pool.
+         * @param name The name of the thread pool.
+         * @param inheritThreadLocals Whether to inherit thread locals from the calling thread to the worker threads. Default value is true.
+         *
+         * @return A NormalThreadPoolExecutor instance.
+         */
         fun build(
             threads: Int,
             name: String,
-            keepAlive: Duration,
+            inheritThreadLocals: Boolean = true
         ): NormalThreadPoolExecutor {
-            val factory =
-                BasicThreadFactory.Builder()
-                    .namingPattern("$name-%d")
-                    .daemon(false)
-                    .uncaughtExceptionHandler(UNCAUGHT_EXCEPTION_HANDLER)
-                    .priority(Thread.NORM_PRIORITY)
-                    .build()
-            return NormalThreadPoolExecutor(
-                threads,
-                threads,
-                keepAlive,
-                LinkedBlockingQueue(),
-                factory,
-                WAITING_REJECTED_EXECUTOR,
-            )
+            return NormalThreadPoolExecutor(LimitedBackpressureBlockingExecutor.buildVirtual(name, threads, inheritThreadLocals = inheritThreadLocals))
         }
     }
 }

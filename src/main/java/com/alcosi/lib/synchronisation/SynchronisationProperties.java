@@ -20,11 +20,29 @@ package com.alcosi.lib.synchronisation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
-
+/**
+ * Configuration properties for synchronization.
+ */
 @ConfigurationProperties("common-lib.synchronisation")
 public class SynchronisationProperties {
+    /**
+     *
+     */
     private Boolean disabled = false;
+    /**
+     * The lockTimeout variable specifies the duration for which a lock can be held before it is automatically released.
+     * The default value is 10 minutes.
+     *
+     * @see SynchronisationProperties
+     */
     private Duration lockTimeout=Duration.ofMinutes(10);
+    /**
+     * The clearDelay variable determines the duration after which the synchronization data will be cleared.
+     * The default value of clearDelay is 1 minute.
+     *
+     * @see SynchronisationProperties#getClearDelay()
+     * @see SynchronisationProperties#setClearDelay(Duration)
+     */
     private Duration clearDelay=Duration.ofMinutes(1);
 
     public Duration getClearDelay() {

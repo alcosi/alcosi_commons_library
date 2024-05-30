@@ -19,10 +19,21 @@ package com.alcosi.lib.rabbit
 
 import org.springframework.amqp.core.Message
 import java.nio.charset.StandardCharsets
+import java.util.logging.Level
 import java.util.logging.Logger
 
-open class RabbitRsLoggingMessagePostProcessor(val maxBodySize: Int) :
-    RabbitLoggingMessagePostProcessor {
+/**
+ * RabbitRsLoggingMessagePostProcessor is a class that implements the RabbitLoggingMessagePostProcessor interface.
+ * It is responsible for logging RabbitMQ server responses in a specific format.
+ * The maximum body size of the response can be specified during initialization.
+ *
+ * @param loggingLevel Level of message in log
+ * @param maxBodySize The maximum body size of the response message. If the message body size exceeds this value,
+ *                    it will be truncated in the log message.
+ */
+open class RabbitRsLoggingMessagePostProcessor(val loggingLevel: Level, val maxBodySize: Int) : RabbitLoggingMessagePostProcessor {
+    /**
+     * Processes the given message and*/
     override fun postProcessMessage(message: Message): Message {
         val properties = message.messageProperties
         val correlationInfoParts = properties.correlationId.split(";")
@@ -43,10 +54,23 @@ open class RabbitRsLoggingMessagePostProcessor(val maxBodySize: Int) :
                 String(message.body, StandardCharsets.UTF_8)
             }
         val logBody = constructRsBody(id, time, exchange, routingKey, queue, headers, propsString, body)
-        logger.info(logBody)
+        logger.log(loggingLevel,logBody)
         return message
     }
 
+    /**
+     * Constructs the response body string for logging purposes.
+     *
+     * @param id the ID of the response
+     * @param time the time taken for processing the response in milliseconds
+     * @param exchange the exchange used for the response
+     * @param routingKey the routing key used for the response
+     * @param queue the queue used for the response
+     * @param headers the headers of the response
+     * @param propsString the properties of the response in a compact string format
+     * @param body the body of the response
+     * @return the formatted response body string
+     */
     protected open fun constructRsBody(
         id: String,
         time: Long,

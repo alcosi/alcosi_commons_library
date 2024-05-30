@@ -23,7 +23,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 
+/**
+ * OrganisationAccountDetailsPrincipalDeSerializer is a class that extends UniversalPrincipalDetailsDeSerializer
+ * and is responsible for deserializing OrganisationAccountDetails objects from JSON.
+ *
+ * @constructor Creates an instance of OrganisationAccountDetailsPrincipalDeSerializer
+ */
 open class OrganisationAccountDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSerializer<OrganisationAccountDetailsPrincipalDeSerializer.OrganisationAccountDetailsSerializationObject>(OrganisationAccountDetails::class.java) {
+    /**
+     * OrganisationAccountDetailsSerializationObject is a class that represents the serialization object for the organisation account details.
+     *
+     * @property organisationId The ID of the organisation.
+     * @constructor Creates an instance of OrganisationAccountDetailsSerializationObject.
+     * @param id The ID of the account.
+     * @param authorities The authorities of the account.
+     * @param className The class name of the object.
+     * @param type The type of the object.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     open class OrganisationAccountDetailsSerializationObject(
         id: String,
@@ -32,11 +48,23 @@ open class OrganisationAccountDetailsPrincipalDeSerializer : UniversalPrincipalD
         type: String,
         val organisationId: String,
     ) : PrincipalSerializationObject(id, authorities, className, type)
-
+    /**
+     * Converts an OrganisationAccountDetailsSerializationObject to an AccountDetails object.
+     *
+     * @param serializationObject The object to be converted.
+     * @return The converted AccountDetails object.
+     */
     override fun returnRealObject(serializationObject: OrganisationAccountDetailsSerializationObject): AccountDetails {
         return OrganisationAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.organisationId, serializationObject.className)
     }
-
+    /**
+     * Returns the internal type object of OrganisationAccountDetailsSerializationObject by reading the given JSON node using the
+     * DeserializationContext.
+     *
+     * @param ctxt the DeserializationContext object.
+     * @param node the JSON node containing the data to be deserialized.
+     * @return the OrganisationAccountDetailsSerializationObject.
+     */
     override fun getInternalTypeObject(
         ctxt: DeserializationContext,
         node: JsonNode,

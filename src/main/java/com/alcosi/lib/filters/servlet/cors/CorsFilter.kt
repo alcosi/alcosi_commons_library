@@ -25,7 +25,29 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.web.filter.OncePerRequestFilter
 
+/**
+ * The CorsFilter class is responsible for handling Cross-Origin Resource Sharing (CORS) requests.
+ * It extends the OncePerRequestFilter class, which ensures that the filter's doFilterInternal method
+ * is executed only once per request.
+ *
+ * The filter sets the necessary response headers for CORS, including the Access-Control-Allow-Origin,
+ * Access-Control-Allow-Methods, Access-Control-Allow-Headers, and Access-Control-Allow-Credentials headers.
+ *
+ * If the request method is not OPTIONS, the filter continues processing the request by invoking the
+ * next filter in the filter chain. Otherwise, it returns a 200 response with an empty JSON body.
+ */
 open class CorsFilter : OncePerRequestFilter() {
+    /**
+     * This method is responsible for handling CORS requests. It sets the necessary response
+     * headers for CORS, including the Access-Control-Allow-Origin, Access-Control-Allow-Methods,
+     * Access-Control-Allow-Headers, and Access-Control-Allow-Credentials headers. If the request
+     * method is not OPTIONS, the method continues processing the request by invoking the next
+     * filter in the filter chain. Otherwise, it returns a 200 response with an empty JSON body.
+     *
+     * @param request The HTTP servlet request.
+     * @param response The HTTP servlet response.
+     * @param filterChain The filter chain to continue processing the request.
+     */
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,

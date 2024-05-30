@@ -26,6 +26,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 
+/**
+ * The CorsFilterConfig class is responsible for configuring and registering a CorsFilter bean
+ * for handling Cross-Origin Resource Sharing (CORS) requests.
+ *
+ * It is open for extension and is marked with annotations such as @AutoConfigureAfter,
+ * @ConditionalOnBean, and @ConditionalOnProperty to ensure proper configuration and bean creation.
+ *
+ * The class is also annotated with @EnableConfigurationProperties to enable the use of CorsFilterProperties
+ * for configuring the CorsFilter bean.
+ */
 @AutoConfigureAfter(FilterConfig::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
@@ -36,6 +46,13 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(CorsFilterProperties::class)
 open class CorsFilterConfig {
+    /**
+     * Configures and registers a CorsFilter bean for handling Cross-Origin Resource Sharing (CORS) requests.
+     *
+     * @param servletFilterProperties The properties for configuring a ServletFilter.
+     * @param corsFilterProperties The properties for configuring the CorsFilter.
+     * @return The FilterRegistrationBean for the CorsFilter.
+     */
     @Bean(name = ["corsFilterBean"], value = ["corsFilterBean"])
     fun corsFilter(
         servletFilterProperties: ServletFilterProperties,

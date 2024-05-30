@@ -23,20 +23,38 @@ import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.filters.servlet.ThreadContext.Companion.REQUEST_ORIGINAL_AUTHORISATION_TOKEN
 import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
-import com.alcosi.lib.objectMapper.MappingHelper
+import com.alcosi.lib.objectMapper.mapOne
 import com.alcosi.lib.secured.encrypt.SensitiveComponent
 import com.alcosi.lib.security.AccountDetails
 import com.alcosi.lib.security.PrincipalDetails
 import com.alcosi.lib.security.UserDetails
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import org.springframework.web.util.ContentCachingResponseWrapper
 import java.nio.charset.Charset
 
+/**
+ * The PrincipalAuthFilter class is a filter used for authentication and setting the authentication principal
+ * in the thread context for each request. It extends the WrappedOnePerRequestFilter class which ensures that
+ * each request is processed only once by the filter.
+ *
+ * @param mappingHelper The ObjectMapper used for mapping JSON strings to objects.
+ * @param threadContext The ThreadContext object used for managing thread-local data.
+ * @param sensitiveComponent The SensitiveComponent used for deserializing sensitive data.
+ */
 open class PrincipalAuthFilter(
-    protected open val mappingHelper: MappingHelper,
+    protected open val mappingHelper: ObjectMapper,
     protected open val threadContext: ThreadContext,
     protected open val sensitiveComponent: SensitiveComponent,
 ) : WrappedOnePerRequestFilter(Int.MAX_VALUE) {
+    /**
+     * Executes the filter logic by setting the authentication principal in the thread context and
+     * calling the next filter in the filter chain.
+     *
+     * @param request The CachingRequestWrapper representing the incoming request.
+     * @param response The ContentCachingResponseWrapper representing the response.
+     * @param filterChain The FilterChain to invoke the next filter.
+     */
     override fun doFilterWrapped(
         request: CachingRequestWrapper,
         response: ContentCachingResponseWrapper,
@@ -59,6 +77,18 @@ open class PrincipalAuthFilter(
         }
     }
 
+    /**
+     * Returns the PrincipalDetails representing the principal for the given request.
+     *
+     * If the request contains the header "USER_DETAILS", this method will try to map the value of the header to an instance of UserDetails using the mappingHelper. If the mapping
+     *  is successful, the UserDetails instance is returned.
+     * If the user header is not present or the mapping fails, this method will try to map the value of the header "ACCOUNT_DETAILS" to an instance of AccountDetails using the mapping
+     * Helper. If the mapping is successful, the AccountDetails instance is returned.
+     * If both headers are missing or the mapping fails for both, null is returned.
+     *
+     * @param request The CachingRequestWrapper representing the incoming request.
+     * @return The PrincipalDetails representing the principal for the given request, or null if no valid principal is found.
+     */
     protected open fun getPrincipal(request: CachingRequestWrapper): PrincipalDetails? {
         val user = request.getHeader(HeaderHelper.USER_DETAILS)?.let { mappingHelper.mapOne(it, UserDetails::class.java) }
         if (user != null) {

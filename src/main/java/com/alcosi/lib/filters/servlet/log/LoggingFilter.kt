@@ -33,13 +33,20 @@ import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
+/**
+ * A filter class for logging HTTP requests and responses.
+ *
+ * @param logInternalService The logging service responsible for handling the logging operations.
+ * @param threadContext The thread context used for retrieving the request ID.
+ * @param maxBodySize The maximum body size for logging the request.
+ */
 open class LoggingFilter(
     val logInternalService: LogInternalService,
     val threadContext: ThreadContext,
     @Value("\${common-lib.request_body_log.max.server:10000}") maxBodySize: Int,
-) : WrappedOnePerRequestFilter(
-        maxBodySize,
-    ) {
+) : WrappedOnePerRequestFilter(maxBodySize,) {
+    /**
+     * Applies the filter to the incoming HTTP request and*/
     override fun doFilterWrapped(
         request: CachingRequestWrapper,
         response: ContentCachingResponseWrapper,
@@ -51,22 +58,41 @@ open class LoggingFilter(
             logInternalService.logRequest(request, id)
             filterChain.doFilter(request, response)
         } catch (t: Throwable) {
-            logger.error("Error in request", t)
+            super.logger.error("Error in request", t)
         } finally {
             logInternalService.afterRequest(request, response, time)
         }
     }
 
+    /**
+     * Retrieves the name of the filter.
+     *
+     * @return The name of the filter as a String, or null if the name is not set.
+     */
     @Nullable
     override fun getFilterName(): String? {
         return "Logging"
     }
 
+    /**
+     * A class that provides logging functionality for internal service requests and responses.
+     *
+     * @property loggingLevel The logging level for the service.
+     * @property maxBodySize The maximum size of the request/response body.
+     * @property threadContext The thread context for the service.
+     */
     open class LogInternalService(
         val loggingLevel: Level,
         val maxBodySize: Int,
         val threadContext: ThreadContext,
     ) {
+        /**
+         * Performs necessary actions after processing an HTTP request.
+         *
+         * @param request The wrapped HTTP request.
+         * @param response The wrapped HTTP response.
+         * @param time The time taken to process the request in milliseconds.
+         */
         open fun afterRequest(
             request: CachingRequestWrapper,
             response: ContentCachingResponseWrapper,
@@ -85,6 +111,12 @@ open class LoggingFilter(
             }
         }
 
+        /**
+         * Logs the HTTP request.
+         *
+         * @param request The wrapped HTTP request.
+         * @param rqId The unique ID for the request.
+         */
         open fun logRequest(
             request: CachingRequestWrapper,
             rqId: String,
@@ -116,6 +148,16 @@ open class LoggingFilter(
             }
         }
 
+        /**
+         * Constructs the log string for the HTTP request body.
+         *
+         * @param rqId The unique ID for the request.
+         * @param request The wrapped HTTP request.
+         * @param queryString The query string of the request.
+         * @param headers The headers of the request.
+         * @param content The body content of the request.
+         * @return The log string representing the request body.
+         */
         protected open fun constructRqBody(
             rqId: String,
             request: CachingRequestWrapper,
@@ -136,6 +178,11 @@ open class LoggingFilter(
             return logString
         }
 
+        /**
+         * Logs the session ID for the request.
+         *
+         * @param request The wrapped HTTP request.
+         */
         protected open fun logSessionId(request: CachingRequestWrapper) {
             val sessionid =
                 Optional.ofNullable(request.getHeader("Authorization")).map { obj: String ->
@@ -148,6 +195,10 @@ open class LoggingFilter(
             attrs?.setAttribute("SESSION_ID", sessionid, RequestAttributes.SCOPE_REQUEST)
         }
 
+        /**
+         * Logs the HTTP response.
+         *
+         * @param request*/
         protected open fun logResponse(
             request: CachingRequestWrapper,
             response: ContentCachingResponseWrapper,
@@ -173,6 +224,18 @@ open class LoggingFilter(
             logger.log(loggingLevel, logBody)
         }
 
+        /**
+         * Constructs the log string for the HTTP response body.
+         *
+         * @param rqId The unique ID for the request.
+         * @param status The HTTP status code.
+         * @param request The wrapped HTTP request.
+         * @param queryString The query string of the request.
+         * @param time The time taken to process the request in milliseconds.
+         * @param headers The headers of the request.
+         * @param content The body content of the request.
+         * @return The log string representing the response body.
+         */
         protected open fun constructRsBody(
             rqId: String,
             status: Int,
@@ -197,6 +260,12 @@ open class LoggingFilter(
         }
     }
 
+    /**
+     * The [Companion] class provides a set of companion properties and functions.
+     *
+     * @property logger The logger instance for logging.
+     * @property FILE_RS The placeholder for the response file bytes.
+     */
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
         val FILE_RS = "<file_bytes>"

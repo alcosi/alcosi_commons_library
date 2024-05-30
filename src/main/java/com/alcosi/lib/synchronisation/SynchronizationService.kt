@@ -17,131 +17,76 @@
 
 package com.alcosi.lib.synchronisation
 
-import com.alcosi.lib.executors.SchedulerTimer
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.locks.StampedLock
-import java.util.logging.Level
-import java.util.logging.Logger
-import java.util.stream.Collectors
+import java.util.concurrent.Callable
 
-open class SynchronizationService(val lockLifetime: Duration, val clearDelay: Duration) {
-    class ClientLock(val lock: StampedLock = StampedLock(), val createdAt: LocalDateTime = LocalDateTime.now()) {
-        @Volatile
-        var stamp: Long? = null
-
-        override fun toString(): String {
-            return "ClientLock(lock=$lock, createdAt=$createdAt, stamp=$stamp)"
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as ClientLock
-
-            if (lock != other.lock) return false
-            if (createdAt != other.createdAt) return false
-            if (stamp != other.stamp) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = lock.hashCode()
-            result = 31 * result + createdAt.hashCode()
-            result = 31 * result + (stamp?.hashCode() ?: 0)
-            return result
-        }
-    }
-
-    protected val locks: ConcurrentMap<Any, ClientLock> = ConcurrentHashMap()
-
+/**
+ * SynchronizationService class manages synchronization locks for tasks.
+ *
+ * This class provides functionality to execute tasks in a synchronized manner
+ * using locks. It wraps a delegate SynchronizationService provided by the
+ * `io.github.breninsul.synchronizationstarter.service` package.
+ *
+ * @property delegate The delegate SynchronizationService object.
+ *
+ * @constructor Creates an instance of SynchronizationService with the specified delegate.
+ *
+ * @param delegate The*/
+@Deprecated("Use io.github.breninsul.synchronizationstarter.service.SynchronizationService", replaceWith = ReplaceWith("io.github.breninsul.synchronizationstarter.service.SynchronizationService","io.github.breninsul.synchronizationstarter.service.SynchronizationService"))
+open class SynchronizationService(protected val delegate: io.github.breninsul.synchronizationstarter.service.SynchronizationService) {
+    /**
+     * Executes the synchronization logic before performing a task.
+     *
+     * This method checks if the provided `id` is not null. If `id` is null, it returns false.
+     * Otherwise, it delegates the execution to the `before` method of the `delegate SynchronizationService` object.
+     *
+     * @param id The identifier of the task to be synchronized. This can be of any type.
+     * @return Returns a boolean value indicating whether the synchronization was successful.
+     */
     open fun before(id: Any?): Boolean {
         if (id == null) {
             return false
         }
-        logger.log(Level.FINEST, "Lock for $id set")
-        val time = System.currentTimeMillis()
-        val lock = getLock(id)
-        val locked: Boolean = lock.lock.isWriteLocked
-        val stamp: Long = lock.lock.writeLock()
-        lock.stamp = (stamp)
-        val tookMs = System.currentTimeMillis() - time
-        logger.log(Level.FINEST, "Lock $id is locked : $locked .Lock Took $tookMs ms")
-        if (tookMs > 100) {
-            logger.log(Level.SEVERE, "Lock took more then 100ms $tookMs $id")
-        }
-        return locked
+        return delegate.before(id)
     }
 
-    protected open fun getLock(id: Any): ClientLock {
-        val clientLock = locks[id]
-        return if (clientLock == null) {
-            val lock = ClientLock()
-            locks[id] = lock
-            lock
-        } else {
-            clientLock
-        }
-    }
-
+    /**
+     * Executes the `after` operation on the delegated SynchronizationService object.
+     *
+     * This method is called after the completion of a task execution to release the synchronization lock.
+     * It takes an `id` parameter which represents the identifier of the lock associated with the task.
+     *
+     * If the `id` parameter is `null`, the method does nothing and returns immediately.
+     * Otherwise, it calls the `after` method on the delegate SynchronizationService object passing the `id` parameter.
+     *
+     * @param id The identifier of the lock associated with the task.
+     */
     open fun after(id: Any?) {
         if (id == null) {
             return
         }
-        val clientLock = locks[id]
-        if (clientLock == null) {
-            logger.log(Level.SEVERE, "No lock for  $id")
-        } else {
-            logger.log(Level.FINEST, "Lock for $id released")
-            unlock(clientLock)
-        }
+        return delegate.after(id)
     }
-
-    protected open val scheduler =
-        object : SchedulerTimer(clearDelay, "ClearDeadLockedSynchronisation", Level.FINEST) {
-            override fun startBatch() {
-                val now = LocalDateTime.now()
-                val old =
-                    locks.entries
-                        .filter { (_, value): Map.Entry<Any, ClientLock> ->
-                            value
-                                .createdAt
-                                .plus(lockLifetime)
-                                .isBefore(now)
-                        }
-                old.map { e -> locks[e.key] to e.key }
-                    .filter { (it.first?.lock?.isWriteLocked) ?: false }
-                    .forEach { l ->
-                        Companion.logger.log(Level.SEVERE, "Lock has been blocked before clear :${l.second}.Took ${System.currentTimeMillis() - l.first?.createdAt?.toEpochSecond(ZoneOffset.UTC)!!}ms ")
-                        l.first!!.lock.unlockWrite(l.first!!.stamp!!)
-                    }
-                val removed =
-                    old
-                        .stream()
-                        .map { e -> e.key to locks.remove(e.key) }
-                        .map { p -> "${p.first}:${p.second}" }
-                        .collect(Collectors.joining(";"))
-                if (removed.isNotBlank()) {
-                    Companion.logger.log(Level.FINEST, "Lock for $removed removed ")
-                }
-            }
-        }
-
-    protected open fun unlock(l: ClientLock) {
+    /**
+     * Executes a task synchronously with the specified id.
+     *
+     * This method executes the given task in a synchronized manner by acquiring a lock
+     * identified by the specified id. The task is executed by calling its `call()` method
+     * from the `java.util.concurrent.Callable` interface.
+     *
+     * @param id The id of the synchronization lock to acquire.
+     * @param task The task to execute.
+     * @return The result of the executed task.
+     */
+    open fun <R> sync(
+        id: Any,
+        task: Callable<R>,
+    ): R {
+        before(id)
         try {
-            val lock: StampedLock = l.lock
-            lock.unlockWrite(l.stamp!!)
-        } catch (t: Throwable) {
-            logger.log(Level.WARNING, "Error unlocking lock ! ${t.javaClass}:${t.message}", t)
+            return task.call()
+        } finally {
+            after(id)
         }
     }
 
-    companion object {
-        val logger = Logger.getLogger(this::class.java.name)
-    }
 }

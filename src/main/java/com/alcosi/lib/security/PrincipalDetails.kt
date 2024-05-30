@@ -20,12 +20,23 @@ package com.alcosi.lib.security
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.security.Principal
 
+/**
+ * Represents the details of a principal, including authorities and identification information.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 interface PrincipalDetails : Principal {
     val authorities: List<String>
     val id: String
     val type: String
 
+    /**
+     * Returns the name of the principal.
+     *
+     * This method concatenates the type and id of the principal and returns it as a string.
+     * The returned string has the format "{type}:{id}".
+     *
+     * @return the name of the principal
+     */
     override fun getName(): String {
         return "$type:$id"
     }

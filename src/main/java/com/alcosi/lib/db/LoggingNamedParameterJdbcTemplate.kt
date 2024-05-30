@@ -28,6 +28,14 @@ import java.util.logging.Level
 import java.util.logging.Level.OFF
 import java.util.logging.Logger
 
+/**
+ * A logging wrapper for NamedParameterJdbcTemplate that provides additional logging functionality.
+ *
+ * @property maxBodySize The maximum body size of values to be logged.
+ * @property jdbcTemplate The JdbcTemplate instance to delegate to.
+ * @property queryLoggingLevel The logging level for executing SQL queries.
+ * @property logParamsLevel The logging level for SQL parameters.
+ */
 open class LoggingNamedParameterJdbcTemplate(
     val maxBodySize: Int,
     jdbcTemplate: JdbcTemplate,
@@ -36,6 +44,14 @@ open class LoggingNamedParameterJdbcTemplate(
 ) : NamedParameterJdbcTemplate(jdbcTemplate) {
     val logger = Logger.getLogger(this.javaClass.name)
 
+    /**
+     * Returns a PreparedStatementCreator object based on the given SQL statement and SqlParameterSource.
+     *
+     * @param sql The SQL statement to be executed.
+     * @param paramSource The SqlParameterSource containing the parameter values.
+     * @param customizer (Optional) A Consumer that customizes the PreparedStatementCreatorFactory.
+     * @return A PreparedStatementCreator object that can be used to create a PreparedStatement.
+     */
     override fun getPreparedStatementCreator(
         sql: String,
         paramSource: SqlParameterSource,
@@ -44,7 +60,16 @@ open class LoggingNamedParameterJdbcTemplate(
         return execute(sql, paramSource, customizer)
     }
 
-    private fun execute(
+    /**
+     * Executes an SQL statement with the provided parameters and customizer,
+     * and returns a PreparedStatementCreator.
+     *
+     * @param sql The SQL statement to be executed.
+     * @param paramSource The parameters to be used in the SQL statement.
+     * @param customizer A customizer function to customize the PreparedStatementCreatorFactory.
+     * @return The PreparedStatementCreator for the executed SQL statement.
+     */
+    protected open fun execute(
         sql: String,
         paramSource: SqlParameterSource,
         customizer: Consumer<PreparedStatementCreatorFactory>?,
@@ -59,7 +84,15 @@ open class LoggingNamedParameterJdbcTemplate(
         return super.getPreparedStatementCreator(sql, paramSource, customizer)
     }
 
-    private fun serializeValue(
+    /**
+     * Serializes the value of a parameter obtained from a SqlParameterSource
+     *
+     * @param paramSource The SqlParameterSource object containing the parameter value
+     * @param it The name of the parameter
+     *
+     * @return The serialized value of the parameter as a String
+     */
+    protected open fun serializeValue(
         paramSource: SqlParameterSource,
         it: String?,
     ): String {

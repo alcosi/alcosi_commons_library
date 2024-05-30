@@ -25,7 +25,18 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 
-class SecuredDataContainerSerializer : StdSerializer<SecuredDataContainer<*>>(SecuredDataContainer::class.java) {
+/**
+ * This class is responsible for serializing objects of type SecuredDataContainer to JSON.
+ * It extends the StdSerializer class and overrides the serialize method.
+ *
+ * @constructor Creates an instance of SecuredDataContainerSerializer.
+ */
+open class SecuredDataContainerSerializer : StdSerializer<SecuredDataContainer<*>>(SecuredDataContainer::class.java) {
+    /**
+     * This method is responsible for serializing objects of type SecuredDataContainer to JSON.
+     * It takes a nullable value of type SecuredDataContainer, a JsonGenerator, and a SerializerProvider as parameters.
+     * If the value is null, it writes a null value using the JsonGenerator.
+     * If the value is not null, it determines the type of the SecuredDataContainer and creates a SecuredDataContainerSerializationDTO object*/
     override fun serialize(
         value: SecuredDataContainer<*>?,
         gen: JsonGenerator,
@@ -48,8 +59,19 @@ class SecuredDataContainerSerializer : StdSerializer<SecuredDataContainer<*>>(Se
     }
 
     companion object {
+        /**
+         * This variable represents a sensitive component used for handling and manipulating sensitive data.
+         *
+         * @property sensitiveComponent The sensitive component instance.
+         * @see SensitiveComponent
+         */
         protected lateinit var sensitiveComponent: SensitiveComponent
 
+        /**
+         * Sets the provided [SensitiveComponent] instance to be used for serializing sensitive data.
+         *
+         * @param c The [SensitiveComponent] instance to be set.
+         */
         fun setSensitiveComponentPublic(c: SensitiveComponent) {
             sensitiveComponent = c
         }

@@ -26,12 +26,18 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 
+/**
+ * Deserializer class for SecuredDataContainer.
+ * It extends StdDeserializer and overrides the deserialize method.
+ */
 open class SecuredDataContainerDeSerializer : StdDeserializer<SecuredDataContainer<*>>(SecuredDataContainer::class.java) {
-//    , ContextualDeserializer
-//    protected open val nullByteArray = SecuredDataByteArray(0, null)
-//    protected open val nullString = SecuredDataString(SecuredDataByteArray(0, null))
-//    protected var currentClass: JavaType? = null
-
+    /**
+     * Deserializes a JSON string into a SecuredDataContainer object.
+     *
+     * @param p The JsonParser used for parsing the JSON string.
+     * @param ctxt The DeserializationContext.
+     * @return The deserialized SecuredDataContainer object, or null if p is null or the container is null.
+     */
     override fun deserialize(
         p: JsonParser?,
         ctxt: DeserializationContext?,
@@ -55,6 +61,13 @@ open class SecuredDataContainerDeSerializer : StdDeserializer<SecuredDataContain
         }
     }
 
+    /**
+     * Retrieves the type of a SecuredDataContainer based on the class.
+     *
+     * @param c The JavaType class to determine the type of.
+     * @return The type of the SecuredDataContainer.
+     * @throws IllegalStateException if the SecuredDataContainer type is incorrect.
+     */
     protected open fun getTypeByClass(c: JavaType): SecuredDataContainerSerializationDTO.TYPE {
         return if (c.isTypeOrSubTypeOf(SecuredDataString::class.java)) {
             SecuredDataContainerSerializationDTO.TYPE.STRING
@@ -65,31 +78,23 @@ open class SecuredDataContainerDeSerializer : StdDeserializer<SecuredDataContain
         }
     }
 
-//    override fun getNullValue(ctxt: DeserializationContext?): SecuredDataContainer<*> {
-//        return if (currentClass == null) {
-//            super.getNullValue(ctxt)
-//        } else {
-//            when (getTypeByClass(currentClass!!)) {
-//                SecuredDataContainerSerializationDTO.TYPE.BYTE_ARRAY -> nullByteArray
-//                SecuredDataContainerSerializationDTO.TYPE.STRING -> nullString
-//            }
-//        }
-//    }
+
 
     companion object {
+        /**
+         * Represents a sensitive component used for deserialization and encryption*/
         protected lateinit var sensitiveComponent: SensitiveComponent
 
+        /**
+         * Sets the provided [SensitiveComponent] instance as the sensitive component
+         * to be used by the [SecuredDataContainerSerializer] and [SecuredDataContainerDeSerializer] classes.
+         *
+         * @param c The [SensitiveComponent] instance to set.
+         */
         fun setSensitiveComponentPublic(c: SensitiveComponent) {
             sensitiveComponent = c
         }
     }
 
-//    override fun createContextual(
-//        ctxt: DeserializationContext?,
-//        property: BeanProperty?,
-//    ): JsonDeserializer<*> {
-//        val new = SecuredDataContainerDeSerializer()
-//        new.currentClass = property?.type
-//        return new
-//    }
+
 }

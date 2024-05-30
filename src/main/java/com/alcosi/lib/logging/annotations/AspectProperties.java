@@ -19,8 +19,18 @@ package com.alcosi.lib.logging.annotations;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * This class represents the configuration properties for the AspectProperties aspect.
+ * It is annotated with @ConfigurationProperties to indicate that the properties*/
 @ConfigurationProperties("common-lib.aspect")
 public class AspectProperties {
+    /**
+     * This variable represents the state of whether the aspect is disabled or not.
+     * By default, it is set to false.
+     *
+     * @see AspectProperties#getDisabled()
+     * @see AspectProperties#setDisabled(Boolean)
+     */
     private Boolean disabled = false;
 
 
