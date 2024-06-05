@@ -33,7 +33,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "4.0.2"
+version = "4.0.4"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"
@@ -48,12 +48,13 @@ java {
     withJavadocJar()
     withSourcesJar()
 }
+val repo = "github.com/alcosi/alcosi_commons_library"
 publishing {
     repositories {
 
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/alcosi/alcosi_commons_library")
+            url = uri("https://maven.pkg.$repo")
             credentials {
                 username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
                 password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
@@ -61,13 +62,13 @@ publishing {
         }
     }
     publications {
-        create<MavenPublication>("Lib") {
+        create<MavenPublication>("CommonLib") {
             from(components["java"])
-            groupId = group.toString()
+            groupId = project.group.toString()
             artifactId = appName
-            version = version
-            uri("https://github.com/alcosi/alcosi_commons_library")
+            version = project.version.toString()
             pom {
+                url.set("https://$repo")
                 licenses {
                     license {
                         name.set("Apache 2.0")
@@ -75,6 +76,26 @@ publishing {
                     }
                 }
             }
+        }
+    }
+}
+
+centralPortal {
+    pom {
+        packaging = "jar"
+        name.set(project.name)
+        val repository = "https://$repo"
+        url.set(repository)
+        licenses {
+            license {
+                name.set("Apache 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0")
+            }
+        }
+        scm {
+            connection.set("scm:$repository.git")
+            developerConnection.set("scm:git@$repo.git")
+            url.set(repository)
         }
     }
 }
