@@ -53,7 +53,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.0"
-val depVersion = "4.0.4"
+val depVersion = "4.0.5"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.1"
@@ -88,8 +88,8 @@ publishing {
             groupId = group.toString()
             artifactId = appName
             version = version
-            uri("https://$repo/tree/main/with-dependency")
             pom {
+                url.set("https://$repo/tree/main/with-dependency")
                 licenses {
                     license {
                         name.set("Apache 2.0")
