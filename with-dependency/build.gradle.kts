@@ -49,12 +49,11 @@ plugins {
     id("com.github.jk1.dependency-license-report") version "2.8"
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
     id("org.jetbrains.dokka") version "1.9.20"
-
 }
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.0"
-val depVersion = "4.0.1"
+val depVersion = "4.0.2"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.1"
@@ -63,7 +62,7 @@ val kotlinVersion = "2.0.0"
 val javaVersion = JavaVersion.VERSION_21
 
 group = "com.alcosi"
-version = "${springVersion}.${depVersion}"
+version = "$springVersion.$depVersion"
 
 java {
     sourceCompatibility = javaVersion
@@ -88,6 +87,7 @@ publishing {
             groupId = group.toString()
             artifactId = appName
             version = version
+            uri("https://github.com/alcosi/alcosi_commons_library/tree/main/with-dependency")
             pom {
                 licenses {
                     license {
@@ -99,7 +99,6 @@ publishing {
         }
     }
 }
-
 
 tasks.compileJava {
     dependsOn.add(tasks.processResources)
@@ -172,10 +171,11 @@ tasks.withType<Test> {
     jvmArgs("-Xmx1024m")
     useJUnitPlatform()
 }
-val javadocJar = tasks.named<Jar>("javadocJar") {
-    from(tasks.named("dokkaJavadoc"))
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
+val javadocJar =
+    tasks.named<Jar>("javadocJar") {
+        from(tasks.named("dokkaJavadoc"))
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 tasks.getByName<Jar>("jar") {
     enabled = true
     archiveClassifier = ""
@@ -197,8 +197,9 @@ licenseReport {
     configurations = LicenseReportExtension.ALL
     excludeOwnGroup = false
     excludeBoms = false
-    renderers = arrayOf(
-        JsonGroupedGenerator("group-report.json", onlyOneLicensePerModule = false),
-        MDGroupedGenerator("../../DEPENDENCIES.md", onlyOneLicensePerModule = false)
-    )
+    renderers =
+        arrayOf(
+            JsonGroupedGenerator("group-report.json", onlyOneLicensePerModule = false),
+            MDGroupedGenerator("../../DEPENDENCIES.md", onlyOneLicensePerModule = false),
+        )
 }

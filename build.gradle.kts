@@ -33,14 +33,13 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "4.0.1"
+version = "4.0.2"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"
 val web3jVersion = "4.12.0"
 val kotlinVersion = "2.0.0"
 val javaVersion = JavaVersion.VERSION_21
-
 
 java {
     sourceCompatibility = javaVersion
@@ -60,11 +59,14 @@ publishing {
                 password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
             }
         }
-
     }
     publications {
         create<MavenPublication>("Lib") {
             from(components["java"])
+            groupId = group.toString()
+            artifactId = appName
+            version = version
+            uri("https://github.com/alcosi/alcosi_commons_library")
             pom {
                 licenses {
                     license {
@@ -76,8 +78,6 @@ publishing {
         }
     }
 }
-
-
 
 tasks.compileJava {
     dependsOn.add(tasks.processResources)
@@ -98,7 +98,6 @@ configurations {
         exclude(module = "spring-boot-starter-tomcat")
     }
 }
-
 
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
@@ -136,8 +135,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.8.0")
 }
 
-
-
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xjsr305=strict"
@@ -149,15 +146,16 @@ tasks.withType<Test> {
     jvmArgs("-Xmx1024m")
     useJUnitPlatform()
 }
-val javadocJar = tasks.named<Jar>("javadocJar") {
-    from(tasks.named("dokkaJavadoc"))
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-tasks.getByName<Jar>("jar") {
-    enabled = true
-    archiveClassifier = ""
-}
+val javadocJar =
+    tasks.named<Jar>("javadocJar") {
+        from(tasks.named("dokkaJavadoc"))
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 
+tasks.jar {
+    enabled = true
+    archiveClassifier.set("")
+}
 signing {
     useGpgCmd()
 }
@@ -174,8 +172,9 @@ licenseReport {
     configurations = LicenseReportExtension.ALL
     excludeOwnGroup = false
     excludeBoms = false
-    renderers = arrayOf(
-        JsonGroupedGenerator("group-report.json", onlyOneLicensePerModule = false),
-        MDGroupedGenerator("../../DEPENDENCIES.md", onlyOneLicensePerModule = false)
-    )
+    renderers =
+        arrayOf(
+            JsonGroupedGenerator("group-report.json", onlyOneLicensePerModule = false),
+            MDGroupedGenerator("../../DEPENDENCIES.md", onlyOneLicensePerModule = false),
+        )
 }
