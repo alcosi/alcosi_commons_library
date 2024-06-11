@@ -105,6 +105,32 @@ centralPortal {
     pom {
         packaging = "jar"
         name.set(project.name)
+        description.set(
+            """
+ This library is a set of frequently used components and includes (in the future it is planned to split into separate libraries):
+- Facilitating synchronization of processes, including those in different threads (com.alcosi.lib.synchronisation)
+- Logging of incoming and outgoing requests Http,RabbitMQ (com.alcosi.lib.rabbit,com.alcosi.lib.logging.http,com.alcosi.lib.filters)
+- Logging of execution time and errors with annotations (using AspectJ) (com.alcosi.lib.logging.annotations)
+- Logging SQL queries/responses and notice/exception (for JDBCTemplate) (com.alcosi.lib.db)
+- CORS Filter
+- Response caching for incoming Http requests. (com.alcosi.lib.filters)
+- Error handling for incoming and outgoing requests Http,RabbitMQ (com.alcosi.lib.rabbit,com.alcosi.lib.logging.http)
+- RabbitMQ configuration (com.alcosi.lib.rabbit)
+- Facilitating the connection of external JARs to the application. (com.alcosi.lib.utils.ExternalJarLoad)
+- Set of serializers for Jackson (com.alcosi.lib.serializers)
+- Custom thread pools, including with blocking queue (com.alcosi.lib.executors)
+- Swagger and OpenAPI distribution (com.alcosi.lib.doc)
+- Load balancer when working with Etherium nodes (com.alcosi.lib.crypto)
+- Contract caching for WEB3J (com.alcosi.lib.crypto)
+- Automatic registration of frequently used components in Spring (only if available in classpath)
+- Interface and wrappers for encryption/decryption (com.alcosi.lib.secured.encrypt)
+- Encryption key provider interface and implementations - in env. variable and through http
+- Thread context form headers/to headers (com.alcosi.lib.filters,com.alcosi.lib.logging.http)
+- Simple authentication (com.alcosi.lib.filters)
+- Secured data containers with JSON serialization and log masking (com.alcosi.lib.secured.container,com.alcosi.lib.secured.logging.files,com.alcosi.lib.serializers)
+With dependencies
+        """,
+        )
         val repository = "https://$repo"
         url.set(repository)
         licenses {
@@ -117,6 +143,14 @@ centralPortal {
             connection.set("scm:$repository.git")
             developerConnection.set("scm:git@$repo.git")
             url.set(repository)
+        }
+        developers {
+            developer {
+                id.set("Alcosi")
+                name.set("Alcosi")
+                email.set("info@alcosi.com")
+                url.set("https://alcosi.com/")
+            }
         }
     }
 }

@@ -19,7 +19,6 @@ package com.alcosi.lib.secured.encrypt
 
 import com.alcosi.lib.secured.SecuredConstants
 import com.alcosi.lib.secured.SecuredConstants.SMALL_TEXT
-import com.alcosi.lib.secured.encrypt.encryption.rsa.Rsa
 import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaDecrypter
 import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaEncrypter
 import com.alcosi.lib.secured.encrypt.key.KeyProvider
@@ -31,10 +30,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.security.KeyPairGenerator
-import java.security.interfaces.RSAPrivateKey
-import java.security.spec.PKCS8EncodedKeySpec
 import java.util.logging.Logger
-import javax.crypto.Cipher
 
 @ExtendWith(SpringExtension::class)
 class RSATest {

@@ -18,7 +18,6 @@
 package com.alcosi.lib.objectMapper
 
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -42,7 +41,7 @@ class ObjectMapperTest {
             val factory = objectMapperConfig.getJsonFactory(properties)
             val mapper = objectMapperConfig.getObjectMapper(properties, factory, listOf())
             val time = System.currentTimeMillis()
-            val deserialized = mapper.readValue<SerializationTest>(getBigJson(100))
+            val deserialized = mapper.readValue(getBigJson(100), SerializationTest::class.java)
             val took = System.currentTimeMillis() - time
             logger.log(Level.INFO, "Took ${took}ms")
             assertNotNull(deserialized)
@@ -80,7 +79,7 @@ class ObjectMapperTest {
             val objectMapperConfig = ObjectMapperConfig()
             val factory = objectMapperConfig.getJsonFactory(properties)
             val mapper = objectMapperConfig.getObjectMapper(properties, factory, listOf())
-            val deserialized = mapper.readValue<SerializationTest>(getBigJson(100))
+            val deserialized = mapper.readValue(getBigJson(100), SerializationTest::class.java)
         }
     }
 
