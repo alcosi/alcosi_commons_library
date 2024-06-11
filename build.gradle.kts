@@ -127,9 +127,9 @@ Without dependencies
         developers {
             developer {
                 id.set("Alcosi")
-                name.set("Alcosi")
+                name.set("Alcosi Group")
                 email.set("info@alcosi.com")
-                url.set("https://alcosi.com/")
+                url.set("alcosi.com")
             }
         }
     }
