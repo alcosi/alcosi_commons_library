@@ -39,7 +39,6 @@ import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
-import java.util.logging.Level
 
 /**
  * This class configures the RestTemplate for making HTTP requests.
@@ -82,6 +81,7 @@ class RestTemplateConfig {
     fun getRestTemplateContextFilter(headerHelper: HeaderHelper): RestTemplateContextHeadersFilter {
         return RestTemplateContextHeadersFilter(headerHelper, 0)
     }
+
     /**
      * Retrieves a SimpleClientHttpRequestFactory instance with configured connection and read timeouts.
      *
@@ -98,6 +98,7 @@ class RestTemplateConfig {
         val factory = BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory)
         return factory
     }
+
     /**
      * Retrieves the RestTemplateBuilder instance with configured filters, request factory, and configurer.
      *
@@ -114,13 +115,14 @@ class RestTemplateConfig {
         factory: ClientHttpRequestFactory,
         configurer: ObjectProvider<RestTemplateBuilderConfigurer>,
     ): RestTemplateBuilder {
-        val builder = RestTemplateBuilder().requestFactory { -> factory }
         val filtersList =
             filters.toList().sortedWith(OrderedComparator)
+        val builder = RestTemplateBuilder().requestFactory { -> factory }.interceptors(filtersList)
         builder.interceptors(filtersList)
         configurer.stream().forEach { it.configure(builder) }
         return builder
     }
+
     /**
      * Retrieves the RestTemplate instance.
      *
