@@ -23,16 +23,6 @@ import com.github.jk1.license.LicenseReportExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    repositories {
-        maven {
-            name = "GitHub"
-            url = uri("https://maven.pkg.github.com/alcosi/gradle-dependency-license-page-generator")
-            credentials {
-                username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
-                password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
-            }
-        }
-    }
     dependencies {
         classpath("com.alcosi:dependency-license-page-generator:1.0.0")
     }
@@ -70,36 +60,6 @@ java {
     withSourcesJar()
 }
 val repo = "github.com/alcosi/alcosi_commons_library"
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.$repo")
-            credentials {
-                username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
-                password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("Lib") {
-            from(components["java"])
-            groupId = group.toString()
-            artifactId = appName
-            version = version
-            pom {
-                url.set("https://$repo/tree/main/with-dependency")
-                licenses {
-                    license {
-                        name.set("Apache 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0")
-                    }
-                }
-            }
-        }
-    }
-}
 
 centralPortal {
     pom {
@@ -165,14 +125,6 @@ tasks.compileKotlin {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven {
-        name = "GitHub"
-        url = uri("https://maven.pkg.github.com/alcosi/alcosi_commons_library")
-        credentials {
-            username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
-            password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
-        }
-    }
 }
 
 configurations.configureEach {
@@ -248,6 +200,11 @@ idea {
 tasks.named("generateLicenseReport") {
     outputs.upToDateWhen { false }
 }
+
+tasks.named("generateLicenseReport") {
+    outputs.upToDateWhen { false }
+}
+
 licenseReport {
     unionParentPomLicenses = false
     outputDir = "$projectDir/reports/license"
