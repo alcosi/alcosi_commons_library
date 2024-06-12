@@ -5,16 +5,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 buildscript {
-    repositories {
-        maven {
-            name = "GitHub"
-            url = uri("https://maven.pkg.github.com/alcosi/gradle-dependency-license-page-generator")
-            credentials {
-                username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
-                password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
-            }
-        }
-    }
     dependencies {
         classpath("com.alcosi:dependency-license-page-generator:1.0.0")
     }
@@ -50,36 +40,6 @@ java {
     withSourcesJar()
 }
 val repo = "github.com/alcosi/alcosi_commons_library"
-publishing {
-    repositories {
-
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.$repo")
-            credentials {
-                username = "${System.getenv()["GIHUB_PACKAGE_USERNAME"] ?: System.getenv()["GITHUB_PACKAGE_USERNAME"]}"
-                password = "${System.getenv()["GIHUB_PACKAGE_TOKEN"] ?: System.getenv()["GITHUB_PACKAGE_TOKEN"]}"
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("CommonLib") {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = appName
-            version = project.version.toString()
-            pom {
-                url.set("https://$repo")
-                licenses {
-                    license {
-                        name.set("Apache 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0")
-                    }
-                }
-            }
-        }
-    }
-}
 
 centralPortal {
     pom {
@@ -226,6 +186,10 @@ idea {
         isDownloadJavadoc = true
         isDownloadSources = true
     }
+}
+
+tasks.named("generateLicenseReport") {
+    outputs.upToDateWhen { false }
 }
 
 licenseReport {

@@ -572,6 +572,16 @@
                     "version": "2.0.6"
                 },
                 {
+                    "name": "org.springframework.security:spring-security-crypto",
+                    "url": "https://spring.io/projects/spring-security",
+                    "version": "6.3.0"
+                },
+                {
+                    "name": "org.springframework.security:spring-security-rsa",
+                    "url": "http://github.com/spring-projects/spring-security-oauth",
+                    "version": "1.1.3"
+                },
+                {
                     "name": "org.springframework:spring-aop",
                     "url": "https://github.com/spring-projects/spring-framework",
                     "version": "6.1.8"
@@ -798,6 +808,11 @@
                     "version": "2.2"
                 },
                 {
+                    "name": "org.hdrhistogram:HdrHistogram",
+                    "url": "http://hdrhistogram.github.io/HdrHistogram/",
+                    "version": "2.2.1"
+                },
+                {
                     "name": "org.jetbrains.intellij.deps:trove4j",
                     "url": "https://github.com/JetBrains/intellij-deps-trove4j",
                     "version": "1.0.20200330"
@@ -836,6 +851,11 @@
                     "name": "org.junit:junit-bom",
                     "url": "https://junit.org/junit5/",
                     "version": "5.10.2"
+                },
+                {
+                    "name": "org.latencyutils:LatencyUtils",
+                    "url": "http://latencyutils.github.io/LatencyUtils/",
+                    "version": "2.0.3"
                 },
                 {
                     "name": "org.postgresql:postgresql",

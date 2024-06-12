@@ -245,7 +245,9 @@ idea {
         isDownloadSources = true
     }
 }
-
+tasks.named("generateLicenseReport") {
+    outputs.upToDateWhen { false }
+}
 licenseReport {
     unionParentPomLicenses = false
     outputDir = "$projectDir/reports/license"
