@@ -1,7 +1,6 @@
 import com.alcosi.gradle.dependency.group.JsonGroupedGenerator
 import com.alcosi.gradle.dependency.group.MDGroupedGenerator
 import com.github.jk1.license.LicenseReportExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 buildscript {
@@ -24,7 +23,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "4.0.6"
+version = "4.0.7"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"
@@ -122,7 +121,7 @@ dependencies {
     compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.0")
     compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
-    compileOnly("io.github.breninsul:synchronization-starter:1.0.1")
+    compileOnly("io.github.breninsul:synchronization-starter:1.0.2")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
     compileOnly("org.apache.commons:commons-lang3:3.14.0")
     compileOnly("com.squareup.okhttp3:okhttp:4.12.0")
@@ -157,11 +156,8 @@ configurations {
     testImplementation.extendsFrom(compileOnly)
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = javaVersion.majorVersion
-    }
+kotlin {
+    jvmToolchain(javaVersion.majorVersion.toInt())
 }
 
 tasks.withType<Test> {

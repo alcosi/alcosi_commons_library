@@ -20,7 +20,6 @@
 import com.alcosi.gradle.dependency.group.JsonGroupedGenerator
 import com.alcosi.gradle.dependency.group.MDGroupedGenerator
 import com.github.jk1.license.LicenseReportExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     dependencies {
@@ -43,7 +42,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.0"
-val depVersion = "4.0.6"
+val depVersion = "4.0.7"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.1"
@@ -140,7 +139,7 @@ dependencies {
     api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.0")
     api("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
-    api("io.github.breninsul:synchronization-starter:1.0.1")
+    api("io.github.breninsul:synchronization-starter:1.0.2")
     api("io.github.breninsul:future-starter:1.0.2")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
@@ -167,11 +166,8 @@ dependencies {
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = javaVersion.majorVersion
-    }
+kotlin {
+    jvmToolchain(javaVersion.majorVersion.toInt())
 }
 
 tasks.withType<Test> {
