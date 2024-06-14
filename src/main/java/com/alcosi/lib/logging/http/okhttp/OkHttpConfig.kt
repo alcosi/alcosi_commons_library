@@ -30,7 +30,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
-import java.util.logging.Level
 
 /**
  * The OkHttpConfig class is a configuration class that provides beans related to OkHttp library.
@@ -63,7 +62,7 @@ class OkHttpConfig {
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
     ): OKLoggingInterceptor {
-        return OKLoggingInterceptor(properties.maxLogBodySize, properties.loggingLevel.javaLevel, headerHelper, 1)
+        return OKLoggingInterceptor(properties.maxLogBodySize, properties.loggingLevel.javaLevel, 1)
     }
 
     /**

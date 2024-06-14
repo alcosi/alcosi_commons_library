@@ -17,7 +17,6 @@
 
 package com.alcosi.lib.logging.http.okhttp
 
-import com.alcosi.lib.filters.servlet.HeaderHelper
 import okhttp3.*
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
@@ -32,10 +31,9 @@ import java.util.logging.Logger
  *
  * @property maxBodySize The maximum size of the response body to log.
  * @property loggingLevel The logging level for the interceptor.
- * @property headerHelper An instance of the HeaderHelper class to handle headers.
  * @property order The order of the interceptor in the chain.
  */
-open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, val headerHelper: HeaderHelper, private val order: Int) : Interceptor, Ordered {
+open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, private val order: Int) : Interceptor, Ordered {
     /**
      * Variable to handle logging functionality.
      * Uses the java.util.logging.Logger class to log messages.
@@ -69,7 +67,7 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
      * @param response  The response obtained from the network request.
      * @param request   The original request made.
      * @param time      The time taken for the network request.
-     * @return          The modified response with log information.
+     * @return The modified response with log information.
      */
     protected open fun logRs(
         rqId: String,
@@ -97,7 +95,7 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
      * @param request   The original request made.
      * @param time      The time taken for the network request.
      * @param content   The content of the response body.
-     * @return          The constructed response body string.
+     * @return The constructed response body string.
      */
     protected open fun constructRsBody(
         rqId: String,
@@ -165,7 +163,7 @@ open class OKLoggingInterceptor(val maxBodySize: Int, val loggingLevel: Level, v
      * @param rqId      The ID of the request.
      * @param request   The request object containing the request details.
      * @param body      The body of the request.
-     * @return          The constructed request body string.
+     * @return The constructed request body string.
      */
     protected open fun constructRqBody(
         rqId: String,
