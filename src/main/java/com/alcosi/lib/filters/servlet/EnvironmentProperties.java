@@ -30,7 +30,7 @@ public class EnvironmentProperties {
      * It is a private variable in the EnvironmentProperties class.
      * The default value of the name field is "dev".
      */
-    private String name="dev";
+    private String name="dev-app";
     /**
      * The Environment variable represents the current environment in which the application is running.
      * The environment indicates whether the application is running in development, test, or production.

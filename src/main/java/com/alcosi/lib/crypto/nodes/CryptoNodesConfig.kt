@@ -76,7 +76,6 @@ class CryptoNodesConfig {
             OKLoggingInterceptor(
                 cryptoNodeProperties.nodesLoggingMaxBody,
                 cryptoNodeProperties.nodesLoggingLevel.javaLevel,
-                headerHelper,
                 0,
             ),
             cryptoNodeProperties.nodesTimeout,

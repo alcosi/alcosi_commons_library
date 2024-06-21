@@ -27,7 +27,6 @@ import java.util.logging.Level.SEVERE
 import java.util.logging.Logger
 import kotlin.io.path.listDirectoryEntries
 
-
 /**
  * The `ExternalJarLoad` class provides functionality to dynamically load external JAR files and their classes
  * into the current application.
@@ -67,22 +66,22 @@ open class ExternalJarLoad {
             return classLoader
         }
         val child = URLClassLoader(jarList.map { it.toUri().toURL() }.toTypedArray(), classLoader)
+        val classNamesFromJar = jarList.flatMap { getClassNamesFromJar(it.toString()) }
+
         val classes =
-            jarList
-                .flatMap {
-                    val classNames =
-                        getClassNamesFromJar(it.toString())
-                            .map { className ->
-                                logger.log(INFO, "Loaded $className")
-                                Class.forName(className, true, child)
-                            }
-                    return@flatMap classNames
+            classNamesFromJar
+                .filter { className -> !isModuleInfo(className) }
+                .map { className ->
+                    logger.log(INFO, "Loaded $className")
+                    Class.forName(className, true, child)
                 }
         if (setCurrentClassLoader) {
             Thread.currentThread().setContextClassLoader(child)
         }
         return child
     }
+
+    protected open fun isModuleInfo(className: String) = className.endsWith("module-info")
 
     /**
      * Retrieves the names of all classes within a JAR file.
@@ -117,7 +116,5 @@ open class ExternalJarLoad {
      * @param jarPath The path of the JAR file.
      * @return An ArrayList of class names found within the JAR file.
      */
-    protected open fun getClassNamesFromJar(jarPath: String): ArrayList<String> {
-        return getClassNamesFromJar(JarInputStream(FileInputStream(jarPath)))
-    }
+    protected open fun getClassNamesFromJar(jarPath: String): ArrayList<String> = getClassNamesFromJar(JarInputStream(FileInputStream(jarPath)))
 }

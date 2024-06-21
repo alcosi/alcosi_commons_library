@@ -39,7 +39,7 @@ public class AuthFilterProperties {
      *
      * @see AuthFilterProperties
      */
-    private String accessKey;
+    private String accessKey= "devAccessKey";
     /**
      * The orderDelta variable represents the difference between the order of the AuthFilter and the order of other filters.
      * The default value of orderDelta is 4.

@@ -55,9 +55,7 @@ class FilterConfig {
      */
     @Bean
     @ConditionalOnMissingBean(ThreadContext::class)
-    fun getThreadContext(): ThreadContext {
-        return ThreadContext()
-    }
+    fun getThreadContext(): ThreadContext = ThreadContext()
 
     /**
      * Retrieves an instance of `HeaderHelper` with the given parameters.
@@ -71,11 +69,9 @@ class FilterConfig {
     @Bean
     @ConditionalOnMissingBean(HeaderHelper::class)
     fun getHeaderHelper(
-        @Value("\${spring.application.name}") serviceName: String,
-        @Value("\${spring.application.environment}") environmentName: String,
+        @Value("\${spring.application.name:dev-app}") serviceName: String,
+        @Value("\${spring.application.environment:dev}") environmentName: String,
         environment: EnvironmentProperties, // sometimes it's not working (values from properties file/env are not setted to EnvironmentProperties), no idea why
         context: ThreadContext,
-    ): HeaderHelper {
-        return HeaderHelper(serviceName, environmentName, context)
-    }
+    ): HeaderHelper = HeaderHelper(serviceName, environmentName, context)
 }
