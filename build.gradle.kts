@@ -13,8 +13,8 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
-    id("org.springframework.boot") version "3.3.0"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("org.springframework.boot") version "3.3.1"
+    id("io.spring.dependency-management") version "1.1.5"
     id("org.jetbrains.kotlin.jvm") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.spring") version "2.0.0"
     id("com.github.jk1.dependency-license-report") version "2.8"
@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "4.0.9"
+version = "4.0.10"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"

@@ -31,8 +31,8 @@ plugins {
     id("idea")
     id("java-library")
     id("maven-publish")
-    id("org.springframework.boot") version "3.3.0"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("org.springframework.boot") version "3.3.1"
+    id("io.spring.dependency-management") version "1.1.5"
     id("org.jetbrains.kotlin.jvm") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.spring") version "2.0.0"
     id("com.github.jk1.dependency-license-report") version "2.8"
@@ -41,8 +41,8 @@ plugins {
 }
 
 val appName = "commons-library-basic-dependency"
-val springVersion = "3.3.0"
-val depVersion = "4.0.9"
+val springVersion = "3.3.1"
+val depVersion = "4.0.10"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.1"
@@ -150,7 +150,8 @@ dependencies {
     api("org.apache.commons:commons-text:1.12.0")
     api("org.bouncycastle:bcprov-jdk18on:1.78.1")
     api("org.postgresql:postgresql:42.7.3")
-    api("org.flywaydb:flyway-core:10.13.0")
+    api("org.flywaydb:flyway-core:10.14.0")
+    api("org.flywaydb:flyway-database-postgresql:10.14.0")
     api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")

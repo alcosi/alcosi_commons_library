@@ -20,9 +20,10 @@ package com.alcosi.lib.filters.servlet.log
 import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
+import com.alcosi.lib.filters.servlet.log.ServletLoggingFilterConfig.Companion.LOG_CONFIG_ATTRIBUTE
 import jakarta.servlet.FilterChain
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.Part
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.lang.Nullable
 import org.springframework.web.context.request.RequestAttributes
@@ -43,8 +44,8 @@ import java.util.logging.Logger
 open class LoggingFilter(
     val logInternalService: LogInternalService,
     val threadContext: ThreadContext,
-    @Value("\${common-lib.request_body_log.max.server:10000}") maxBodySize: Int,
-) : WrappedOnePerRequestFilter(maxBodySize,) {
+    maxBodySize: Int,
+) : WrappedOnePerRequestFilter(maxBodySize) {
     /**
      * Applies the filter to the incoming HTTP request and*/
     override fun doFilterWrapped(
@@ -65,14 +66,23 @@ open class LoggingFilter(
     }
 
     /**
+     * Determines whether the given HTTP request should be filtered by the LoggingFilter.
+     *
+     * @param request The HttpServletRequest object representing the incoming HTTP request.
+     * @return true if the request should not be filtered, false otherwise.
+     */
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val config = (request.getAttribute(LOG_CONFIG_ATTRIBUTE) as ServletLoggingFilterConfig?) ?: ServletLoggingFilterConfig()
+        return !config.enabled
+    }
+
+    /**
      * Retrieves the name of the filter.
      *
      * @return The name of the filter as a String, or null if the name is not set.
      */
     @Nullable
-    override fun getFilterName(): String? {
-        return "Logging"
-    }
+    override fun getFilterName(): String? = "Logging"
 
     /**
      * A class that provides logging functionality for internal service requests and responses.
@@ -126,42 +136,56 @@ open class LoggingFilter(
             }
             logSessionId(request)
             val contentEncoding = Charset.forName(request.characterEncoding ?: "UTF-8")
+            val config = getLoggingFilterConfig(request)
+
             try {
                 val content =
-                    if (request.contentType != null && request.contentType.startsWith("multipart/form-data")) {
-                        val parts: List<Part> = ArrayList(request.parts)
-                        parts.filter { it.size < maxBodySize }.map { "${it.name}:${it.contentType}:${it.size}" }
-                            .joinToString(";")
+                    if (config.logBody) {
+                        if (request.contentType != null && request.contentType.startsWith("multipart/form-data")) {
+                            val parts: List<Part> = ArrayList(request.parts)
+                            parts
+                                .filter { it.size < maxBodySize }
+                                .map { "${it.name}:${it.contentType}:${it.size}" }
+                                .joinToString(";")
+                        } else {
+                            String(request.body, contentEncoding)
+                        }
                     } else {
-                        String(request.body, contentEncoding)
+                        MASKED
                     }
                 val queryString = if (request.queryString == null) "" else "?" + request.queryString
                 val headers =
-                    Collections.list(request.headerNames).map { headerName: String ->
-                        "$headerName:${Collections.list(request.getHeaders(headerName)).joinToString(";")}"
-                    }.joinToString(";")
-                logger.info("RQ|= ${request.method} ${request.requestURI}$queryString")
-                val logString = constructRqBody(rqId, request, queryString, headers, content)
+                    if (config.logHeaders) {
+                        Collections
+                            .list(request.headerNames)
+                            .map { headerName: String ->
+                                "$headerName:${Collections.list(request.getHeaders(headerName)).joinToString(";")}"
+                            }.joinToString(";")
+                    } else {
+                        MASKED
+                    }
+                val uriString = if (config.logUri) "${request.method} ${request.requestURI}$queryString" else MASKED
+                val logString = constructRqBody(rqId, uriString, headers, content)
                 logger.log(loggingLevel, logString)
             } catch (t: Throwable) {
                 logger.log(Level.SEVERE, "", t)
             }
         }
 
+        protected open fun getLoggingFilterConfig(request: CachingRequestWrapper) = (request.getAttribute(LOG_CONFIG_ATTRIBUTE) as ServletLoggingFilterConfig?) ?: ServletLoggingFilterConfig()
+
         /**
          * Constructs the log string for the HTTP request body.
          *
          * @param rqId The unique ID for the request.
-         * @param request The wrapped HTTP request.
-         * @param queryString The query string of the request.
+         * @param uriString URI of request.
          * @param headers The headers of the request.
          * @param content The body content of the request.
          * @return The log string representing the request body.
          */
         protected open fun constructRqBody(
             rqId: String,
-            request: CachingRequestWrapper,
-            queryString: String,
+            uriString: String,
             headers: String,
             content: String,
         ): String {
@@ -170,7 +194,7 @@ open class LoggingFilter(
                 
                 ===========================SERVER request begin===========================
                 =ID           : $rqId
-                =URI          : ${request.method} ${request.requestURI}$queryString
+                =URI          : $uriString
                 =Headers      : $headers    
                 =Body         : $content
                 ===========================SERVER request end   ==========================
@@ -185,12 +209,19 @@ open class LoggingFilter(
          */
         protected open fun logSessionId(request: CachingRequestWrapper) {
             val sessionid =
-                Optional.ofNullable(request.getHeader("Authorization")).map { obj: String ->
-                    obj.uppercase(
-                        Locale.getDefault(),
-                    )
-                }
-                    .orElseGet { UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault()) }
+                Optional
+                    .ofNullable(request.getHeader("Authorization"))
+                    .map { obj: String ->
+                        obj.uppercase(
+                            Locale.getDefault(),
+                        )
+                    }.orElseGet {
+                        UUID
+                            .randomUUID()
+                            .toString()
+                            .replace("-", "")
+                            .uppercase(Locale.getDefault())
+                    }
             val attrs = RequestContextHolder.getRequestAttributes()
             attrs?.setAttribute("SESSION_ID", sessionid, RequestAttributes.SCOPE_REQUEST)
         }
@@ -205,22 +236,33 @@ open class LoggingFilter(
             rqId: String,
             time: Long,
         ) {
+            val config = getLoggingFilterConfig(request)
             val status = response.status
             val queryString = if (request.queryString == null) "" else "?" + request.queryString
             val headers =
-                response.headerNames.map { headerName: String ->
-                    "$headerName:${response.getHeaders(headerName).joinToString(";")}"
-                }.joinToString(";")
-            val content =
-                if (MediaType.APPLICATION_OCTET_STREAM.toString().equals(response.contentType, ignoreCase = true) ||
-                    MediaType.IMAGE_PNG.toString().equals(response.contentType, ignoreCase = true) ||
-                    (response.contentType ?: "").lowercase().contains("html")
-                ) {
-                    FILE_RS
+                if (config.logHeaders) {
+                    response.headerNames
+                        .map { headerName: String ->
+                            "$headerName:${response.getHeaders(headerName).joinToString(";")}"
+                        }.joinToString(";")
                 } else {
-                    String(response.contentAsByteArray, Charset.forName(response.characterEncoding))
+                    MASKED
                 }
-            val logBody = constructRsBody(rqId, status, request, queryString, time, headers, content)
+            val content =
+                if (config.logBody) {
+                    if (MediaType.APPLICATION_OCTET_STREAM.toString().equals(response.contentType, ignoreCase = true) ||
+                        MediaType.IMAGE_PNG.toString().equals(response.contentType, ignoreCase = true) ||
+                        (response.contentType ?: "").lowercase().contains("html")
+                    ) {
+                        FILE_RS
+                    } else {
+                        String(response.contentAsByteArray, Charset.forName(response.characterEncoding))
+                    }
+                } else {
+                    MASKED
+                }
+            val uriString = if (config.logUri) "$status ${request.method} ${request.requestURI}$queryString" else MASKED
+            val logBody = constructRsBody(rqId, uriString, time, headers, content)
             logger.log(loggingLevel, logBody)
         }
 
@@ -228,9 +270,7 @@ open class LoggingFilter(
          * Constructs the log string for the HTTP response body.
          *
          * @param rqId The unique ID for the request.
-         * @param status The HTTP status code.
-         * @param request The wrapped HTTP request.
-         * @param queryString The query string of the request.
+         * @param uriString The URI string of the request.
          * @param time The time taken to process the request in milliseconds.
          * @param headers The headers of the request.
          * @param content The body content of the request.
@@ -238,9 +278,7 @@ open class LoggingFilter(
          */
         protected open fun constructRsBody(
             rqId: String,
-            status: Int,
-            request: CachingRequestWrapper,
-            queryString: String,
+            uriString: String,
             time: Long,
             headers: String,
             content: String,
@@ -250,7 +288,7 @@ open class LoggingFilter(
                 
                 ===========================SERVER response begin===========================
                 =ID           : $rqId
-                =URI          : $status ${request.method} ${request.requestURI}$queryString
+                =URI          : $uriString
                 =Took         : ${System.currentTimeMillis() - time} ms
                 =Headers      : $headers    
                 =Body         : $content
@@ -269,5 +307,6 @@ open class LoggingFilter(
     companion object {
         val logger = Logger.getLogger(this::class.java.name)
         val FILE_RS = "<file_bytes>"
+        val MASKED = "<MASKED>"
     }
 }

@@ -29,7 +29,9 @@ import org.springframework.web.util.ContentCachingResponseWrapper
  * It extends the OncePerRequestFilter class.
  * The filter processes the HttpServletRequest and HttpServletResponse with the help of two abstract methods:
  *     - doFilterWrapped: This method*/
-abstract class WrappedOnePerRequestFilter(val maxBodySize: Int) : OncePerRequestFilter() {
+abstract class WrappedOnePerRequestFilter(
+    val maxBodySize: Int,
+) : OncePerRequestFilter() {
     /**
      * Apply the filter to the incoming HTTP request and response.
      *
@@ -44,6 +46,7 @@ abstract class WrappedOnePerRequestFilter(val maxBodySize: Int) : OncePerRequest
     ) {
         doFilterWrapped(wrapRequest(request), wrapResponse(response), filterChain)
     }
+
     /**
      * Performs the actual filtering of the request and response.
      *
@@ -56,30 +59,30 @@ abstract class WrappedOnePerRequestFilter(val maxBodySize: Int) : OncePerRequest
         response: ContentCachingResponseWrapper,
         filterChain: FilterChain,
     )
+
     /**
      * Wraps the given HttpServletRequest object with a CachingRequestWrapper.
      *
      * @param request the HttpServletRequest object to be wrapped
      * @return a CachingRequestWrapper that wraps the given HttpServletRequest object
      */
-    protected open fun wrapRequest(request: HttpServletRequest): CachingRequestWrapper {
-        return if (request is CachingRequestWrapper) {
+    protected open fun wrapRequest(request: HttpServletRequest): CachingRequestWrapper =
+        if (request is CachingRequestWrapper) {
             request
         } else {
             CachingRequestWrapper(maxBodySize, request)
         }
-    }
+
     /**
      * Wraps the given HttpServletResponse with a ContentCachingResponseWrapper.
      *
      * @param response The HttpServletResponse to be wrapped.
      * @return The ContentCachingResponseWrapper that wraps the given response.
      */
-    protected open fun wrapResponse(response: HttpServletResponse): ContentCachingResponseWrapper {
-        return if (response is ContentCachingResponseWrapper) {
+    protected open fun wrapResponse(response: HttpServletResponse): ContentCachingResponseWrapper =
+        if (response is ContentCachingResponseWrapper) {
             response
         } else {
             ContentCachingResponseWrapper(response)
         }
-    }
 }
