@@ -36,6 +36,7 @@ open class SensitiveComponent(
      * Regular expression used to match sensitive data pattern.
      */
     open val regex = Regex(sensitiveDataPattern)
+
     /**
      * Regular expression pattern for matching sensitive data within curly braces.
      *
@@ -44,6 +45,7 @@ open class SensitiveComponent(
      * @see Pattern
      */
     open val regexPattern = Pattern.compile("(\\{[^{}]*)$sensitiveDataPattern([^{}]*})")
+
     /**
      * Deserializes a string value to a byte array.
      *
@@ -69,16 +71,20 @@ open class SensitiveComponent(
             }
         }
     }
+
     /**
-     * Serializes a byte array into a string representation.
+     * Serializes a byte array to a string representation.
      *
-     * @param value The byte array to be serialized. If null, returns "<SensitiveData>null*/
+     * @param value The byte array to be serialized.
+     * @return The serialized string representation of the byte array, or null if the value is null.
+     */
     open fun serialize(value: ByteArray?): String? {
         if (value == null) {
             return "<SensitiveData>null</SensitiveData>"
         }
         return "<SensitiveData>${Hex.encodeHexString(value)}</SensitiveData>"
     }
+
     /**
      * Decrypts a given value using the provided key.
      *

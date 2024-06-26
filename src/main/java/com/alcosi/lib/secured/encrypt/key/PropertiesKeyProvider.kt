@@ -25,9 +25,13 @@ import org.apache.commons.codec.binary.Hex
  * @param privKey The private key as a hexadecimal string.
  * @param publicKey The public key as a hexadecimal string.
  */
-open class PropertiesKeyProvider(privKey: String, publicKey: String) : KeyProvider {
-    protected open val privKeyBytes = Hex.decodeHex(privKey)
-    protected open val pubKeyBytes = Hex.decodeHex(publicKey)
+open class PropertiesKeyProvider(
+    privKey: String,
+    publicKey: String,
+) : KeyProvider {
+    protected open val privKeyBytes = if (privKey.isBlank()) ByteArray(0) else Hex.decodeHex(privKey)
+    protected open val pubKeyBytes = if (publicKey.isBlank()) ByteArray(0) else Hex.decodeHex(publicKey)
+
     /**
      * Return the appropriate key based on the provided mode.
      *
@@ -35,10 +39,9 @@ open class PropertiesKeyProvider(privKey: String, publicKey: String) : KeyProvid
      * @return The key as a ByteArray. If the mode is `MODE.ENCRYPT`, it returns the public key as a ByteArray.
      * If the mode is `MODE.DECRYPT`, it returns the private key as a ByteArray.
      */
-    override fun key(mode: KeyProvider.MODE): ByteArray {
-        return when (mode) {
+    override fun key(mode: KeyProvider.MODE): ByteArray =
+        when (mode) {
             KeyProvider.MODE.ENCRYPT -> pubKeyBytes
             KeyProvider.MODE.DECRYPT -> privKeyBytes
         }
-    }
 }

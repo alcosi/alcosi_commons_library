@@ -22,8 +22,11 @@ import com.alcosi.lib.secured.encrypt.encryption.Decrypter
 import com.alcosi.lib.secured.encrypt.encryption.Encrypter
 import com.alcosi.lib.secured.encrypt.encryption.aes.AesDecrypter
 import com.alcosi.lib.secured.encrypt.encryption.aes.AesEncrypter
+import com.alcosi.lib.secured.encrypt.encryption.masking.MaskingDecrypter
+import com.alcosi.lib.secured.encrypt.encryption.masking.MaskingEncrypter
 import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaDecrypter
 import com.alcosi.lib.secured.encrypt.encryption.rsa.RsaEncrypter
+import com.alcosi.lib.secured.encrypt.key.EmptyKeyProvider
 import com.alcosi.lib.secured.encrypt.key.HttpRequestKeyProvider
 import com.alcosi.lib.secured.encrypt.key.KeyProvider
 import com.alcosi.lib.secured.encrypt.key.PropertiesKeyProvider
@@ -35,9 +38,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
-/**
- * Configuration class for encryption related beans.
- */
+/** Configuration class for encryption related beans. */
 @ConditionalOnProperty(
     prefix = "common-lib.secured",
     name = ["disabled"],
@@ -48,9 +49,11 @@ import org.springframework.context.annotation.Primary
 @EnableConfigurationProperties(EncryptionProperties::class)
 class EncryptionConfig {
     /**
-     * Returns a KeyProvider implementation based on the given EncryptionProperties.
+     * Returns a KeyProvider implementation based on the given
+     * EncryptionProperties.
      *
-     * @param properties The EncryptionProperties containing the private and public keys.
+     * @param properties The EncryptionProperties containing the private and
+     *     public keys.
      * @return The KeyProvider implementation.
      */
     @ConditionalOnProperty(
@@ -61,15 +64,17 @@ class EncryptionConfig {
     @Primary
     @ConditionalOnMissingBean(KeyProvider::class)
     @Bean("ServiceDataEncryptionPropertiesKeyProvider")
-    fun getServiceDataEncryptionPropertiesSyncKeyProvider(properties: EncryptionProperties): KeyProvider {
-        return PropertiesKeyProvider(properties.privateKey, properties.publicKey)
-    }
+    fun getServiceDataEncryptionPropertiesSyncKeyProvider(properties: EncryptionProperties): KeyProvider = PropertiesKeyProvider(properties.privateKey, properties.publicKey)
+
     /**
-     * Creates a [KeyProvider] for service data encryption using HTTP request headers.
+     * Creates a [KeyProvider] for service data encryption using HTTP request
+     * headers.
      *
-     * @param properties The [EncryptionProperties] containing the necessary configuration properties.
+     * @param properties The [EncryptionProperties] containing the necessary
+     *     configuration properties.
      * @param helper The [HeaderHelper] used to create request headers.
-     * @param sensitiveComponent The [SensitiveComponent] used for handling sensitive data.
+     * @param sensitiveComponent The [SensitiveComponent] used for handling
+     *     sensitive data.
      * @return A [KeyProvider] instance.
      */
     @ConditionalOnProperty(
@@ -83,16 +88,33 @@ class EncryptionConfig {
         properties: EncryptionProperties,
         helper: HeaderHelper,
         sensitiveComponent: SensitiveComponent,
-    ): KeyProvider {
-        return HttpRequestKeyProvider(sensitiveComponent, helper, properties.accessKey, properties.uri)
-    }
+    ): KeyProvider = HttpRequestKeyProvider(sensitiveComponent, helper, properties.accessKey, properties.uri)
+
+    @ConditionalOnProperty(
+        prefix = "common-lib.secured",
+        name = ["mode"],
+        havingValue = "MASKING",
+        matchIfMissing = false,
+    )
+    @ConditionalOnMissingBean(KeyProvider::class)
+    @Bean("ServiceDataEncryptionEmptyKeyProvider")
+    fun getServiceDataEncryptionEmptyKeyProvider(
+        properties: EncryptionProperties,
+        helper: HeaderHelper,
+        sensitiveComponent: SensitiveComponent,
+    ): KeyProvider = EmptyKeyProvider()
+
     /**
-     * Retrieves an instance of the AESServiceDataEncryptionEncrypter.
-     * This method is annotated with @ConditionalOnProperty to conditionally create the bean based on the value of the "common-lib.secured.mode" property in the configuration.
-     * If the property is not present or its value is "AES", an instance of AesEncrypter will be returned.
-     * If the property is present and its value is not "AES", this method will not be invoked and the bean will not be created.
-     * This method is also annotated with @ConditionalOnMissingBean to ensure that the bean is only created if there is no existing bean of type Encrypter in the application context
-     * .
+     * Retrieves an instance of the AESServiceDataEncryptionEncrypter. This
+     * method is annotated with @ConditionalOnProperty to conditionally
+     * create the bean based on the value of the "common-lib.secured.mode"
+     * property in the configuration. If the property is not present or its
+     * value is "AES", an instance of AesEncrypter will be returned. If the
+     * property is present and its value is not "AES", this method will not be
+     * invoked and the bean will not be created. This method is also annotated
+     * with @ConditionalOnMissingBean to ensure that the bean is only created
+     * if there is no existing bean of type Encrypter in the application
+     * context .
      *
      * @return An instance of the AESServiceDataEncryptionEncrypter.
      */
@@ -104,9 +126,8 @@ class EncryptionConfig {
     )
     @Bean("AESServiceDataEncryptionEncrypter")
     @ConditionalOnMissingBean(Encrypter::class)
-    fun getAESServiceDataEncryptionEncrypter(): Encrypter {
-        return AesEncrypter()
-    }
+    fun getAESServiceDataEncryptionEncrypter(): Encrypter = AesEncrypter()
+
     /**
      * Retrieves an AES-based decrypter for service data encryption.
      *
@@ -120,16 +141,69 @@ class EncryptionConfig {
     )
     @Bean("AESServiceDataEncryptionDecrypter")
     @ConditionalOnMissingBean(Decrypter::class)
-    fun getAESServiceDataEncryptionDecrypter(): Decrypter {
-        return AesDecrypter()
-    }
+    fun getAESServiceDataEncryptionDecrypter(): Decrypter = AesDecrypter()
+
     /**
-     * Retrieves an instance of the RSAServiceDataEncryptionEncrypter.
-     * This method is annotated with `@ConditionalOnProperty` to ensure that it is only created when the "common-lib.secured.mode" property is set to "RSA" in the configuration.
-     * It is also annotated with `@Bean` to indicate that it is a bean that should be managed by the Spring container.
-     * If there is already a bean of type `Encrypter` present in the container, this method will not be invoked.
+     * Retrieves an instance of the MaskingEncrypter.
      *
-     * @return An instance of the `Encrypter` interface that provides RSA encryption functionality.
+     * This method is annotated with @ConditionalOnProperty to conditionally
+     * create the bean based on the value of the "common-lib.secured.mode"
+     * property in the configuration. If the property is not present or its
+     * value is "MASKING", an instance of MaskingEncrypter will be returned.
+     * If the property is present and its value is not "MASKING", this method
+     * will not be invoked and the bean will not be created. This method is
+     * also annotated with @ConditionalOnMissingBean to ensure that the bean
+     * is only created if there is no existing bean of type Encrypter in the
+     * application context .
+     *
+     * @return An instance of the MaskingEncrypter.
+     */
+    @ConditionalOnProperty(
+        prefix = "common-lib.secured",
+        name = ["mode"],
+        havingValue = "MASKING",
+        matchIfMissing = false,
+    )
+    @Bean("MaskingServiceDataEncryptionEncrypter")
+    @ConditionalOnMissingBean(Encrypter::class)
+    fun getMaskingServiceDataEncryptionEncrypter(): Encrypter = MaskingEncrypter()
+
+    /**
+     * Retrieves an instance of the MaskingDecrypter.
+     *
+     * This method is annotated with @ConditionalOnProperty to conditionally
+     * create the bean based on the value of the "common-lib.secured.mode"
+     * property in the configuration. If the property is not present or its
+     * value is "MASKING", an instance of MaskingDecrypter will be returned.
+     * If the property is present and its value is not "MASKING", this method
+     * will not be invoked and the bean will not be created. This method is
+     * also annotated with @ConditionalOnMissingBean to ensure that the bean
+     * is only created if there is no existing bean of type Decrypter in the
+     * application context .
+     *
+     * @return An instance of the MaskingDecrypter.
+     */
+    @ConditionalOnProperty(
+        prefix = "common-lib.secured",
+        name = ["mode"],
+        havingValue = "MASKING",
+        matchIfMissing = false,
+    )
+    @Bean("MaskingServiceDataEncryptionDecrypter")
+    @ConditionalOnMissingBean(Decrypter::class)
+    fun getMaskingServiceDataEncryptionDecrypter(): Decrypter = MaskingDecrypter()
+
+    /**
+     * Retrieves an instance of the RSAServiceDataEncryptionEncrypter. This
+     * method is annotated with `@ConditionalOnProperty` to ensure that it is
+     * only created when the "common-lib.secured.mode" property is set to "RSA"
+     * in the configuration. It is also annotated with `@Bean` to indicate that
+     * it is a bean that should be managed by the Spring container. If there is
+     * already a bean of type `Encrypter` present in the container, this method
+     * will not be invoked.
+     *
+     * @return An instance of the `Encrypter` interface that provides RSA
+     *     encryption functionality.
      */
     @ConditionalOnProperty(
         prefix = "common-lib.secured",
@@ -139,11 +213,11 @@ class EncryptionConfig {
     )
     @Bean("RSAServiceDataEncryptionEncrypter")
     @ConditionalOnMissingBean(Encrypter::class)
-    fun getRSAServiceDataEncryptionEncrypter(): Encrypter {
-        return RsaEncrypter()
-    }
+    fun getRSAServiceDataEncryptionEncrypter(): Encrypter = RsaEncrypter()
+
     /**
-     * Retrieves a Decrypter instance that uses RSA encryption algorithm for data decryption.
+     * Retrieves a Decrypter instance that uses RSA encryption algorithm for
+     * data decryption.
      *
      * @return The Decrypter instance.
      */
@@ -155,9 +229,8 @@ class EncryptionConfig {
     )
     @Bean("RSAServiceDataEncryptionDecrypter")
     @ConditionalOnMissingBean(Decrypter::class)
-    fun getRSAServiceDataEncryptionDecrypter(): Decrypter {
-        return RsaDecrypter()
-    }
+    fun getRSAServiceDataEncryptionDecrypter(): Decrypter = RsaDecrypter()
+
     /**
      * Retrieves the SensitiveComponent instance.
      *
@@ -165,7 +238,5 @@ class EncryptionConfig {
      */
     @Bean("SensitiveComponent")
     @ConditionalOnMissingBean(SensitiveComponent::class)
-    fun getSensitiveComponent(): SensitiveComponent {
-        return SensitiveComponent(ObjectMapper())
-    }
+    fun getSensitiveComponent(): SensitiveComponent = SensitiveComponent(ObjectMapper())
 }
