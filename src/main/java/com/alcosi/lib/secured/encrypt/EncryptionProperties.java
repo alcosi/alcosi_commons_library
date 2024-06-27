@@ -139,6 +139,6 @@ public class EncryptionProperties {
      *
      */
     public  enum MODE {
-        AES, RSA
+        AES, RSA,MASKING
     }
 }
