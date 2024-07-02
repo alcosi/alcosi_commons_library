@@ -34,7 +34,10 @@ import java.util.logging.Logger
  * @param messageConversionErrorCode The error code to be used for HTTP message conversion exceptions.
  * @param unknownErrorCode The error code to be used for unknown exceptions.
  */
-open class CaughtExceptionRouterFilter(val messageConversionErrorCode: Int, val unknownErrorCode: Int) : RouterFilter {
+open class CaughtExceptionRouterFilter(
+    val messageConversionErrorCode: Int,
+    val unknownErrorCode: Int,
+) : RouterFilter {
     /**
      * This method is an implementation of the `RouterFilter` interface.
      * It handles the filtering of requests in a server.
@@ -79,4 +82,6 @@ open class CaughtExceptionRouterFilter(val messageConversionErrorCode: Int, val 
     companion object {
         val logger = Logger.getLogger(this.javaClass.name)
     }
+
+    override fun getOrder() = 1
 }

@@ -52,9 +52,7 @@ class RouterFilterConfig {
         havingValue = "false",
     )
     @ConditionalOnMissingBean(CaughtExceptionRouterFilter::class)
-    fun getCaughtExceptionRouterFilter(props: RouterFilterCaughtExceptionsProperties): CaughtExceptionRouterFilter {
-        return CaughtExceptionRouterFilter(props.messageConversionErrorCode, props.unknownErrorCode)
-    }
+    fun getCaughtExceptionRouterFilter(props: RouterFilterCaughtExceptionsProperties): CaughtExceptionRouterFilter = CaughtExceptionRouterFilter(props.messageConversionErrorCode, props.unknownErrorCode)
 
     /**
      * Retrieves a FilteredRouterBeanPostProcessor instance based on the provided list of RouterFilters.
@@ -64,7 +62,5 @@ class RouterFilterConfig {
      */
     @Bean
     @ConditionalOnMissingBean(FilteredRouterBeanPostProcessor::class)
-    fun getFilteredRouterBeanPostProcessor(filters: List<RouterFilter>): FilteredRouterBeanPostProcessor {
-        return FilteredRouterBeanPostProcessor(filters)
-    }
+    fun getFilteredRouterBeanPostProcessor(filters: List<RouterFilter>): FilteredRouterBeanPostProcessor = FilteredRouterBeanPostProcessor(filters.sortedBy { it.order })
 }

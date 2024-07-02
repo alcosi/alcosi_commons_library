@@ -17,6 +17,7 @@
 
 package com.alcosi.lib.filters.router
 
+import org.springframework.core.Ordered
 import org.springframework.web.servlet.function.HandlerFilterFunction
 import org.springframework.web.servlet.function.ServerResponse
 
@@ -25,4 +26,6 @@ import org.springframework.web.servlet.function.ServerResponse
  *
  * @param T the type of the request handler function.
  */
-interface RouterFilter : HandlerFilterFunction<ServerResponse, ServerResponse>
+interface RouterFilter :
+    HandlerFilterFunction<ServerResponse, ServerResponse>,
+    Ordered

@@ -33,4 +33,6 @@ open class LoggingConfigRouterFilter(
         request.servletRequest().setAttribute(LOG_CONFIG_ATTRIBUTE, config)
         return next.handle(request)
     }
+
+    override fun getOrder() = -1
 }
