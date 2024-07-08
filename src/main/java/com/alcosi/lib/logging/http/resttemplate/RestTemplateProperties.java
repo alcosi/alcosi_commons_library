@@ -31,7 +31,7 @@ public class RestTemplateProperties {
     private Boolean enabled = true;
     private Duration connectTimeout = Duration.ofSeconds(10);
     private Duration readTimeout = Duration.ofSeconds(120);
-    private RestTemplateLoggerProperties logging;
+    private RestTemplateLoggerProperties logging=new RestTemplateLoggerProperties();
     private Boolean contextHeadersDisabled = false;
 
     public Boolean getContextHeadersDisabled() {

@@ -36,7 +36,7 @@ public class OkHttpLoggingProperties {
     private Duration connectTimeout = Duration.ofSeconds(10);
     private Duration readTimeout = Duration.ofSeconds(120);
     private Duration writeTimeout = Duration.ofSeconds(120);
-    private OkHttpLoggerProperties logging;
+    private OkHttpLoggerProperties logging= new OkHttpLoggerProperties();
 
     public Boolean getEnabled() {
         return enabled;
