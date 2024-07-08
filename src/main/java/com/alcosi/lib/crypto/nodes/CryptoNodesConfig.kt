@@ -20,6 +20,7 @@ package com.alcosi.lib.crypto.nodes
 import com.alcosi.lib.executors.NormalThreadPoolExecutor
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.okhttp.OKLoggingInterceptor
+import io.github.breninsul.okhttp.logging.OkHttpLoggerConfiguration
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
@@ -71,12 +72,24 @@ class CryptoNodesConfig {
         headerHelper: HeaderHelper,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
+        val config = OkHttpLoggerConfiguration()
+        val requestMaskers =
+            listOf(
+                config.okHttpRequestRegexJsonBodyMasking(cryptoNodeProperties.logging.request.mask),
+                config.okHttpRequestFormUrlencodedBodyMasking(cryptoNodeProperties.logging.request.mask),
+            )
+        val responseMaskers =
+            listOf(
+                config.okHttpResponseRegexJsonBodyMasking(cryptoNodeProperties.logging.request.mask),
+                config.okHttpResponseFormUrlencodedBodyMasking(cryptoNodeProperties.logging.request.mask),
+            )
         configureTimeouts(
             builder,
             OKLoggingInterceptor(
-                cryptoNodeProperties.nodesLoggingMaxBody,
-                cryptoNodeProperties.nodesLoggingLevel.javaLevel,
-                0,
+                cryptoNodeProperties.logging,
+                requestMaskers,
+                responseMaskers,
+                headerHelper,
             ),
             cryptoNodeProperties.nodesTimeout,
         )
@@ -108,9 +121,7 @@ class CryptoNodesConfig {
      */
     @Bean
     @ConditionalOnMissingBean(ContractGasProvider::class)
-    fun gasProvider(): ContractGasProvider {
-        return DefaultGasProvider()
-    }
+    fun gasProvider(): ContractGasProvider = DefaultGasProvider()
 
     /**
      * Retrieves a HealthCheckerNormalThreadPoolExecutor instance with the given CryptoNodeProperties.
@@ -120,9 +131,7 @@ class CryptoNodesConfig {
      * @return The HealthCheckerNormalThreadPoolExecutor instance.
      */
     @Bean("healthCheckerNormalThreadPoolExecutor")
-    fun getHealthCheckerNormalThreadPoolExecutor(cryptoNodeProperties: CryptoNodeProperties): ExecutorService {
-        return NormalThreadPoolExecutor.build(cryptoNodeProperties.health.threads, "crypto-health-check")
-    }
+    fun getHealthCheckerNormalThreadPoolExecutor(cryptoNodeProperties: CryptoNodeProperties): ExecutorService = NormalThreadPoolExecutor.build(cryptoNodeProperties.health.threads, "crypto-health-check")
 
     /**
      * Retrieves the CryptoNodeHealthActualizer instance.
@@ -138,15 +147,14 @@ class CryptoNodesConfig {
         cryptoNodeProperties: CryptoNodeProperties,
         @Qualifier("healthCheckerNormalThreadPoolExecutor") executor: ExecutorService,
         @Qualifier("cryptoNodeHttpClient") httpClient: OkHttpClient,
-    ): CryptoNodeHealthActualizer {
-        return CryptoNodeHealthActualizer(
+    ): CryptoNodeHealthActualizer =
+        CryptoNodeHealthActualizer(
             cryptoNodeProperties.health.nodesLoggingLevel.javaLevel,
             cryptoNodeProperties,
             executor,
             CryptoNodeHealthChecker(httpClient),
             cryptoNodeProperties.health.refreshTimeout,
         )
-    }
 
     /**
      * Returns the default gas provider for contracts.
@@ -156,9 +164,7 @@ class CryptoNodesConfig {
      * @return the default gas provider
      */
     @ConditionalOnMissingBean(ContractGasProvider::class)
-    fun getDefaultGasProvider(): ContractGasProvider {
-        return DefaultGasProvider()
-    }
+    fun getDefaultGasProvider(): ContractGasProvider = DefaultGasProvider()
 
     /**
      * Generates the configuration for Crypto Nodes admin service.
@@ -203,7 +209,5 @@ class CryptoNodesConfig {
     fun getCryptoNodesLoadBalancer(
         cryptoNodesHealthActualizer: CryptoNodeHealthActualizer,
         properties: CryptoNodeProperties,
-    ): CryptoNodesLoadBalancer {
-        return CryptoNodesLoadBalancer(cryptoNodesHealthActualizer, properties.balancerTimeout)
-    }
+    ): CryptoNodesLoadBalancer = CryptoNodesLoadBalancer(cryptoNodesHealthActualizer, properties.balancerTimeout)
 }

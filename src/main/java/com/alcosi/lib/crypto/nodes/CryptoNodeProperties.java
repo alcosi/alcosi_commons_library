@@ -18,6 +18,7 @@
 package com.alcosi.lib.crypto.nodes;
 
 import com.alcosi.lib.logging.JavaLoggingLevel;
+import io.github.breninsul.okhttp.logging.OkHttpLoggerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
@@ -28,6 +29,16 @@ import java.util.Map;
  */
 @ConfigurationProperties("common-lib.crypto.node")
 public class CryptoNodeProperties {
+    private OkHttpLoggerProperties logging;
+
+    public OkHttpLoggerProperties getLogging() {
+        return logging;
+    }
+
+    public void setLogging(OkHttpLoggerProperties logging) {
+        this.logging = logging;
+    }
+
     public Map<Integer, String> getUrl() {
         return url;
     }
@@ -60,21 +71,6 @@ public class CryptoNodeProperties {
         this.threads = threads;
     }
 
-    public JavaLoggingLevel getNodesLoggingLevel() {
-        return nodesLoggingLevel;
-    }
-
-    public void setNodesLoggingLevel(JavaLoggingLevel nodesLoggingLevel) {
-        this.nodesLoggingLevel = nodesLoggingLevel;
-    }
-
-    public Integer getNodesLoggingMaxBody() {
-        return nodesLoggingMaxBody;
-    }
-
-    public void setNodesLoggingMaxBody(Integer nodesLoggingMaxBody) {
-        this.nodesLoggingMaxBody = nodesLoggingMaxBody;
-    }
 
     public Duration getNodesTimeout() {
         return nodesTimeout;
@@ -158,37 +154,7 @@ public class CryptoNodeProperties {
      * cryptoNodeProperties.setThreads(10);
      */
     private Integer threads = 20;
-    /**
-     * The private variable nodesLoggingLevel of type JavaLoggingLevel represents the logging level for the nodes.
-     * It is used to control the verbosity of log messages related to the nodes in the application.
-     *
-     * The available logging levels defined in the JavaLoggingLevel enum are:
-     * - SEVERE: Represents a severe error that requires immediate attention.
-     * - WARNING: Represents a warning that may indicate a potential problem.
-     * - INFO: Represents an informative message about the progress of the application.
-     * - CONFIG: Represents configuration information.
-     * - FINE: Represents fine-grained tracing information.
-     * - FINER: Represents even more detailed tracing information.
-     * - FINEST: Represents the lowest level of tracing information.
-     *
-     * The default value for nodesLoggingLevel is JavaLoggingLevel.INFO.
-     *
-     * Note: The JavaLoggingLevel enum has an associated Java Level object defined in the java.util.logging.Level class.
-     *
-     * This variable is declared inside the CryptoNodeProperties class, which is a part of the containing class hierarchy.
-     *
-     * @see CryptoNodeProperties#getNodesLoggingLevel()
-     * @see CryptoNodeProperties#setNodesLoggingLevel(JavaLoggingLevel)
-     * @see JavaLoggingLevel
-     * @see java.util.logging.Level
-     */
-    private JavaLoggingLevel nodesLoggingLevel = JavaLoggingLevel.INFO;
-    /**
-     * The maximum number of nodes to log the body details for.
-     *
-     * Default value: 10000
-     */
-    private Integer nodesLoggingMaxBody = 10000;
+
     /**
      * The nodesTimeout variable represents the duration of the timeout for nodes in seconds.
      * After the timeout period has elapsed, the nodes will be considered inactive.
