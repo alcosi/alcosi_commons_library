@@ -141,6 +141,8 @@ dependencies {
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.2")
     api("io.github.breninsul:future-starter:1.0.2")
+    api("io.github.breninsul:rest-template-logging-interceptor:1.1.0")
+    api("io.github.breninsul:okhttp-logging-interceptor:1.0.7")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")

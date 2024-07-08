@@ -19,6 +19,7 @@ package com.alcosi.lib.logging.http.okhttp
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.OrderedComparator
+import io.github.breninsul.okhttp.logging.OkHttpLoggerConfiguration
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.springframework.beans.factory.ObjectProvider
@@ -47,7 +48,7 @@ import org.springframework.context.annotation.Primary
 @AutoConfiguration
 @ConditionalOnClass(Interceptor::class)
 @EnableConfigurationProperties(OkHttpLoggingProperties::class)
-@ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class OkHttpConfig {
     /**
      * Retrieves an instance of the OKLoggingInterceptor class.
@@ -57,12 +58,23 @@ class OkHttpConfig {
     @Bean
     @ConditionalOnMissingBean(OKLoggingInterceptor::class)
     @ConditionalOnBean(HeaderHelper::class)
-    @ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["logging-disabled"], matchIfMissing = true, havingValue = "false")
+    @ConditionalOnProperty(prefix = "common-lib.okhttp.logging", name = ["enabled"], matchIfMissing = true, havingValue = "true")
     fun getOKLoggingInterceptor(
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
     ): OKLoggingInterceptor {
-        return OKLoggingInterceptor(properties.maxLogBodySize, properties.loggingLevel.javaLevel, 1)
+        val config = OkHttpLoggerConfiguration()
+        val requestMaskers =
+            listOf(
+                config.okHttpRequestRegexJsonBodyMasking(properties.logging.request.mask),
+                config.okHttpRequestFormUrlencodedBodyMasking(properties.logging.request.mask),
+            )
+        val responseMaskers =
+            listOf(
+                config.okHttpResponseRegexJsonBodyMasking(properties.logging.request.mask),
+                config.okHttpResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
+            )
+        return OKLoggingInterceptor(properties.logging, requestMaskers, responseMaskers, headerHelper)
     }
 
     /**
@@ -74,9 +86,7 @@ class OkHttpConfig {
     @ConditionalOnMissingBean(OKContextHeadersInterceptor::class)
     @ConditionalOnBean(HeaderHelper::class)
     @ConditionalOnProperty(prefix = "common-lib.okhttp", name = ["context-headers-disabled"], matchIfMissing = true, havingValue = "false")
-    fun getOKContextInterceptor(headerHelper: HeaderHelper): OKContextHeadersInterceptor {
-        return OKContextHeadersInterceptor(headerHelper, 0)
-    }
+    fun getOKContextInterceptor(headerHelper: HeaderHelper): OKContextHeadersInterceptor = OKContextHeadersInterceptor(headerHelper, 0)
 
     /**
      * Creates an instance of OkHttpClient with the provided configurations.

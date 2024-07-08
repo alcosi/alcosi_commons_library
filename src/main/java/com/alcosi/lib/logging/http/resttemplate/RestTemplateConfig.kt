@@ -19,6 +19,7 @@ package com.alcosi.lib.logging.http.resttemplate
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.OrderedComparator
+import io.github.breninsul.rest.logging.RestTemplateLoggerConfiguration
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
@@ -40,13 +41,11 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 
-/**
- * This class configures the RestTemplate for making HTTP requests.
- */
+/** This class configures the RestTemplate for making HTTP requests. */
 @AutoConfiguration
 @AutoConfigureBefore(RestClientAutoConfiguration::class, RestTemplateAutoConfiguration::class)
 @EnableConfigurationProperties(RestTemplateProperties::class)
-@ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["disabled"], matchIfMissing = true, havingValue = "false")
+@ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["enabled"], matchIfMissing = true, havingValue = "true")
 class RestTemplateConfig {
     /**
      * Retrieves the `RestTemplateLogRequestResponseFilter` instance.
@@ -59,12 +58,23 @@ class RestTemplateConfig {
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplateLogRequestResponseFilter::class)
     @ConditionalOnBean(HeaderHelper::class)
-    @ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["logging-disabled"], matchIfMissing = true, havingValue = "false")
+    @ConditionalOnProperty(prefix = "common-lib.rest-template.logging", name = ["enabled"], matchIfMissing = true, havingValue = "false")
     fun getLogRequestResponseFilter(
         properties: RestTemplateProperties,
         headerHelper: HeaderHelper,
     ): RestTemplateLogRequestResponseFilter {
-        return RestTemplateLogRequestResponseFilter(properties.maxLogBodySize, properties.loggingLevel.javaLevel, headerHelper, 1)
+        val config = RestTemplateLoggerConfiguration()
+        val requestMaskers =
+            listOf(
+                config.restTemplateRequestRegexJsonBodyMasking(properties.logging.request.mask),
+                config.restTemplateRequestFormUrlencodedBodyMasking(properties.logging.request.mask),
+            )
+        val responseMaskers =
+            listOf(
+                config.restTemplateResponseRegexJsonBodyMasking(properties.logging.request.mask),
+                config.restTemplateResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
+            )
+        return RestTemplateLogRequestResponseFilter(properties.logging, requestMaskers, responseMaskers, headerHelper)
     }
 
     /**
@@ -78,14 +88,14 @@ class RestTemplateConfig {
     @ConditionalOnMissingBean(RestTemplateContextHeadersFilter::class)
     @ConditionalOnBean(HeaderHelper::class)
     @ConditionalOnProperty(prefix = "common-lib.rest-template", name = ["context-headers-disabled"], matchIfMissing = true, havingValue = "false")
-    fun getRestTemplateContextFilter(headerHelper: HeaderHelper): RestTemplateContextHeadersFilter {
-        return RestTemplateContextHeadersFilter(headerHelper, 0)
-    }
+    fun getRestTemplateContextFilter(headerHelper: HeaderHelper): RestTemplateContextHeadersFilter = RestTemplateContextHeadersFilter(headerHelper, 0)
 
     /**
-     * Retrieves a SimpleClientHttpRequestFactory instance with configured connection and read timeouts.
+     * Retrieves a SimpleClientHttpRequestFactory instance with configured
+     * connection and read timeouts.
      *
-     * @param properties The properties used to configure the SimpleClientHttpRequestFactory.
+     * @param properties The properties used to configure the
+     *     SimpleClientHttpRequestFactory.
      * @return The SimpleClientHttpRequestFactory instance.
      */
     @Bean("clientHttpRequestFactory")
@@ -93,14 +103,15 @@ class RestTemplateConfig {
     @ConditionalOnMissingBean(ClientHttpRequestFactory::class)
     fun getSimpleClientHttpRequestFactory(properties: RestTemplateProperties): ClientHttpRequestFactory {
         val simpleClientHttpRequestFactory = SimpleClientHttpRequestFactory()
-        simpleClientHttpRequestFactory.setConnectTimeout(properties.connectionTimeout.toMillis().toInt())
+        simpleClientHttpRequestFactory.setConnectTimeout(properties.connectTimeout.toMillis().toInt())
         simpleClientHttpRequestFactory.setReadTimeout(properties.readTimeout.toMillis().toInt())
         val factory = BufferingClientHttpRequestFactory(simpleClientHttpRequestFactory)
         return factory
     }
 
     /**
-     * Retrieves the RestTemplateBuilder instance with configured filters, request factory, and configurer.
+     * Retrieves the RestTemplateBuilder instance with configured filters,
+     * request factory, and configurer.
      *
      * @param filters Provider of ClientHttpRequestInterceptor filters.
      * @param factory ClientHttpRequestFactory instance.
@@ -117,7 +128,7 @@ class RestTemplateConfig {
     ): RestTemplateBuilder {
         val filtersList =
             filters.toList().sortedWith(OrderedComparator)
-        val builder = RestTemplateBuilder().requestFactory { -> factory }.interceptors(filtersList)
+        val builder = RestTemplateBuilder().requestFactory { _ -> factory }.interceptors(filtersList)
         builder.interceptors(filtersList)
         configurer.stream().forEach { it.configure(builder) }
         return builder
@@ -126,22 +137,23 @@ class RestTemplateConfig {
     /**
      * Retrieves the RestTemplate instance.
      *
-     * @param builder The RestTemplateBuilder instance used to build the RestTemplate.
+     * @param builder The RestTemplateBuilder instance used to build the
+     *     RestTemplate.
      * @return The RestTemplate instance.
      */
     @Bean("restTemplate")
     @ConditionalOnClass(RestTemplate::class)
     @ConditionalOnMissingBean(RestTemplate::class)
-    fun getRestTemplate(builder: RestTemplateBuilder): RestTemplate {
-        return builder.build()
-    }
+    fun getRestTemplate(builder: RestTemplateBuilder): RestTemplate = builder.build()
 
     /**
      * Retrieves the RestClient instance.
      *
-     * @param filters The ObjectProvider of ClientHttpRequestInterceptor filters.
+     * @param filters The ObjectProvider of ClientHttpRequestInterceptor
+     *     filters.
      * @param configurer The ObjectProvider of RestClientBuilderConfigurer.
-     * @param factory The ClientHttpRequestFactory for creating ClientHttpRequests.
+     * @param factory The ClientHttpRequestFactory for creating
+     *     ClientHttpRequests.
      * @return The RestClient instance.
      */
     @Bean("restClient")

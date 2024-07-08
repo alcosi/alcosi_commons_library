@@ -37,8 +37,8 @@ Force to disable components
 |        common-lib.filter.context.disabled         |                        true                         |                         Thread context filter Filter                          |
 |          common-lib.filter.auth.disabled          |                        true                         |                           Simple auth filter Filter                           |
 |        common-lib.logging_aspects.disabled        |                        true                         |             Logging of execution time and errors with annotations             |
-|            common-lib.okhttp.disabled             |                        true                         |                Logging of outgoing requests (HTTP,OkHTTP lib)                 |
-|         common-lib.rest-template.disabled         |                        true                         |               Logging of outgoing requests (HTTP,RestTemplate)                |
+|             common-lib.okhttp.enabled             |                        false                        |                Logging of outgoing requests (HTTP,OkHTTP lib)                 |
+|         common-lib.rest-template.enabled          |                        false                        |               Logging of outgoing requests (HTTP,RestTemplate)                |
 |         common-lib.jdbc-template.disabled         |                        true                         |     Logging SQL queries/responses and notice/exception (for JDBCTemplate)     |
 |        common-lib.mapping-helper.disabled         |                        true                         |                                Mapping helper                                 |
 |            common-lib.rabbit.disabled             |                        true                         | RabbitMQ configuration,  Logging of incoming and outgoing requests (RabbitMQ) |

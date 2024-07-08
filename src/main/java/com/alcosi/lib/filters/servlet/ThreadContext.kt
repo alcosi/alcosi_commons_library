@@ -75,9 +75,7 @@ open class ThreadContext {
      *
      * @return a mutable map containing all the elements from the local storage.
      */
-    open fun getAll(): MutableMap<String, Any?> {
-        return local.get()
-    }
+    open fun getAll(): MutableMap<String, Any?> = local.get()
 
     /**
      * Returns the value associated with the given name.
@@ -89,9 +87,7 @@ open class ThreadContext {
 
     /**
      * Checks whether the given name is contained in the*/
-    open fun contains(name: String): Boolean {
-        return getAll().contains(name)
-    }
+    open fun contains(name: String): Boolean = getAll().contains(name)
 
     /**
      * Sets the authentication principal for the current thread context.
@@ -107,9 +103,14 @@ open class ThreadContext {
      * @return The authentication principal, or null if not found.
      * @param T The type of the principal details.
      */
-    open fun <T : PrincipalDetails> getAuthPrincipal(): T? {
-        return getAll()[AUTH_PRINCIPAL] as T?
-    }
+    open fun <T : PrincipalDetails> getAuthPrincipalOrNull(): T? = getAll()[AUTH_PRINCIPAL] as T?
+
+    /**
+     * Retrieves the authentication principal from the stored collection.
+     *
+     * @return The authentication principal of type T.
+     */
+    open fun <T : PrincipalDetails> getAuthPrincipal(): T = getAll()[AUTH_PRINCIPAL] as T
 
     /**
      * Returns the request ID.

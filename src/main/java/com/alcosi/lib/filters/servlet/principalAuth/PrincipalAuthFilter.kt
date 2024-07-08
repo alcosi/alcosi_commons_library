@@ -62,7 +62,7 @@ open class PrincipalAuthFilter(
     ) {
         try {
             try {
-                val principal = getPrincipal(request)
+                val principal = getPrincipalOrNull(request)
                 threadContext.setAuthPrincipal(principal)
                 request.setAttribute(ThreadContext.AUTH_PRINCIPAL, principal)
                 val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)?.let { sensitiveComponent.deserialize(it)?.toString(Charset.defaultCharset()) }
@@ -89,12 +89,12 @@ open class PrincipalAuthFilter(
      * @param request The CachingRequestWrapper representing the incoming request.
      * @return The PrincipalDetails representing the principal for the given request, or null if no valid principal is found.
      */
-    protected open fun getPrincipal(request: CachingRequestWrapper): PrincipalDetails? {
+    protected open fun getPrincipalOrNull(request: CachingRequestWrapper): PrincipalDetails? {
         val user = request.getHeader(HeaderHelper.USER_DETAILS)?.let { mappingHelper.mapOne(it, UserDetails::class.java) }
-        if (user != null) {
-            return user
+        return if (user != null) {
+            user
         } else {
-            return request.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne(it, AccountDetails::class.java) }
+            request.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne(it, AccountDetails::class.java) }
         }
     }
 }
