@@ -18,6 +18,8 @@
 package com.alcosi.lib.logging.http.okhttp
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
+import com.alcosi.lib.logging.http.AlcosiHttpLoggingHelper
+import io.github.breninsul.logging.HttpLoggingHelper
 import io.github.breninsul.okhttp.logging.OkHttpLoggerProperties
 import io.github.breninsul.okhttp.logging.OkHttpRequestBodyMasking
 import io.github.breninsul.okhttp.logging.OkHttpResponseBodyMasking
@@ -38,5 +40,5 @@ open class OKLoggingInterceptor(
     responseBodyMaskers: List<OkHttpResponseBodyMasking>,
     protected open val headerHelper: HeaderHelper,
 ) : io.github.breninsul.okhttp.logging.OKLoggingInterceptor(properties, requestBodyMaskers, responseBodyMaskers) {
-    override fun getIdString(): String = headerHelper.getContextRqId()
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper(headerHelper, "OkHTTP", properties, requestBodyMaskers, responseBodyMaskers)
 }
