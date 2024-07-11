@@ -27,12 +27,10 @@ import java.math.BigInteger
  * @property tokenId The ID of the token.
  * @property contractId The ID of the contract that the token belongs to.
  */
-@JvmRecord
+
 data class CryptoTokenId(
     @JsonAlias("token_id") @JsonProperty("tokenId") val tokenId: BigInteger,
     @JsonAlias("contract_id") @JsonProperty("contractId") val contractId: CryptoContractId,
 ) {
-    override fun toString(): String {
-        return "$contractId:$tokenId"
-    }
+    override fun toString(): String = "$contractId:$tokenId"
 }

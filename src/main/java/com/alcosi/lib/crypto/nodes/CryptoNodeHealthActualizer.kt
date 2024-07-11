@@ -49,9 +49,11 @@ open class CryptoNodeHealthActualizer(
      * The logger variable is an instance of the Logger class, used for logging events and messages.
      */
     val logger = Logger.getLogger(this.javaClass.name)
+
     init {
         TaskSchedulerRegistry.registerTypeTask(SchedulerType.VIRTUAL_WAIT, "CheckNodes", cryptoNodeProperties.health.checkDelay, cryptoNodeProperties.health.firstDelay, this::class, loggingLevel) { checkNodes() }
     }
+
     /**
      * Lazily-initialized variable that holds the raw service list.
      *
@@ -68,13 +70,16 @@ open class CryptoNodeHealthActualizer(
      *
      * @return The list of Service objects obtained from the URL entries.
      */
-    protected open fun getServiceList(): List<Service> {
-        return cryptoNodeProperties.url.entries.asSequence()
+    protected open fun getServiceList(): List<Service> =
+        cryptoNodeProperties.url.entries
+            .asSequence()
             .filter { it.value != null }
             .flatMap { e ->
-                e.value.split(", ").map { URL(it) }.map { Service(e.key, it) }
+                e.value
+                    .split(", ")
+                    .map { URL(it) }
+                    .map { Service(e.key, it) }
             }.toList()
-    }
 
     /**
      * Represents a map of service statuses.
@@ -93,8 +98,11 @@ open class CryptoNodeHealthActualizer(
      * @property chainId The chain ID associated with the service.
      * @property url The URL of the service.
      */
-    @JvmRecord
-    data class Service(val chainId: Int, val url: URL)
+
+    data class Service(
+        val chainId: Int,
+        val url: URL,
+    )
 
     /**
      * Represents the status of a service.
@@ -103,7 +111,7 @@ open class CryptoNodeHealthActualizer(
      * @property url The URL of the service.
      * @property status The status of the service.
      * @property timeout*/
-    @JvmRecord
+
     data class ServiceStatus(
         val chainId: Int,
         val url: URL,
@@ -135,8 +143,7 @@ open class CryptoNodeHealthActualizer(
                         logger.log(Level.SEVERE, "Error actualize health ${it.first.url}", t)
                         return@map null
                     }
-                }
-                .filterNotNull()
+                }.filterNotNull()
                 .filter { it.second?.status ?: false }
                 .map { ServiceStatus(it.first.chainId, it.first.url, it.second!!.status, it.second!!.timeout) }
                 .toList()

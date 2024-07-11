@@ -57,7 +57,7 @@ open class CryptoNodesLoadBalancer(
      * @property chance The chance of the service being selected.
      * @property range The range of possible values for selection.
      */
-    @JvmRecord
+
     data class ServiceChance(
         val url: URL,
         val chance: Long,
@@ -75,9 +75,7 @@ open class CryptoNodesLoadBalancer(
     open fun getActualUrl(
         chainId: Int,
         timeout: Long = 0,
-    ): Future<URL> {
-        return executor.submit(Callable { internal(chainId, timeout) })
-    }
+    ): Future<URL> = executor.submit(Callable { internal(chainId, timeout) })
 
     /**
      * Selects an internal URL for a given chain ID based on the health status and timeouts of available URLs.

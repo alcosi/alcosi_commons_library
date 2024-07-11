@@ -62,6 +62,7 @@ open class SmartContractCreator(
     val nodesAdminService: CryptoNodesAdminServiceHolder,
 ) {
     val contractMap: MutableMap<ContractKey, ContractPair> = HashMap()
+
     init {
         TaskSchedulerRegistry.registerTypeTask(SchedulerType.VIRTUAL_WAIT, "ClearContracts", clearDelay, clearDelay, this::class, Level.FINEST) { clearContracts() }
     }
@@ -74,7 +75,7 @@ open class SmartContractCreator(
      * @property chainId The chain ID of the contract.
      * @property contractType The type of the contract.
      */
-    @JvmRecord
+
     data class ContractKey(
         val credentials: Credentials,
         val address: String,
@@ -93,8 +94,11 @@ open class SmartContractCreator(
      * @property usedTime The time the contract was used. Default value is the
      *     current system time when the ContractPair object is created.
      */
-    @JvmRecord
-    data class ContractPair(val contract: Contract, val usedTime: LocalDateTime = LocalDateTime.now())
+
+    data class ContractPair(
+        val contract: Contract,
+        val usedTime: LocalDateTime = LocalDateTime.now(),
+    )
 
     /**
      * Builds a contract instance of type T using the specified contract ID and
@@ -172,9 +176,7 @@ open class SmartContractCreator(
     open fun getTM(
         credentials: Credentials,
         chainId: Int,
-    ): TransactionManager {
-        return RawTransactionManager(nodesAdminService[chainId], credentials, chainId.toLong())
-    }
+    ): TransactionManager = RawTransactionManager(nodesAdminService[chainId], credentials, chainId.toLong())
 
     /**
      * Clears the expired contracts from the contract map.

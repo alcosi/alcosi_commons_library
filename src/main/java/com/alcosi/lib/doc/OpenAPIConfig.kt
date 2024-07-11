@@ -17,6 +17,7 @@
 
 package com.alcosi.lib.doc
 
+import io.github.breninsul.servlet.logging.logResponseBody
 import org.apache.commons.io.IOUtils
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -27,6 +28,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.function.RouterFunction
 import org.springframework.web.servlet.function.RouterFunctions
+import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -71,9 +73,7 @@ class OpenAPIConfig {
      */
     @Bean
     @ConditionalOnMissingBean(OpenDocErrorConstructor::class)
-    fun openApiErrorConstructor(): OpenDocErrorConstructor.Default {
-        return OpenDocErrorConstructor.Default()
-    }
+    fun openApiErrorConstructor(): OpenDocErrorConstructor.Default = OpenDocErrorConstructor.Default()
 
     /**
      * Creates a RouterFunction for handling OpenAPI routes.
@@ -89,53 +89,59 @@ class OpenAPIConfig {
     ): RouterFunction<ServerResponse> {
         return RouterFunctions
             .route()
-            .GET(openAPIProperties.apiWebPath) {
-                val fileName = it.pathVariable("fileName")
-                val rs =
-                    try {
-                        if (!allowedFileRegex.matches(fileName)) {
-                            throw RuntimeException("Bad filename")
-                        }
-                        val resourceToByteArray =
-                            IOUtils.resourceToByteArray("/openapi/$fileName").let { array ->
-                                if (fileName.equals("swagger-initializer.js", true)) {
-                                    String(array).replace("@ApiPathName@", openAPIProperties.filePath).toByteArray()
-                                } else {
-                                    array
-                                }
-                            }
-                        val type =
-                            if (fileName.endsWith("html", true)) {
-                                MediaType.TEXT_HTML_VALUE
-                            } else if (fileName.endsWith("js", true)) {
-                                "application/javascript; charset=utf-8"
-                            } else if (fileName.endsWith("css", true)) {
-                                "text/css"
-                            } else if (fileName.endsWith("png", true)) {
-                                MediaType.IMAGE_PNG_VALUE
-                            } else if (fileName.endsWith("json", true)) {
-                                MediaType.APPLICATION_JSON_VALUE
-                            } else if (fileName.endsWith("yml", true)) {
-                                MediaType.TEXT_PLAIN_VALUE
-                            } else if (fileName.endsWith("yaml", true)) {
-                                MediaType.TEXT_PLAIN_VALUE
-                            } else {
-                                MediaType.APPLICATION_OCTET_STREAM_VALUE
-                            }
-
-                        val builder =
-                            ServerResponse.ok()
-                                .header(HttpHeaders.CONTENT_TYPE, type)
-                        if (type == MediaType.APPLICATION_OCTET_STREAM_VALUE) {
-                            builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
-                        }
-                        builder.body(resourceToByteArray)
-                    } catch (t: Throwable) {
-                        logger.log(Level.WARNING, "Error in openapi controller", t)
-                        errorConstructor.constructError(t)
-                    }
-                return@GET rs
-            }
-            .build()
+            .GET(openAPIProperties.apiWebPath) { rq ->
+                return@GET getFileBody(rq.pathVariable("fileName"), openAPIProperties, rq, errorConstructor)
+            }.build()
     }
+
+    protected open fun getFileBody(
+        fileName: String,
+        openAPIProperties: OpenAPIProperties,
+        rq: ServerRequest,
+        errorConstructor: OpenDocErrorConstructor,
+    ): ServerResponse {
+        try {
+            if (!allowedFileRegex.matches(fileName)) {
+                throw RuntimeException("Bad filename")
+            }
+            val resourceToByteArray =
+                IOUtils.resourceToByteArray("/openapi/$fileName").let { array ->
+                    if (fileName.equals("swagger-initializer.js", true)) {
+                        String(array).replace("@ApiPathName@", openAPIProperties.filePath).toByteArray()
+                    } else {
+                        array
+                    }
+                }
+            val contentType = getContentType(fileName)
+            val builder = ServerResponse.ok().header(HttpHeaders.CONTENT_TYPE, contentType)
+            if (contentType == MediaType.APPLICATION_OCTET_STREAM_VALUE) {
+                builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"${fileName}\"")
+            }
+            val body = builder.body(resourceToByteArray)
+            rq.logResponseBody(false)
+            return body
+        } catch (t: Throwable) {
+            logger.log(Level.WARNING, "Error in openapi controller", t)
+            return errorConstructor.constructError(t)
+        }
+    }
+
+    protected open fun getContentType(fileName: String) =
+        if (fileName.endsWith("html", true)) {
+            MediaType.TEXT_HTML_VALUE
+        } else if (fileName.endsWith("js", true)) {
+            "application/javascript; charset=utf-8"
+        } else if (fileName.endsWith("css", true)) {
+            "text/css"
+        } else if (fileName.endsWith("png", true)) {
+            MediaType.IMAGE_PNG_VALUE
+        } else if (fileName.endsWith("json", true)) {
+            MediaType.APPLICATION_JSON_VALUE
+        } else if (fileName.endsWith("yml", true)) {
+            MediaType.TEXT_PLAIN_VALUE
+        } else if (fileName.endsWith("yaml", true)) {
+            MediaType.TEXT_PLAIN_VALUE
+        } else {
+            MediaType.APPLICATION_OCTET_STREAM_VALUE
+        }
 }

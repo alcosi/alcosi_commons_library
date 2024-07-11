@@ -32,7 +32,9 @@ import java.util.logging.Logger
  *
  * @property client OkHttpClient instance used for making HTTP requests.
  */
-open class CryptoNodeHealthChecker(val client: OkHttpClient) {
+open class CryptoNodeHealthChecker(
+    val client: OkHttpClient,
+) {
     /**
      * Represents the request body used for checking the health status of a crypto node.
      *
@@ -45,11 +47,12 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient) {
      * @property status The status of the crypto node.
      * @property timeout The time taken for the health check in milliseconds.
      */
-    @JvmRecord
-    data class HeathStatus(val status: Boolean, val timeout: Long) {
-        override fun toString(): String {
-            return "$status:$timeout ms"
-        }
+
+    data class HeathStatus(
+        val status: Boolean,
+        val timeout: Long,
+    ) {
+        override fun toString(): String = "$status:$timeout ms"
     }
 
     /**
@@ -85,7 +88,9 @@ open class CryptoNodeHealthChecker(val client: OkHttpClient) {
     protected open fun checkStatus(url: URL): Boolean {
         try {
             val request =
-                Request.Builder().url(url)
+                Request
+                    .Builder()
+                    .url(url)
                     .post(body)
                     .build()
             val call = client.newCall(request)

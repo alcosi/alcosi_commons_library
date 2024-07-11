@@ -20,6 +20,7 @@ package com.alcosi.lib.filters.servlet.log
 import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
+import io.github.breninsul.servlet.logging.ServletLoggerConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -30,7 +31,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
-import java.util.logging.Level
 
 /**
  * The LoggingFilterConfig class is responsible for configuring and creating beans related to the logging filter.
@@ -45,36 +45,12 @@ import java.util.logging.Level
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
     prefix = "common-lib.filter.logging",
-    name = ["disabled"],
+    name = ["enabled"],
     matchIfMissing = true,
-    havingValue = "false",
+    havingValue = "true",
 )
 @EnableConfigurationProperties(LoggingFilterProperties::class)
 open class LoggingFilterConfig {
-    /**
-     * Returns an instance of `LoggingFilter.LogInternalService` that is used to configure logging properties for internal services.
-     *
-     * @param properties The `LoggingFilterProperties` object containing logging configuration properties.
-     * @param threadContext The `ThreadContext` object providing thread-local data.
-     * @return An instance of `LoggingFilter.LogInternalService` configured with the specified logging level, maximum body size for logs, and thread context.
-     */
-    @Bean(name = ["logInternalService"], value = ["logInternalService"])
-    fun logInternalService(
-        properties: LoggingFilterProperties,
-        threadContext: ThreadContext,
-    ): LoggingFilter.LogInternalService {
-        return LoggingFilter.LogInternalService(Level.parse(properties.loggingLevel), properties.maxBodySizeLog, threadContext)
-    }
-
-    /**
-     * Creates a [FilterRegistrationBean] for the [LoggingFilter].
-     *
-     * @param properties The [LoggingFilterProperties] object containing the filter properties.
-     * @param servletProperties The [ServletFilterProperties] object containing the servlet properties.
-     * @param logInternalService The [LoggingFilter.LogInternalService] object for internal logging.
-     * @param threadContext The [ThreadContext] object for thread context management.
-     * @return A [FilterRegistrationBean] configured with the [LoggingFilter].
-     */
     @Bean(name = ["loggingFilterBean"], value = ["loggingFilterBean"])
     @ConditionalOnClass(ServletWebServerFactory::class)
     @ConditionalOnMissingFilterBean(LoggingFilter::class)
@@ -82,11 +58,22 @@ open class LoggingFilterConfig {
     fun loggingFilter(
         properties: LoggingFilterProperties,
         servletProperties: ServletFilterProperties,
-        logInternalService: LoggingFilter.LogInternalService,
         threadContext: ThreadContext,
     ): FilterRegistrationBean<LoggingFilter> {
+        val config = ServletLoggerConfiguration()
+
+        val requestMaskers =
+            listOf(
+                config.servletRequestRegexJsonBodyMasking(properties.request.mask),
+                config.servletRequestFormUrlencodedBodyMasking(properties.request.mask),
+            )
+        val responseMaskers =
+            listOf(
+                config.servletResponseRegexJsonBodyMasking(properties.request.mask),
+                config.servletResponseFormUrlencodedBodyMasking(properties.request.mask),
+            )
         val registrationBean = FilterRegistrationBean<LoggingFilter>()
-        registrationBean.filter = LoggingFilter(logInternalService, threadContext, properties.maxBodySize)
+        registrationBean.filter = LoggingFilter(properties, requestMaskers, responseMaskers, threadContext)
         registrationBean.order = servletProperties.baseOrder + properties.orderDelta
         return registrationBean
     }

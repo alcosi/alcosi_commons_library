@@ -25,7 +25,7 @@ package com.alcosi.lib.dto
  * @property errorClass The error class.
  * @property httpCode The HTTP code derived from the error code.
  */
-@JvmRecord
+
 data class APIError(
     val message: String,
     val code: Int,
@@ -40,7 +40,5 @@ data class APIError(
      *
      * @return A string representation of the [APIError] instance.
      */
-    override fun toString(): String {
-        return "$errorClass:$code:$message"
-    }
+    override fun toString(): String = "$errorClass:$code:$message"
 }

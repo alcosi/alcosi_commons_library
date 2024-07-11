@@ -9,21 +9,23 @@ buildscript {
     }
 }
 plugins {
+    val kotlinVersion = "2.0.0"
     id("idea")
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
     id("org.springframework.boot") version "3.3.1"
     id("io.spring.dependency-management") version "1.1.5"
-    id("org.jetbrains.kotlin.jvm") version "2.0.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "2.0.0"
+    id("org.jetbrains.kotlin.jvm") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("com.github.jk1.dependency-license-report") version "2.8"
     id("com.github.ben-manes.versions") version "0.50.0"
     id("org.jetbrains.dokka") version "1.9.20"
+    id("org.jetbrains.kotlin.kapt") version kotlinVersion
 }
 
 group = "com.alcosi"
-version = "4.0.17"
+version = "5.0.0"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"
@@ -125,6 +127,7 @@ dependencies {
     compileOnly("io.github.breninsul:future-starter:1.0.2")
     compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.2.4")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.1.4")
+    compileOnly("io.github.breninsul:servlet-logging-starter:1.0.1")
     compileOnly("org.apache.commons:commons-lang3:3.14.0")
     compileOnly("com.squareup.okhttp3:okhttp:4.12.0")
     compileOnly("commons-io:commons-io:2.16.1")
@@ -148,8 +151,10 @@ dependencies {
     compileOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     compileOnly("org.apache.logging.log4j:log4j-core")
     annotationProcessor("org.apache.logging.log4j:log4j-core")
-    annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.apache.logging.log4j:log4j-core")
+
+    kapt("org.springframework.boot:spring-boot-autoconfigure-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-core:5.8.0")
 }

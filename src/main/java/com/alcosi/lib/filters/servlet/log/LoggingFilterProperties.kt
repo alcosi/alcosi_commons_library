@@ -14,58 +14,20 @@
  * limitations under the License.
  *
  */
+package com.alcosi.lib.filters.servlet.log
 
-package com.alcosi.lib.filters.servlet.log;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import io.github.breninsul.logging.HttpLogSettings
+import io.github.breninsul.logging.JavaLoggingLevel
+import io.github.breninsul.servlet.logging.ServletHttpRequestLogSettings
+import io.github.breninsul.servlet.logging.ServletLoggerProperties
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("common-lib.filter.logging")
-public class LoggingFilterProperties {
-    private Boolean disabled = false;
-    private Integer orderDelta = 2;
-    private Integer maxBodySizeLog = 10000;
-    private Integer maxBodySize = 10000;
-
-
-    private String loggingLevel="INFO";
-
-    public Integer getMaxBodySizeLog() {
-        return maxBodySizeLog;
-    }
-
-    public void setMaxBodySizeLog(Integer maxBodySizeLog) {
-        this.maxBodySizeLog = maxBodySizeLog;
-    }
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public Integer getOrderDelta() {
-        return orderDelta;
-    }
-
-    public void setOrderDelta(Integer orderDelta) {
-        this.orderDelta = orderDelta;
-    }
-
-    public Integer getMaxBodySize() {
-        return maxBodySize;
-    }
-
-    public void setMaxBodySize(Integer maxBodySize) {
-        this.maxBodySize = maxBodySize;
-    }
-
-    public String getLoggingLevel() {
-        return loggingLevel;
-    }
-
-    public void setLoggingLevel(String loggingLevel) {
-        this.loggingLevel = loggingLevel;
-    }
-}
+open class LoggingFilterProperties(
+    enabled: Boolean = true,
+    loggingLevel: JavaLoggingLevel = JavaLoggingLevel.INFO,
+    request: ServletHttpRequestLogSettings = ServletHttpRequestLogSettings(tookTimeIncluded = false),
+    response: HttpLogSettings = HttpLogSettings(),
+    open var orderDelta: Int = 2,
+    newLineColumnSymbols: Int = 14,
+) : ServletLoggerProperties(enabled, loggingLevel, request, response, orderDelta, newLineColumnSymbols)

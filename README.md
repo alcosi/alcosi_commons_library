@@ -31,12 +31,12 @@ Force to disable components
 |            common-lib.openapi.disabled            |                        true                         |                       Swagger and OpenAPI distribution                        |
 |          common-lib.crypto.node.disabled          | true Load balancer when working with Etherium nodes |
 |          common-lib.filter.all.disabled           |                        true                         |                   Filters for all incoming requests (HTTP)                    |
-|        common-lib.filter.logging.disabled         |                        true                         |                      Logging of incoming requests (HTTP)                      |
+|         common-lib.filter.logging.enabled         |                        false                        |                      Logging of incoming requests (HTTP)                      |
 |         common-lib.filter.cache.disabled          |                        true                         |                  Response caching for incoming Http requests                  |
 |          common-lib.filter.cors.disabled          |                        true                         |                                  Cors filter                                  |
 |        common-lib.filter.context.disabled         |                        true                         |                         Thread context filter Filter                          |
 |          common-lib.filter.auth.disabled          |                        true                         |                           Simple auth filter Filter                           |
-|        common-lib.logging_aspects.disabled        |                        true                         |             Logging of execution time and errors with annotations             |
+|            common-lib.aspect.disabled             |                        true                         |             Logging of execution time and errors with annotations             |
 |             common-lib.okhttp.enabled             |                        false                        |                Logging of outgoing requests (HTTP,OkHTTP lib)                 |
 |         common-lib.rest-template.enabled          |                        false                        |               Logging of outgoing requests (HTTP,RestTemplate)                |
 |         common-lib.jdbc-template.disabled         |                        true                         |     Logging SQL queries/responses and notice/exception (for JDBCTemplate)     |

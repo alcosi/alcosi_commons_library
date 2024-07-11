@@ -43,5 +43,5 @@ open class RestTemplateLogRequestResponseFilter(
     responseBodyMaskers: List<RestTemplateResponseBodyMasking>,
     protected open val headerHelper: HeaderHelper,
 ) : RestTemplateLoggingInterceptor(properties, requestBodyMaskers, responseBodyMaskers) {
-    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper(headerHelper, "RestTemplate", properties, requestBodyMaskers, responseBodyMaskers)
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "RestTemplate", properties, requestBodyMaskers, responseBodyMaskers)
 }

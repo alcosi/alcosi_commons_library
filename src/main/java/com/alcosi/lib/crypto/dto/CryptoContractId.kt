@@ -26,13 +26,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * @property address The address of the contract.
  * @property chainId The chain ID of the contract.
  */
-@JvmRecord
+
 data class CryptoContractId(
     @JsonProperty("address") val address: String,
     @JsonProperty("chainId")
     @JsonAlias("chain_id") val chainId: Long,
 ) {
-    override fun toString(): String {
-        return "$chainId:$address"
-    }
+    override fun toString(): String = "$chainId:$address"
 }

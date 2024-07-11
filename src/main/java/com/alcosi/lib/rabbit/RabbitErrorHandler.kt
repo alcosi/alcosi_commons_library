@@ -36,7 +36,9 @@ import java.util.logging.Logger
  *
  * @constructor Creates an instance of RabbitErrorHandler with the specified objectMapper.
  */
-open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerErrorHandler {
+open class RabbitErrorHandler(
+    val objectMapper: ObjectMapper,
+) : RabbitListenerErrorHandler {
     init {
         RabbitErrorRs.objectMapper = objectMapper
     }
@@ -55,9 +57,7 @@ open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerEr
         channel: Channel,
         message: org.springframework.messaging.Message<*>?,
         exception: ListenerExecutionFailedException?,
-    ): Any {
-        return handleError(amqpMessage, message, exception)
-    }
+    ): Any = handleError(amqpMessage, message, exception)
 
     /**
      * Handles errors that occur during message processing in RabbitMQ.
@@ -84,7 +84,7 @@ open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerEr
      * @param status The HTTP status code to be set in the response message header.
      * @return The generated response message.
      */
-   protected open fun getRs(
+    protected open fun getRs(
         r: Any?,
         status: HttpStatus,
     ): Message {
@@ -113,8 +113,12 @@ open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerEr
      * @property code The error code.
      * @constructor Creates a new RabbitErrorRs instance.
      */
-    @JvmRecord
-    data class RabbitErrorRs(val error: String?, val message: String?, val code: Int?) {
+
+    data class RabbitErrorRs(
+        val error: String?,
+        val message: String?,
+        val code: Int?,
+    ) {
         constructor(error: String?, msg: String?) : this(error, msg, null)
 
         /**
@@ -122,9 +126,7 @@ open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerEr
          *
          * @return The JSON representation of the current object as a string.
          */
-        override fun toString(): String {
-            return objectMapper!!.writeValueAsString(this)
-        }
+        override fun toString(): String = objectMapper!!.writeValueAsString(this)
 
         /**
          * Companion class for RabbitErrorRs.
@@ -132,9 +134,7 @@ open class RabbitErrorHandler(val objectMapper: ObjectMapper) : RabbitListenerEr
         companion object {
             var objectMapper: ObjectMapper? = null
 
-            fun fromThrowable(t: Throwable?): RabbitErrorRs {
-                return RabbitErrorRs(t?.javaClass?.name, t?.message)
-            }
+            fun fromThrowable(t: Throwable?): RabbitErrorRs = RabbitErrorRs(t?.javaClass?.name, t?.message)
         }
     }
 

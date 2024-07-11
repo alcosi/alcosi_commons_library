@@ -17,12 +17,13 @@
 
 package com.alcosi.lib.filters.servlet.cache
 
-import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
 import io.github.breninsul.javatimerscheduler.registry.SchedulerType
 import io.github.breninsul.javatimerscheduler.registry.TaskSchedulerRegistry
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.lang.Nullable
+import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.ContentCachingResponseWrapper
 import java.time.Duration
 import java.time.LocalDateTime
@@ -40,10 +41,27 @@ import java.util.stream.Collectors
  * @property maxBodySize The maximum size of the request body.
  * @property clearDelay The delay duration for clearing the cache.
  */
-open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clearDelay: Duration) : WrappedOnePerRequestFilter(maxBodySize) {
+open class CachingRqRsFilter(
+    val refreshUri: String,
+    maxBodySize: Int,
+    val clearDelay: Duration,
+) : OncePerRequestFilter() {
     init {
         TaskSchedulerRegistry.registerTypeTask(SchedulerType.VIRTUAL_WAIT, "ClearRqRsCache", clearDelay, clearDelay, this::class, Level.FINEST) { clearCache() }
     }
+
+    /**
+     * Wraps the given HttpServletResponse with a ContentCachingResponseWrapper.
+     *
+     * @param response The HttpServletResponse to be wrapped.
+     * @return The ContentCachingResponseWrapper that wraps the given response.
+     */
+    protected open fun wrapResponse(response: HttpServletResponse): ContentCachingResponseWrapper =
+        if (response is ContentCachingResponseWrapper) {
+            response
+        } else {
+            ContentCachingResponseWrapper(response)
+        }
 
     /**
      * Represents an object stored in the cache.
@@ -56,7 +74,7 @@ open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clear
      * @property lifetime The expiration time of the cached object, represented
      *     by a LocalDateTime instance.
      */
-    @JvmRecord
+
     data class CacheObject(
         val body: ByteArray,
         val headers: Map<String, List<String>>,
@@ -70,30 +88,11 @@ open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clear
      * @return The name of the filter, or null if not set.
      */
     @Nullable
-    override fun getFilterName(): String? {
-        return "Caching"
-    }
+    override fun getFilterName(): String? = "Caching"
 
-    /** Cache variable used to store cache objects. Cache objects */
-    protected val cache: MutableMap<String, CacheObject> = HashMap()
-
-    /**
-     * This method filters the HTTP request and response using the provided
-     * wrappers and filter chain. It checks if the specified URI is present
-     * in the cache. If found, it retrieves the cached response and sets the
-     * appropriate headers and body to the response wrapper. If not found, the
-     * filter chain is invoked to process the request and response. If the
-     * request is marked as cacheable, the response body, headers, HTTP status,
-     * and valid till time are stored in the cache for future use.
-     *
-     * @param request The caching request wrapper.
-     * @param response The content caching response wrapper.
-     * @param filterChain The filter chain to invoke if the URI is not found in
-     *     the cache.
-     */
-    override fun doFilterWrapped(
-        request: CachingRequestWrapper,
-        response: ContentCachingResponseWrapper,
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
         val uri = getUri(request)
@@ -103,30 +102,33 @@ open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clear
         if (cache.containsKey(uri)) {
             val cacheObject = cache[uri]!!
             response.status = cacheObject.rsCode
-            setHeaders(response, cacheObject)
-            val outputStream = response.response.outputStream
+            response.setHeaders(cacheObject)
+            val outputStream = response.outputStream
             outputStream.write(cacheObject.body)
             outputStream.flush()
             logger.info("Request $uri cache used ")
         } else {
-            filterChain.doFilter(request, response)
-            val cacheable = (true == request.getAttribute(CACHE_REQUEST_ATTRIBUTE_NAME))
+            val wrappedResponse = wrapResponse(response)
+            filterChain.doFilter(request, wrappedResponse)
+            val cacheable = (true == request.getAttribute(CACHE_REQUEST_ATTRIBUTE))
             if (cacheable) {
                 val headers: HashMap<String, List<String>> = HashMap()
                 response.headerNames
                     .forEach { hn: String ->
                         headers[hn] = LinkedList(response.getHeaders(hn))
                     }
-                val body = response.contentAsByteArray
-                response.copyBodyToResponse()
-                val lifetime =
-                    request.getAttribute(CACHE_REQUEST_LIFETIME_ATTRIBUTE_NAME) as Duration
+                val body = wrappedResponse.contentAsByteArray
+                wrappedResponse.copyBodyToResponse()
+                val lifetime = request.getAttribute(CACHE_REQUEST_LIFETIME_ATTRIBUTE) as Duration
                 val validTill = LocalDateTime.now().plus(lifetime)
-                cache[uri] = CacheObject(body, headers, response.status, validTill)
+                cache[uri] = CacheObject(body, headers, wrappedResponse.status, validTill)
                 logger.info("Request $uri has been cached till $validTill")
             }
         }
     }
+
+    /** Cache variable used to store cache objects. Cache objects */
+    protected val cache: MutableMap<String, CacheObject> = HashMap()
 
     /**
      * Returns the URI of the HTTP request.
@@ -155,6 +157,26 @@ open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clear
             .forEach(Consumer { key: String -> cache.remove(key) })
     }
 
+    /**
+     * Sets the headers of the response based on the provided CacheObject.
+     *
+     * @param response The ContentCachingResponseWrapper representing the
+     *     response.
+     * @param cacheObject The CacheObject containing the headers to be set.
+     */
+    protected open fun HttpServletResponse.setHeaders(cacheObject: CacheObject?) {
+        cacheObject!!
+            .headers
+            .filter { it.key != null }
+            .forEach { (key: String, value: List<String?>) ->
+                value
+                    .forEach { v: String? ->
+                        if (v != null) {
+                            this.setHeader(key, v)
+                        }
+                    }
+            }
+    }
 
     /**
      * The `Companion` class represents a companion object with utility methods
@@ -166,31 +188,7 @@ open class CachingRqRsFilter(val refreshUri: String, maxBodySize: Int, val clear
      *     caching request lifetime.
      */
     companion object {
-        const val CACHE_REQUEST_ATTRIBUTE_NAME = "CacheRequest"
-        const val CACHE_REQUEST_LIFETIME_ATTRIBUTE_NAME = "CacheRequestLifetime"
-
-        /**
-         * Sets the headers of the response based on the provided CacheObject.
-         *
-         * @param response The ContentCachingResponseWrapper representing the
-         *     response.
-         * @param cacheObject The CacheObject containing the headers to be set.
-         */
-        protected fun setHeaders(
-            response: ContentCachingResponseWrapper,
-            cacheObject: CacheObject?,
-        ) {
-            cacheObject!!
-                .headers
-                .filter { it.key != null }
-                .forEach { (key: String, value: List<String?>) ->
-                    value
-                        .forEach { v: String? ->
-                            if (v != null) {
-                                response.setHeader(key, v)
-                            }
-                        }
-                }
-        }
+        const val CACHE_REQUEST_ATTRIBUTE = "CacheRequest"
+        const val CACHE_REQUEST_LIFETIME_ATTRIBUTE = "CacheRequestLifetime"
     }
 }

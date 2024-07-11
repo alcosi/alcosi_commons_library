@@ -21,8 +21,6 @@ import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.filters.servlet.HeaderHelper.Companion.ORIGINAL_AUTHORISATION
 import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.filters.servlet.ThreadContext.Companion.REQUEST_ORIGINAL_AUTHORISATION_TOKEN
-import com.alcosi.lib.filters.servlet.WrappedOnePerRequestFilter
-import com.alcosi.lib.filters.servlet.cache.CachingRequestWrapper
 import com.alcosi.lib.objectMapper.mapOne
 import com.alcosi.lib.secured.encrypt.SensitiveComponent
 import com.alcosi.lib.security.AccountDetails
@@ -30,7 +28,9 @@ import com.alcosi.lib.security.PrincipalDetails
 import com.alcosi.lib.security.UserDetails
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
-import org.springframework.web.util.ContentCachingResponseWrapper
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.web.filter.OncePerRequestFilter
 import java.nio.charset.Charset
 
 /**
@@ -46,23 +46,15 @@ open class PrincipalAuthFilter(
     protected open val mappingHelper: ObjectMapper,
     protected open val threadContext: ThreadContext,
     protected open val sensitiveComponent: SensitiveComponent,
-) : WrappedOnePerRequestFilter(Int.MAX_VALUE) {
-    /**
-     * Executes the filter logic by setting the authentication principal in the thread context and
-     * calling the next filter in the filter chain.
-     *
-     * @param request The CachingRequestWrapper representing the incoming request.
-     * @param response The ContentCachingResponseWrapper representing the response.
-     * @param filterChain The FilterChain to invoke the next filter.
-     */
-    override fun doFilterWrapped(
-        request: CachingRequestWrapper,
-        response: ContentCachingResponseWrapper,
+) : OncePerRequestFilter() {
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
         try {
             try {
-                val principal = getPrincipalOrNull(request)
+                val principal = request.getPrincipalOrNull()
                 threadContext.setAuthPrincipal(principal)
                 request.setAttribute(ThreadContext.AUTH_PRINCIPAL, principal)
                 val originalToken = request.getHeader(ORIGINAL_AUTHORISATION)?.let { sensitiveComponent.deserialize(it)?.toString(Charset.defaultCharset()) }
@@ -89,12 +81,8 @@ open class PrincipalAuthFilter(
      * @param request The CachingRequestWrapper representing the incoming request.
      * @return The PrincipalDetails representing the principal for the given request, or null if no valid principal is found.
      */
-    protected open fun getPrincipalOrNull(request: CachingRequestWrapper): PrincipalDetails? {
-        val user = request.getHeader(HeaderHelper.USER_DETAILS)?.let { mappingHelper.mapOne(it, UserDetails::class.java) }
-        return if (user != null) {
-            user
-        } else {
-            request.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne(it, AccountDetails::class.java) }
-        }
-    }
+    protected open fun HttpServletRequest.getPrincipalOrNull(): PrincipalDetails? =
+        getHeader(HeaderHelper.USER_DETAILS)?.let {
+            mappingHelper.mapOne(it, UserDetails::class.java)
+        } ?: this.getHeader(HeaderHelper.ACCOUNT_DETAILS)?.let { mappingHelper.mapOne(it, AccountDetails::class.java) }
 }
