@@ -53,7 +53,7 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(LoggingFilterProperties::class)
 open class LoggingFilterConfig {
-    @Bean(name = ["loggingFilterBean"], value = ["loggingFilterBean"])
+    @Bean(name = ["ServletLoggingFilter"])
     @ConditionalOnClass(ServletWebServerFactory::class)
     @ConditionalOnMissingFilterBean(LoggingFilter::class)
     @ConditionalOnMissingBean(LoggingFilter::class)

@@ -21,9 +21,7 @@ import io.github.breninsul.logging.JavaLoggingLevel
 import io.github.breninsul.servlet.logging.ServletHttpRequestLogSettings
 import io.github.breninsul.servlet.logging.ServletLoggerProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Primary
 
-@Primary
 @ConfigurationProperties("common-lib.filter.logging")
 open class LoggingFilterProperties(
     enabled: Boolean = true,
