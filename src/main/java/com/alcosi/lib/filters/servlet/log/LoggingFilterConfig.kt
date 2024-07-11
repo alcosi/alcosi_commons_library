@@ -22,6 +22,7 @@ import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
 import io.github.breninsul.servlet.logging.ServletLoggerConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
+import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -42,6 +43,7 @@ import org.springframework.context.annotation.Bean
  * The class is also annotated with @EnableConfigurationProperties(LoggingFilterProperties::class) to enable the use of LoggingFilterProperties.
  */
 @AutoConfigureAfter(FilterConfig::class)
+@AutoConfigureBefore(ServletLoggerConfiguration::class)
 @ConditionalOnBean(FilterConfig::class)
 @ConditionalOnProperty(
     prefix = "common-lib.filter.logging",

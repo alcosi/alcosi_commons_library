@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.0.1"
+version = "5.0.2"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.1"
