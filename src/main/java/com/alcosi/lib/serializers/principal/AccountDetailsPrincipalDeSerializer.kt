@@ -32,7 +32,5 @@ open class AccountDetailsPrincipalDeSerializer : UniversalPrincipalDetailsDeSeri
      * @param serializationObject The object to be converted.
      * @return The converted AccountDetails object.
      */
-    override fun returnRealObject(serializationObject: PrincipalSerializationObject): AccountDetails {
-        return AccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.className)
-    }
+    override fun returnRealObject(serializationObject: PrincipalSerializationObject): AccountDetails = AccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.className, serializationObject.additionalProperties)
 }

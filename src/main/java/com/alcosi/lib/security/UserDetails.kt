@@ -36,7 +36,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
  */
 @JsonDeserialize(using = UserDetailsPrincipalDeSerializer::class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-class UserDetails(
+open class UserDetails(
     id: String,
     className: String = UserDetails::class.java.name,
+    override val additionalProperties: Map<String, String> = mapOf(),
 ) : OneAuthorityPrincipal(id, "PERMISSION_USER", className, "USER")

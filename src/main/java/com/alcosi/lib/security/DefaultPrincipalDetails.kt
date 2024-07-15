@@ -36,4 +36,5 @@ open class DefaultPrincipalDetails(
     override val authorities: List<String>,
     val className: String,
     override val type: String,
+    override val additionalProperties: Map<String, String> = mapOf(),
 ) : PrincipalDetails

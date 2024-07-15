@@ -37,4 +37,5 @@ open class ClientAccountDetails(
     authorities: List<String>,
     val clientId: String,
     className: String = ClientAccountDetails::class.java.name,
-) : AccountDetails(id, authorities, className)
+    additionalProperties: Map<String, String> = mapOf(),
+) : AccountDetails(id, authorities, className, additionalProperties)

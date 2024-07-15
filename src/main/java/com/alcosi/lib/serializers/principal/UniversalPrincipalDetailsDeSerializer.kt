@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.NullNode
+
 /**
  * UniversalPrincipalDetailsDeSerializer is a class that extends StdDeserializer to provide deserialization for DefaultPrincipalDetails objects.
  *
@@ -31,7 +32,9 @@ import com.fasterxml.jackson.databind.node.NullNode
  * @property claszz The class object for DefaultPrincipalDetails.
  * @constructor Creates an instance of UniversalPrincipalDetailsDeSerializer.
  */
-open class UniversalPrincipalDetailsDeSerializer<T : UniversalPrincipalDetailsDeSerializer.PrincipalSerializationObject>(claszz: Class<out DefaultPrincipalDetails>) : StdDeserializer<DefaultPrincipalDetails?>(claszz) {
+open class UniversalPrincipalDetailsDeSerializer<T : UniversalPrincipalDetailsDeSerializer.PrincipalSerializationObject>(
+    claszz: Class<out DefaultPrincipalDetails>,
+) : StdDeserializer<DefaultPrincipalDetails?>(claszz) {
     /**
      * Represents the serialization object for a Principal.
      *
@@ -46,7 +49,9 @@ open class UniversalPrincipalDetailsDeSerializer<T : UniversalPrincipalDetailsDe
         val authorities: List<String>,
         val className: String,
         val type: String,
+        val additionalProperties: Map<String, String> = mapOf(),
     )
+
     /**
      * Deserializes a JSON object into a DefaultPrincipalDetails object.
      *
@@ -74,15 +79,16 @@ open class UniversalPrincipalDetailsDeSerializer<T : UniversalPrincipalDetailsDe
             return p.codec.treeToValue(node, originalClass) as DefaultPrincipalDetails?
         }
     }
+
     /**
      * Returns a real object of type [DefaultPrincipalDetails] based on the provided [serializationObject].
      *
      * @param serializationObject The object used for serialization.
      * @return The [DefaultPrincipalDetails] object created from [serializationObject].
      */
-    protected open fun returnRealObject(serializationObject: T): DefaultPrincipalDetails {
-        return DefaultPrincipalDetails(serializationObject.id, serializationObject.authorities, serializationObject.className, serializationObject.type)
-    }
+    protected open fun returnRealObject(serializationObject: T): DefaultPrincipalDetails =
+        DefaultPrincipalDetails(serializationObject.id, serializationObject.authorities, serializationObject.className, serializationObject.type, serializationObject.additionalProperties)
+
     /**
      * Retrieves the internal type object from the given JsonNode using the provided DeserializationContext.
      *
@@ -93,7 +99,5 @@ open class UniversalPrincipalDetailsDeSerializer<T : UniversalPrincipalDetailsDe
     protected open fun getInternalTypeObject(
         ctxt: DeserializationContext,
         node: JsonNode,
-    ): T {
-        return ctxt.readTreeAsValue(node, PrincipalSerializationObject::class.java) as T
-    }
+    ): T = ctxt.readTreeAsValue(node, PrincipalSerializationObject::class.java) as T
 }

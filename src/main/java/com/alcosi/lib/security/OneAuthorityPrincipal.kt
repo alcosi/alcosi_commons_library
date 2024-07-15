@@ -34,4 +34,5 @@ abstract class OneAuthorityPrincipal(
     authority: String,
     className: String,
     type: String,
-) : DefaultPrincipalDetails(id, listOf(authority), className, type)
+    additionalProperties: Map<String, String> = mapOf(),
+) : DefaultPrincipalDetails(id, listOf(authority), className, type, additionalProperties)

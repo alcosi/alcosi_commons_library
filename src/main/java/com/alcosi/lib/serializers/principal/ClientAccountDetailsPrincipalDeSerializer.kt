@@ -22,6 +22,7 @@ import com.alcosi.lib.security.ClientAccountDetails
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonNode
+
 /**
  * ClientAccountDetailsPrincipalDeSerializer is a class that extends UniversalPrincipalDetailsDeSerializer and is responsible for deserializing
  * ClientAccountDetails objects from JSON.
@@ -47,15 +48,16 @@ open class ClientAccountDetailsPrincipalDeSerializer : UniversalPrincipalDetails
         type: String,
         val clientId: String,
     ) : PrincipalSerializationObject(id, authorities, className, type)
+
     /**
      * Converts a ClientAccountDetailsSerializationObject to an AccountDetails object.
      *
      * @param serializationObject The object to be converted.
      * @return The converted AccountDetails object.
      */
-    override fun returnRealObject(serializationObject: ClientAccountDetailsSerializationObject): AccountDetails {
-        return ClientAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.clientId, serializationObject.className)
-    }
+    override fun returnRealObject(serializationObject: ClientAccountDetailsSerializationObject): AccountDetails =
+        ClientAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.clientId, serializationObject.className, serializationObject.additionalProperties)
+
     /**
      * Retrieves the internal type object from the given JSON node using the provided DeserializationContext.
      *

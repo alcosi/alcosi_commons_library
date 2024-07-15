@@ -35,4 +35,5 @@ open class AccountDetails(
     id: String,
     authorities: List<String>,
     className: String = AccountDetails::class.java.name,
-) : DefaultPrincipalDetails(id, authorities, className, "ACCOUNT")
+    additionalProperties: Map<String, String> = mapOf(),
+) : DefaultPrincipalDetails(id, authorities, className, "ACCOUNT", additionalProperties)

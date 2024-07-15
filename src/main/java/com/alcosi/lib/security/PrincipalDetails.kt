@@ -28,6 +28,7 @@ interface PrincipalDetails : Principal {
     val authorities: List<String>
     val id: String
     val type: String
+    val additionalProperties: Map<String, String>
 
     /**
      * Returns the name of the principal.
@@ -37,7 +38,5 @@ interface PrincipalDetails : Principal {
      *
      * @return the name of the principal
      */
-    override fun getName(): String {
-        return "$type:$id"
-    }
+    override fun getName(): String = "$type:$id"
 }

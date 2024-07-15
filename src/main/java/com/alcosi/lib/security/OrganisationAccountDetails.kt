@@ -38,4 +38,5 @@ open class OrganisationAccountDetails(
     authorities: List<String>,
     val organisationId: String,
     className: String = OrganisationAccountDetails::class.java.name,
+    override val additionalProperties: Map<String, String> = mapOf(),
 ) : AccountDetails(id, authorities, className)

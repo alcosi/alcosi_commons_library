@@ -48,15 +48,16 @@ open class OrganisationAccountDetailsPrincipalDeSerializer : UniversalPrincipalD
         type: String,
         val organisationId: String,
     ) : PrincipalSerializationObject(id, authorities, className, type)
+
     /**
      * Converts an OrganisationAccountDetailsSerializationObject to an AccountDetails object.
      *
      * @param serializationObject The object to be converted.
      * @return The converted AccountDetails object.
      */
-    override fun returnRealObject(serializationObject: OrganisationAccountDetailsSerializationObject): AccountDetails {
-        return OrganisationAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.organisationId, serializationObject.className)
-    }
+    override fun returnRealObject(serializationObject: OrganisationAccountDetailsSerializationObject): AccountDetails =
+        OrganisationAccountDetails(serializationObject.id, serializationObject.authorities, serializationObject.organisationId, serializationObject.className, serializationObject.additionalProperties)
+
     /**
      * Returns the internal type object of OrganisationAccountDetailsSerializationObject by reading the given JSON node using the
      * DeserializationContext.
