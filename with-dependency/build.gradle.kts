@@ -42,7 +42,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.2"
-val depVersion = "5.0.5"
+val depVersion = "5.0.6"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.1"
@@ -136,7 +136,7 @@ configurations.configureEach {
 dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
-    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.0")
+    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.1")
     api("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.2")
