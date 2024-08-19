@@ -42,11 +42,11 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.2"
-val depVersion = "5.0.6"
+val depVersion = "5.0.7"
 val kotlinCoroutinesVersion = "1.8.1"
 
-val jacksonVersion = "2.17.1"
-val web3jVersion = "4.12.0"
+val jacksonVersion = "2.17.2"
+val web3jVersion = "4.12.1"
 val kotlinVersion = "2.0.0"
 val javaVersion = JavaVersion.VERSION_21
 
@@ -136,7 +136,7 @@ configurations.configureEach {
 dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
-    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.1")
+    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
     api("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.2")
@@ -144,17 +144,17 @@ dependencies {
     api("io.github.breninsul:rest-template-logging-interceptor:1.2.5")
     api("io.github.breninsul:okhttp-logging-interceptor:1.1.5")
     api("io.github.breninsul:servlet-logging-starter:1.0.2")
-    api("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
+    api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")
     api("commons-io:commons-io:2.16.1")
-    api("org.apache.commons:commons-lang3:3.14.0")
-    api("commons-codec:commons-codec:1.17.0")
+    api("org.apache.commons:commons-lang3:3.16.0")
+    api("commons-codec:commons-codec:1.17.1")
     api("org.apache.commons:commons-text:1.12.0")
     api("org.bouncycastle:bcprov-jdk18on:1.78.1")
     api("org.postgresql:postgresql:42.7.3")
-    api("org.flywaydb:flyway-core:10.14.0")
-    api("org.flywaydb:flyway-database-postgresql:10.14.0")
+    api("org.flywaydb:flyway-core:10.17.1")
+    api("org.flywaydb:flyway-database-postgresql:10.17.1")
     api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
@@ -178,11 +178,10 @@ tasks.withType<Test> {
     jvmArgs("-Xmx1024m")
     useJUnitPlatform()
 }
-val javadocJar =
-    tasks.named<Jar>("javadocJar") {
-        from(tasks.named("dokkaJavadoc"))
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    }
+tasks.named<Jar>("javadocJar") {
+    from(tasks.named("dokkaJavadoc"))
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
 tasks.getByName<Jar>("jar") {
     enabled = true
     archiveClassifier = ""
@@ -197,10 +196,6 @@ idea {
         isDownloadSources = true
     }
 }
-tasks.named("generateLicenseReport") {
-    outputs.upToDateWhen { false }
-}
-
 tasks.named("generateLicenseReport") {
     outputs.upToDateWhen { false }
 }

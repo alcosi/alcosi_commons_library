@@ -25,11 +25,11 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.0.6"
+version = "5.0.7"
 val appName = "commons-library"
 
-val jacksonVersion = "2.17.1"
-val web3jVersion = "4.12.0"
+val jacksonVersion = "2.17.2"
+val web3jVersion = "4.12.1"
 val kotlinVersion = "2.0.0"
 val javaVersion = JavaVersion.VERSION_21
 
@@ -120,7 +120,7 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
     compileOnly("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
-    compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.1")
+    compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
     compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.2")
@@ -128,11 +128,11 @@ dependencies {
     compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.2.5")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.1.5")
     compileOnly("io.github.breninsul:servlet-logging-starter:1.0.2")
-    compileOnly("org.apache.commons:commons-lang3:3.14.0")
+    compileOnly("org.apache.commons:commons-lang3:3.16.0")
+    compileOnly("commons-codec:commons-codec:1.17.1")
+    compileOnly("org.apache.commons:commons-text:1.12.0")
     compileOnly("com.squareup.okhttp3:okhttp:4.12.0")
     compileOnly("commons-io:commons-io:2.16.1")
-    compileOnly("commons-codec:commons-codec:1.16.1")
-    compileOnly("org.apache.commons:commons-text:1.12.0")
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
     compileOnly("org.postgresql:postgresql:42.7.3")
     compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
