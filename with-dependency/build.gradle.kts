@@ -42,7 +42,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.3.2"
-val depVersion = "5.0.7"
+val depVersion = "5.0.8"
 val kotlinCoroutinesVersion = "1.8.1"
 
 val jacksonVersion = "2.17.2"
@@ -141,9 +141,9 @@ dependencies {
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.2")
     api("io.github.breninsul:future-starter:1.0.2")
-    api("io.github.breninsul:rest-template-logging-interceptor:1.2.5")
-    api("io.github.breninsul:okhttp-logging-interceptor:1.1.5")
-    api("io.github.breninsul:servlet-logging-starter:1.0.2")
+    api("io.github.breninsul:rest-template-logging-interceptor:1.2.6")
+    api("io.github.breninsul:okhttp-logging-interceptor:1.1.6")
+    api("io.github.breninsul:servlet-logging-starter:1.0.2.3")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")

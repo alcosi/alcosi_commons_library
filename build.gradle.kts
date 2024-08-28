@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.0.7"
+version = "5.0.8"
 val appName = "commons-library"
 
 val jacksonVersion = "2.17.2"
@@ -125,9 +125,9 @@ dependencies {
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.2")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
-    compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.2.5")
-    compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.1.5")
-    compileOnly("io.github.breninsul:servlet-logging-starter:1.0.2")
+    compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.2.6")
+    compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.1.6")
+    compileOnly("io.github.breninsul:servlet-logging-starter:1.0.2.3")
     compileOnly("org.apache.commons:commons-lang3:3.16.0")
     compileOnly("commons-codec:commons-codec:1.17.1")
     compileOnly("org.apache.commons:commons-text:1.12.0")
