@@ -20,10 +20,7 @@ package com.alcosi.lib.logging.http.resttemplate
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.AlcosiHttpLoggingHelper
 import io.github.breninsul.logging.HttpLoggingHelper
-import io.github.breninsul.rest.logging.RestTemplateLoggerProperties
-import io.github.breninsul.rest.logging.RestTemplateLoggingInterceptor
-import io.github.breninsul.rest.logging.RestTemplateRequestBodyMasking
-import io.github.breninsul.rest.logging.RestTemplateResponseBodyMasking
+import io.github.breninsul.rest.logging.*
 import java.util.*
 
 /**
@@ -39,9 +36,10 @@ import java.util.*
  */
 open class RestTemplateLogRequestResponseFilter(
     properties: RestTemplateLoggerProperties,
+    uriMasking: List<RestTemplateUriMasking>,
     requestBodyMaskers: List<RestTemplateRequestBodyMasking>,
     responseBodyMaskers: List<RestTemplateResponseBodyMasking>,
     protected open val headerHelper: HeaderHelper,
-) : RestTemplateLoggingInterceptor(properties, requestBodyMaskers, responseBodyMaskers) {
-    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "RestTemplate", properties, requestBodyMaskers, responseBodyMaskers)
+) : RestTemplateLoggingInterceptor(properties, uriMasking, requestBodyMaskers, responseBodyMaskers) {
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "RestTemplate", properties, uriMasking, requestBodyMaskers, responseBodyMaskers)
 }

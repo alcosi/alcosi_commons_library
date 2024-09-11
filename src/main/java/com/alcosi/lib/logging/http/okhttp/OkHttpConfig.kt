@@ -74,7 +74,8 @@ class OkHttpConfig {
                 config.okHttpResponseRegexJsonBodyMasking(properties.logging.request.mask),
                 config.okHttpResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
             )
-        return OKLoggingInterceptor(properties.logging, requestMaskers, responseMaskers, headerHelper)
+        val uriMaskers = listOf(config.okHttpUriMaskingDelegate(properties.logging.request.mask))
+        return OKLoggingInterceptor(properties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper)
     }
 
     /**

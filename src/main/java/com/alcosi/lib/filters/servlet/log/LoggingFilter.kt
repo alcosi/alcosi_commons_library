@@ -20,10 +20,7 @@ package com.alcosi.lib.filters.servlet.log
 import com.alcosi.lib.filters.servlet.ThreadContext
 import com.alcosi.lib.logging.http.AlcosiHttpLoggingHelper
 import io.github.breninsul.logging.HttpLoggingHelper
-import io.github.breninsul.servlet.logging.ServletLoggerProperties
-import io.github.breninsul.servlet.logging.ServletLoggingFilter
-import io.github.breninsul.servlet.logging.ServletRequestBodyMasking
-import io.github.breninsul.servlet.logging.ServletResponseBodyMasking
+import io.github.breninsul.servlet.logging.*
 
 /**
  * Performs logging for servlet requests and responses.
@@ -35,10 +32,11 @@ import io.github.breninsul.servlet.logging.ServletResponseBodyMasking
  */
 open class LoggingFilter(
     properties: ServletLoggerProperties,
+    uriMasking: List<ServletUriMasking>,
     requestBodyMaskers: List<ServletRequestBodyMasking>,
     responseBodyMaskers: List<ServletResponseBodyMasking>,
     threadContext: ThreadContext,
-) : ServletLoggingFilter(properties, requestBodyMaskers, responseBodyMaskers) {
+) : ServletLoggingFilter(properties, uriMasking, requestBodyMaskers, responseBodyMaskers) {
     val id = threadContext.getRqId()
-    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ threadContext.getRqId() }, "Servlet", properties.toHttpLoggingProperties(), requestBodyMaskers, responseBodyMaskers)
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ threadContext.getRqId() }, "Servlet", properties.toHttpLoggingProperties(), uriMasking, requestBodyMaskers, responseBodyMaskers)
 }

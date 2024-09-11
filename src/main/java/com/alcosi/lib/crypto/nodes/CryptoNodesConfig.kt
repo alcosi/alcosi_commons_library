@@ -83,14 +83,10 @@ class CryptoNodesConfig {
                 config.okHttpResponseRegexJsonBodyMasking(cryptoNodeProperties.logging.request.mask),
                 config.okHttpResponseFormUrlencodedBodyMasking(cryptoNodeProperties.logging.request.mask),
             )
+        val uriMaskers = listOf(config.okHttpUriMaskingDelegate(cryptoNodeProperties.logging.request.mask))
         configureTimeouts(
             builder,
-            OKLoggingInterceptor(
-                cryptoNodeProperties.logging,
-                requestMaskers,
-                responseMaskers,
-                headerHelper,
-            ),
+            OKLoggingInterceptor(cryptoNodeProperties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper),
             cryptoNodeProperties.nodesTimeout,
         )
         return builder.build()

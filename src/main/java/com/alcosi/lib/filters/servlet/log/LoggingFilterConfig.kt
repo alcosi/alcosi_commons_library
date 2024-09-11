@@ -74,8 +74,12 @@ open class LoggingFilterConfig {
                 config.servletResponseRegexJsonBodyMasking(properties.request.mask),
                 config.servletResponseFormUrlencodedBodyMasking(properties.request.mask),
             )
+        val uriMaskers =
+            listOf(
+                config.servletUriMasking(properties.request.mask),
+            )
         val registrationBean = FilterRegistrationBean<LoggingFilter>()
-        registrationBean.filter = LoggingFilter(properties, requestMaskers, responseMaskers, threadContext)
+        registrationBean.filter = LoggingFilter(properties, uriMaskers, requestMaskers, responseMaskers, threadContext)
         registrationBean.order = servletProperties.baseOrder + properties.orderDelta
         return registrationBean
     }

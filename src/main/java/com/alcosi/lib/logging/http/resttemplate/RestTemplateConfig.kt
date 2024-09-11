@@ -74,7 +74,8 @@ class RestTemplateConfig {
                 config.restTemplateResponseRegexJsonBodyMasking(properties.logging.request.mask),
                 config.restTemplateResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
             )
-        return RestTemplateLogRequestResponseFilter(properties.logging, requestMaskers, responseMaskers, headerHelper)
+        val uriMaskers = listOf(config.restTemplateUriMasking(properties.logging.request.mask))
+        return RestTemplateLogRequestResponseFilter(properties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper)
     }
 
     /**
