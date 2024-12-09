@@ -42,7 +42,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.4.0"
-val depVersion = "5.1.0"
+val depVersion = "5.1.1"
 val kotlinCoroutinesVersion = "1.9.0"
 
 val jacksonVersion = "2.18.2"
@@ -147,6 +147,7 @@ dependencies {
     api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")
+    api("org.apache.httpcomponents.client5:httpclient5:5.4.1")
     api("commons-io:commons-io:2.18.0")
     api("org.apache.commons:commons-lang3:3.17.0")
     api("commons-codec:commons-codec:1.17.1")
