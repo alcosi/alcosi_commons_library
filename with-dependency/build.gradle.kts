@@ -31,23 +31,23 @@ plugins {
     id("idea")
     id("java-library")
     id("maven-publish")
-    id("org.springframework.boot") version "3.3.3"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.5"
-    id("org.jetbrains.kotlin.jvm") version "2.0.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "2.0.0"
-    id("com.github.jk1.dependency-license-report") version "2.8"
-    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.1.0"
+    id("com.github.jk1.dependency-license-report") version "2.9"
+    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
     id("org.jetbrains.dokka") version "1.9.20"
 }
 
 val appName = "commons-library-basic-dependency"
-val springVersion = "3.3.3"
-val depVersion = "5.0.9"
-val kotlinCoroutinesVersion = "1.8.1"
+val springVersion = "3.4.0"
+val depVersion = "5.1.0"
+val kotlinCoroutinesVersion = "1.9.0"
 
-val jacksonVersion = "2.17.2"
-val web3jVersion = "4.12.1"
-val kotlinVersion = "2.0.0"
+val jacksonVersion = "2.18.2"
+val web3jVersion = "4.12.2"
+val kotlinVersion = "2.1.0"
 val javaVersion = JavaVersion.VERSION_21
 
 group = "com.alcosi"
@@ -147,14 +147,14 @@ dependencies {
     api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")
-    api("commons-io:commons-io:2.16.1")
-    api("org.apache.commons:commons-lang3:3.16.0")
+    api("commons-io:commons-io:2.18.0")
+    api("org.apache.commons:commons-lang3:3.17.0")
     api("commons-codec:commons-codec:1.17.1")
     api("org.apache.commons:commons-text:1.12.0")
-    api("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    api("org.postgresql:postgresql:42.7.3")
-    api("org.flywaydb:flyway-core:10.17.1")
-    api("org.flywaydb:flyway-database-postgresql:10.17.1")
+    api("org.bouncycastle:bcprov-jdk18on:1.79")
+    api("org.postgresql:postgresql:42.7.4")
+    api("org.flywaydb:flyway-core:11.0.1")
+    api("org.flywaydb:flyway-database-postgresql:11.0.1")
     api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")

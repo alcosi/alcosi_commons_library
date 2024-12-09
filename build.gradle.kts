@@ -9,28 +9,28 @@ buildscript {
     }
 }
 plugins {
-    val kotlinVersion = "2.0.0"
+    val kotlinVersion = "2.1.0"
     id("idea")
     id("java-library")
     id("maven-publish")
-    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
-    id("org.springframework.boot") version "3.3.3"
+    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
+    id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.5"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
-    id("com.github.jk1.dependency-license-report") version "2.8"
-    id("com.github.ben-manes.versions") version "0.50.0"
+    id("com.github.jk1.dependency-license-report") version "2.9"
+    id("com.github.ben-manes.versions") version "0.51.0"
     id("org.jetbrains.dokka") version "1.9.20"
     id("org.jetbrains.kotlin.kapt") version kotlinVersion
 }
 
 group = "com.alcosi"
-version = "5.0.9"
+version = "5.1.0"
 val appName = "commons-library"
 
-val jacksonVersion = "2.17.2"
-val web3jVersion = "4.12.1"
-val kotlinVersion = "2.0.0"
+val jacksonVersion = "2.18.2"
+val web3jVersion = "4.12.2"
+val kotlinVersion = "2.1.0"
 val javaVersion = JavaVersion.VERSION_21
 
 java {
@@ -128,13 +128,13 @@ dependencies {
     compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.3.0")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.2.0")
     compileOnly("io.github.breninsul:servlet-logging-starter:1.1.0")
-    compileOnly("org.apache.commons:commons-lang3:3.16.0")
+    compileOnly("org.apache.commons:commons-lang3:3.17.0")
     compileOnly("commons-codec:commons-codec:1.17.1")
     compileOnly("org.apache.commons:commons-text:1.12.0")
+    compileOnly("commons-io:commons-io:2.18.0")
     compileOnly("com.squareup.okhttp3:okhttp:4.12.0")
-    compileOnly("commons-io:commons-io:2.16.1")
-    compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    compileOnly("org.postgresql:postgresql:42.7.3")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.79")
+    compileOnly("org.postgresql:postgresql:42.7.4")
     compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     compileOnly("org.web3j:crypto:$web3jVersion")
     compileOnly("org.web3j:core:$web3jVersion")

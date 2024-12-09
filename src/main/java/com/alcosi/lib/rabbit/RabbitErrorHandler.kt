@@ -67,7 +67,7 @@ open class RabbitErrorHandler(
      * @param exception The exception that was thrown during message processing.
      * @return The response message indicating the error.
      */
-    override fun handleError(
+    protected open fun handleError(
         amqpMessage: Message?,
         message: org.springframework.messaging.Message<*>?,
         exception: ListenerExecutionFailedException?,
