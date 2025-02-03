@@ -16,18 +16,18 @@
  */
 package com.alcosi.lib.filters.servlet.log
 
-import io.github.breninsul.logging.HttpLogSettings
-import io.github.breninsul.logging.JavaLoggingLevel
-import io.github.breninsul.servlet.logging.ServletHttpRequestLogSettings
-import io.github.breninsul.servlet.logging.ServletLoggerProperties
+
+import io.github.breninsul.servlet.logging2.ServletHttpRequestLogSettings
+import io.github.breninsul.servlet.logging2.ServletLoggerProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("common-lib.filter.logging")
 open class LoggingFilterProperties(
     enabled: Boolean = true,
-    loggingLevel: JavaLoggingLevel = JavaLoggingLevel.INFO,
+    loggingLevel: io.github.breninsul.logging2.JavaLoggingLevel = io.github.breninsul.logging2.JavaLoggingLevel.INFO,
     request: ServletHttpRequestLogSettings = ServletHttpRequestLogSettings(tookTimeIncluded = false),
-    response: HttpLogSettings = HttpLogSettings(),
-    open var orderDelta: Int = 2,
+    response: io.github.breninsul.logging2.HttpLogSettings = io.github.breninsul.logging2.HttpLogSettings(),
     newLineColumnSymbols: Int = 14,
-) : ServletLoggerProperties(enabled, loggingLevel, request, response, orderDelta, newLineColumnSymbols)
+    resolveHandlerAnnotation: Boolean = true,
+    open var orderDelta: Int = 2,
+) : ServletLoggerProperties(enabled, loggingLevel, request, response,orderDelta, newLineColumnSymbols,resolveHandlerAnnotation)

@@ -17,7 +17,7 @@
 
 package com.alcosi.lib.doc
 
-import io.github.breninsul.servlet.logging.logResponseBody
+import io.github.breninsul.servlet.logging2.logResponseBody
 import org.apache.commons.io.IOUtils
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean

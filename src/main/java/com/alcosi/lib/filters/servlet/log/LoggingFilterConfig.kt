@@ -20,7 +20,9 @@ package com.alcosi.lib.filters.servlet.log
 import com.alcosi.lib.filters.servlet.FilterConfig
 import com.alcosi.lib.filters.servlet.ServletFilterProperties
 import com.alcosi.lib.filters.servlet.ThreadContext
-import io.github.breninsul.servlet.logging.ServletLoggerConfiguration
+import io.github.breninsul.servlet.logging2.ServletLoggerConfiguration
+import io.github.breninsul.servlet.logging2.ServletLoggerProperties
+import io.github.breninsul.servlet.logging2.filter.ServletLoggingFilter
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -32,6 +34,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory
 import org.springframework.context.annotation.Bean
+import org.springframework.web.servlet.HandlerMapping
 
 /**
  * The LoggingFilterConfig class is responsible for configuring and creating beans related to the logging filter.
@@ -53,33 +56,30 @@ import org.springframework.context.annotation.Bean
 )
 @EnableConfigurationProperties(LoggingFilterProperties::class)
 open class LoggingFilterConfig {
+
+
+    @Bean(name = ["ServletLoggerService"])
+    @ConditionalOnClass(ServletWebServerFactory::class)
+    @ConditionalOnMissingBean(AlcosiServletLoggerService::class)
+    fun loggingService(
+        properties: LoggingFilterProperties,
+        threadContext: ThreadContext,
+    ): AlcosiServletLoggerService {
+        return AlcosiServletLoggerService(properties,threadContext)
+    }
+
     @Bean(name = ["ServletLoggingFilter"])
     @ConditionalOnClass(ServletWebServerFactory::class)
-    @ConditionalOnMissingFilterBean(LoggingFilter::class)
-    @ConditionalOnMissingBean(LoggingFilter::class)
+    @ConditionalOnMissingFilterBean(AlcosiServletLoggingFilter::class)
+    @ConditionalOnMissingBean(AlcosiServletLoggingFilter::class)
     fun loggingFilter(
         properties: LoggingFilterProperties,
         servletProperties: ServletFilterProperties,
-        threadContext: ThreadContext,
-    ): FilterRegistrationBean<LoggingFilter> {
-        val config = ServletLoggerConfiguration()
-
-        val requestMaskers =
-            listOf(
-                config.servletRequestRegexJsonBodyMasking(properties.request.mask),
-                config.servletRequestFormUrlencodedBodyMasking(properties.request.mask),
-            )
-        val responseMaskers =
-            listOf(
-                config.servletResponseRegexJsonBodyMasking(properties.request.mask),
-                config.servletResponseFormUrlencodedBodyMasking(properties.request.mask),
-            )
-        val uriMaskers =
-            listOf(
-                config.servletUriMasking(properties.request.mask),
-            )
-        val registrationBean = FilterRegistrationBean<LoggingFilter>()
-        registrationBean.filter = LoggingFilter(properties, uriMaskers, requestMaskers, responseMaskers, threadContext)
+        loggerService: AlcosiServletLoggerService,
+        handlerMappings: List<HandlerMapping>,
+    ): FilterRegistrationBean<ServletLoggingFilter> {
+        val registrationBean = FilterRegistrationBean<ServletLoggingFilter>()
+        registrationBean.filter = AlcosiServletLoggingFilter(loggerService,properties,handlerMappings)
         registrationBean.order = servletProperties.baseOrder + properties.orderDelta
         return registrationBean
     }
