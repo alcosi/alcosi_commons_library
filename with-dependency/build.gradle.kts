@@ -137,7 +137,7 @@ dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
     api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
-    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.8")
+    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.2")
     api("io.github.breninsul:future-starter:1.0.2")
