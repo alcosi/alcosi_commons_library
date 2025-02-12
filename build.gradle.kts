@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.2.2"
+version = "5.2.3"
 val appName = "commons-library"
 
 val jacksonVersion = "2.18.2"
@@ -123,7 +123,7 @@ dependencies {
     compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
     compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
-    compileOnly("io.github.breninsul:synchronization-starter:1.0.2")
+    compileOnly("io.github.breninsul:synchronization-starter:1.0.3")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
     compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.3.0")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.2.0")
