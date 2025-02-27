@@ -19,7 +19,7 @@ package com.alcosi.lib.logging.http.resttemplate
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.AlcosiHttpLoggingHelper
-import io.github.breninsul.logging.HttpLoggingHelper
+import io.github.breninsul.logging2.HttpLoggingHelper
 import io.github.breninsul.rest.logging.*
 import java.util.*
 
@@ -28,18 +28,14 @@ import java.util.*
  * for logging the request and response details of a REST API call made using the `RestTemplate` class.
  *
  * @param properties The properties used to configure the filter.
- * @param requestBodyMaskers The list of `RestTemplateRequestBodyMasking` instances used to mask request body fields.
- * @param responseBodyMaskers The list of `RestTemplateResponseBodyMasking` instances used to mask response body fields.
  * @param headerHelper The `HeaderHelper` instance used by the filter.
  *
  * @see RestTemplate
  */
 open class RestTemplateLogRequestResponseFilter(
     properties: RestTemplateLoggerProperties,
-    uriMasking: List<RestTemplateUriMasking>,
-    requestBodyMaskers: List<RestTemplateRequestBodyMasking>,
-    responseBodyMaskers: List<RestTemplateResponseBodyMasking>,
+
     protected open val headerHelper: HeaderHelper,
-) : RestTemplateLoggingInterceptor(properties, uriMasking, requestBodyMaskers, responseBodyMaskers) {
-    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "RestTemplate", properties, uriMasking, requestBodyMaskers, responseBodyMaskers)
+) : RestTemplateLoggingInterceptor(properties) {
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "RestTemplate", properties)
 }

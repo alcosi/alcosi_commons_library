@@ -26,16 +26,13 @@
 
 package com.alcosi.lib.logging.http
 
-import io.github.breninsul.logging.*
+import io.github.breninsul.logging2.*
 import java.util.function.Supplier
 
 open class AlcosiHttpLoggingHelper(
     protected open val idSupplier: Supplier<String>,
     name: String,
     properties: HttpLoggingProperties,
-    uriMasking: List<HttpUriMasking>,
-    requestBodyMaskers: List<HttpRequestBodyMasking>,
-    responseBodyMaskers: List<HttpResponseBodyMasking>,
-) : HttpLoggingHelper(name, properties, uriMasking, requestBodyMaskers, responseBodyMaskers) {
+) : HttpLoggingHelper(name, properties) {
     override fun getIdString(): String = idSupplier.get()
 }

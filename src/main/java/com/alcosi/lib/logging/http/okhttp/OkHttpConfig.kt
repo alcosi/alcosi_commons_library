@@ -63,19 +63,7 @@ class OkHttpConfig {
         properties: OkHttpLoggingProperties,
         headerHelper: HeaderHelper,
     ): OKLoggingInterceptor {
-        val config = OkHttpLoggerConfiguration()
-        val requestMaskers =
-            listOf(
-                config.okHttpRequestRegexJsonBodyMasking(properties.logging.request.mask),
-                config.okHttpRequestFormUrlencodedBodyMasking(properties.logging.request.mask),
-            )
-        val responseMaskers =
-            listOf(
-                config.okHttpResponseRegexJsonBodyMasking(properties.logging.request.mask),
-                config.okHttpResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
-            )
-        val uriMaskers = listOf(config.okHttpUriMaskingDelegate(properties.logging.request.mask))
-        return OKLoggingInterceptor(properties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper)
+        return OKLoggingInterceptor(properties.logging, headerHelper)
     }
 
     /**

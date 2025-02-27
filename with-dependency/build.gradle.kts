@@ -23,7 +23,7 @@ import com.github.jk1.license.LicenseReportExtension
 
 buildscript {
     dependencies {
-        classpath("com.alcosi:dependency-license-page-generator:1.0.0")
+        classpath("com.alcosi:dependency-license-page-generator:1.0.2")
     }
 }
 
@@ -31,7 +31,7 @@ plugins {
     id("idea")
     id("java-library")
     id("maven-publish")
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.5"
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
     id("org.jetbrains.kotlin.plugin.spring") version "2.1.0"
@@ -41,8 +41,8 @@ plugins {
 }
 
 val appName = "commons-library-basic-dependency"
-val springVersion = "3.4.2"
-val depVersion = "5.2.4"
+val springVersion = "3.4.3"
+val depVersion = "5.3.0"
 val kotlinCoroutinesVersion = "1.10.1"
 
 val jacksonVersion = "2.18.2"
@@ -136,14 +136,14 @@ configurations.configureEach {
 dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
-    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
+    api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
     api("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     api("io.github.breninsul:synchronization-starter:1.0.3")
     api("io.github.breninsul:future-starter:1.0.2")
-    api("io.github.breninsul:rest-template-logging-interceptor:1.3.1")
-    api("io.github.breninsul:okhttp-logging-interceptor:1.2.0")
-    api("io.github.breninsul:servlet-logging-starter:2.1.0")
+    api("io.github.breninsul:rest-template-logging-interceptor:2.0.0")
+    api("io.github.breninsul:okhttp-logging-interceptor:2.0.0")
+    api("io.github.breninsul:servlet-logging-starter:2.1.3")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
     api("jakarta.servlet:jakarta.servlet-api:6.0.0")
     api("javax.annotation:javax.annotation-api:1.3.2")

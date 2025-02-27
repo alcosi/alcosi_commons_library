@@ -19,11 +19,8 @@ package com.alcosi.lib.logging.http.okhttp
 
 import com.alcosi.lib.filters.servlet.HeaderHelper
 import com.alcosi.lib.logging.http.AlcosiHttpLoggingHelper
-import io.github.breninsul.logging.HttpLoggingHelper
+import io.github.breninsul.logging2.HttpLoggingHelper
 import io.github.breninsul.okhttp.logging.OkHttpLoggerProperties
-import io.github.breninsul.okhttp.logging.OkHttpRequestBodyMasking
-import io.github.breninsul.okhttp.logging.OkHttpResponseBodyMasking
-import io.github.breninsul.okhttp.logging.OkHttpUriMasking
 import okhttp3.*
 import java.util.*
 
@@ -37,10 +34,7 @@ import java.util.*
  */
 open class OKLoggingInterceptor(
     properties: OkHttpLoggerProperties,
-    uriMasking: List<OkHttpUriMasking>,
-    requestBodyMaskers: List<OkHttpRequestBodyMasking>,
-    responseBodyMaskers: List<OkHttpResponseBodyMasking>,
     protected open val headerHelper: HeaderHelper,
-) : io.github.breninsul.okhttp.logging.OKLoggingInterceptor(properties, uriMasking, requestBodyMaskers, responseBodyMaskers) {
-    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "OkHTTP", properties, uriMasking, requestBodyMaskers, responseBodyMaskers)
+) : io.github.breninsul.okhttp.logging.OKLoggingInterceptor(properties) {
+    override val helper: HttpLoggingHelper = AlcosiHttpLoggingHelper({ headerHelper.getContextRqId() }, "OkHTTP", properties)
 }

@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.utils.extendsFrom
 
 buildscript {
     dependencies {
-        classpath("com.alcosi:dependency-license-page-generator:1.0.0")
+        classpath("com.alcosi:dependency-license-page-generator:1.0.2")
     }
 }
 plugins {
@@ -14,7 +14,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.5"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.2.4"
+version = "5.3.0"
 val appName = "commons-library"
 
 val jacksonVersion = "2.18.2"
@@ -120,14 +120,15 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
     compileOnly("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
-    compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.2")
+    compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
     compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.3")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
-    compileOnly("io.github.breninsul:rest-template-logging-interceptor:1.3.0")
-    compileOnly("io.github.breninsul:okhttp-logging-interceptor:1.2.0")
-    compileOnly("io.github.breninsul:servlet-logging-starter:2.1.0")
+    compileOnly("io.github.breninsul:rest-template-logging-interceptor:2.0.0")
+    compileOnly("io.github.breninsul:okhttp-logging-interceptor:2.0.0")
+    compileOnly("io.github.breninsul:servlet-logging-starter:2.1.3")
+    compileOnly("io.github.breninsul:spring-input-stream-response-converter:1.1.1")
     compileOnly("org.apache.commons:commons-lang3:3.17.0")
     compileOnly("commons-codec:commons-codec:1.18.0")
     compileOnly("org.apache.commons:commons-text:1.12.0")

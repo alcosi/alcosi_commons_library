@@ -63,19 +63,7 @@ class RestTemplateConfig {
         properties: RestTemplateProperties,
         headerHelper: HeaderHelper,
     ): RestTemplateLogRequestResponseFilter {
-        val config = RestTemplateLoggerConfiguration()
-        val requestMaskers =
-            listOf(
-                config.restTemplateRequestRegexJsonBodyMasking(properties.logging.request.mask),
-                config.restTemplateRequestFormUrlencodedBodyMasking(properties.logging.request.mask),
-            )
-        val responseMaskers =
-            listOf(
-                config.restTemplateResponseRegexJsonBodyMasking(properties.logging.request.mask),
-                config.restTemplateResponseFormUrlencodedBodyMasking(properties.logging.request.mask),
-            )
-        val uriMaskers = listOf(config.restTemplateUriMasking(properties.logging.request.mask))
-        return RestTemplateLogRequestResponseFilter(properties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper)
+        return RestTemplateLogRequestResponseFilter(properties.logging, headerHelper)
     }
 
     /**

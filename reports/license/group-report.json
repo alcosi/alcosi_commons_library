@@ -2,6 +2,19 @@
     "dependencies": [
         {
             "license": {
+                "name": "AL 2.0",
+                "uri": "https://www.apache.org/licenses/LICENSE-2.0.html"
+            },
+            "modules": [
+                {
+                    "name": "com.rabbitmq:amqp-client",
+                    "url": "https://www.rabbitmq.com",
+                    "version": "5.22.0"
+                }
+            ]
+        },
+        {
+            "license": {
                 "name": "Apache License, Version 2.0",
                 "uri": "https://www.apache.org/licenses/LICENSE-2.0.txt"
             },
@@ -9,52 +22,52 @@
                 {
                     "name": "com.fasterxml.jackson.core:jackson-annotations",
                     "url": "https://github.com/FasterXML/jackson",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.core:jackson-core",
                     "url": "https://github.com/FasterXML/jackson-core",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.core:jackson-databind",
                     "url": "https://github.com/FasterXML/jackson",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.dataformat:jackson-dataformat-xml",
                     "url": "https://github.com/FasterXML/jackson-dataformat-xml",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
                     "url": "https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
                     "url": "https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.module:jackson-module-kotlin",
                     "url": "https://github.com/FasterXML/jackson-module-kotlin",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson.module:jackson-module-parameter-names",
                     "url": "https://github.com/FasterXML/jackson-modules-java8/jackson-module-parameter-names",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.jackson:jackson-bom",
                     "url": "https://github.com/FasterXML/jackson-bom",
-                    "version": "2.17.1"
+                    "version": "2.18.2"
                 },
                 {
                     "name": "com.fasterxml.woodstox:woodstox-core",
                     "url": "https://github.com/FasterXML/woodstox",
-                    "version": "6.6.2"
+                    "version": "7.0.0"
                 },
                 {
                     "name": "com.github.jnr:jffi",
@@ -124,87 +137,92 @@
                 {
                     "name": "commons-codec:commons-codec",
                     "url": "https://commons.apache.org/proper/commons-codec/",
-                    "version": "1.16.1"
+                    "version": "1.18.0"
                 },
                 {
                     "name": "commons-io:commons-io",
                     "url": "https://commons.apache.org/proper/commons-io/",
-                    "version": "2.16.1"
+                    "version": "2.18.0"
+                },
+                {
+                    "name": "io.consensys.protocols:jc-kzg-4844",
+                    "url": "http://github.com/Consensys/jc-kzg-4844",
+                    "version": "2.0.0"
                 },
                 {
                     "name": "io.micrometer:micrometer-commons",
                     "url": "https://github.com/micrometer-metrics/micrometer",
-                    "version": "1.13.0"
+                    "version": "1.14.4"
                 },
                 {
                     "name": "io.micrometer:micrometer-core",
                     "url": "https://github.com/micrometer-metrics/micrometer",
-                    "version": "1.13.0"
+                    "version": "1.14.4"
                 },
                 {
                     "name": "io.micrometer:micrometer-jakarta9",
                     "url": "https://github.com/micrometer-metrics/micrometer",
-                    "version": "1.13.0"
+                    "version": "1.14.4"
                 },
                 {
                     "name": "io.micrometer:micrometer-observation",
                     "url": "https://github.com/micrometer-metrics/micrometer",
-                    "version": "1.13.0"
+                    "version": "1.14.4"
                 },
                 {
                     "name": "io.netty:netty-buffer",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-codec",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-common",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-handler",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-resolver",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-tcnative-boringssl-static",
-                    "url": "https://github.com/netty/netty-tcnative/netty-tcnative-boringssl-static/",
-                    "version": "2.0.65.Final"
+                    "url": "https://netty.io/",
+                    "version": "2.0.70.Final"
                 },
                 {
                     "name": "io.netty:netty-tcnative-classes",
-                    "url": null,
-                    "version": "2.0.65.Final"
+                    "url": "https://netty.io/",
+                    "version": "2.0.70.Final"
                 },
                 {
                     "name": "io.netty:netty-transport-classes-epoll",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-transport-native-epoll",
                     "url": "https://netty.io/",
-                    "version": "4.1.110.Final"
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-transport-native-unix-common",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.netty:netty-transport",
-                    "url": null,
-                    "version": "4.1.110.Final"
+                    "url": "https://netty.io/",
+                    "version": "4.1.118.Final"
                 },
                 {
                     "name": "io.reactivex.rxjava2:rxjava",
@@ -222,34 +240,29 @@
                     "version": "2.4.2"
                 },
                 {
-                    "name": "it.unimi.dsi:fastutil-core",
-                    "url": "http://fastutil.di.unimi.it/",
-                    "version": "8.5.12"
-                },
-                {
                     "name": "net.bytebuddy:byte-buddy-agent",
                     "url": null,
-                    "version": "1.14.16"
+                    "version": "1.15.11"
                 },
                 {
                     "name": "net.bytebuddy:byte-buddy",
                     "url": null,
-                    "version": "1.14.16"
+                    "version": "1.15.11"
                 },
                 {
                     "name": "net.minidev:accessors-smart",
                     "url": "https://urielch.github.io/",
-                    "version": "2.5.1"
+                    "version": "2.5.2"
                 },
                 {
                     "name": "net.minidev:json-smart",
                     "url": "https://urielch.github.io/",
-                    "version": "2.5.1"
+                    "version": "2.5.2"
                 },
                 {
                     "name": "org.apache.commons:commons-lang3",
                     "url": "https://commons.apache.org/proper/commons-lang/",
-                    "version": "3.14.0"
+                    "version": "3.17.0"
                 },
                 {
                     "name": "org.apache.commons:commons-text",
@@ -257,14 +270,34 @@
                     "version": "1.12.0"
                 },
                 {
+                    "name": "org.apache.httpcomponents.client5:httpclient5",
+                    "url": null,
+                    "version": "5.4.2"
+                },
+                {
+                    "name": "org.apache.httpcomponents.core5:httpcore5-h2",
+                    "url": null,
+                    "version": "5.3.3"
+                },
+                {
+                    "name": "org.apache.httpcomponents.core5:httpcore5",
+                    "url": null,
+                    "version": "5.3.3"
+                },
+                {
                     "name": "org.apache.logging.log4j:log4j-api",
                     "url": null,
-                    "version": "2.23.1"
+                    "version": "2.24.3"
                 },
                 {
                     "name": "org.apache.logging.log4j:log4j-core",
                     "url": null,
-                    "version": "2.23.1"
+                    "version": "2.24.3"
+                },
+                {
+                    "name": "org.apache.tika:tika-core",
+                    "url": "https://tika.apache.org/",
+                    "version": "2.9.2"
                 },
                 {
                     "name": "org.apache.yetus:audience-annotations",
@@ -274,12 +307,12 @@
                 {
                     "name": "org.apache.zookeeper:zookeeper-jute",
                     "url": null,
-                    "version": "3.9.1"
+                    "version": "3.9.2"
                 },
                 {
                     "name": "org.apache.zookeeper:zookeeper",
                     "url": null,
-                    "version": "3.9.1"
+                    "version": "3.9.2"
                 },
                 {
                     "name": "org.apiguardian:apiguardian-api",
@@ -289,137 +322,137 @@
                 {
                     "name": "org.assertj:assertj-core",
                     "url": "https://assertj.github.io/doc/#assertj-core",
-                    "version": "3.25.3"
+                    "version": "3.26.3"
                 },
                 {
                     "name": "org.awaitility:awaitility",
                     "url": "http://awaitility.org",
-                    "version": "4.2.1"
+                    "version": "4.2.2"
                 },
                 {
                     "name": "org.freemarker:freemarker",
                     "url": "https://freemarker.apache.org/",
-                    "version": "2.3.32"
+                    "version": "2.3.34"
                 },
                 {
                     "name": "org.jetbrains.dokka:analysis-kotlin-descriptors",
                     "url": "https://github.com/Kotlin/dokka",
-                    "version": "1.9.20"
+                    "version": "2.0.0"
                 },
                 {
                     "name": "org.jetbrains.dokka:analysis-markdown",
                     "url": "https://github.com/Kotlin/dokka",
-                    "version": "1.9.20"
+                    "version": "2.0.0"
                 },
                 {
                     "name": "org.jetbrains.dokka:dokka-base",
                     "url": "https://github.com/Kotlin/dokka",
-                    "version": "1.9.20"
+                    "version": "2.0.0"
                 },
                 {
                     "name": "org.jetbrains.dokka:dokka-core",
                     "url": "https://github.com/Kotlin/dokka",
-                    "version": "1.9.20"
+                    "version": "2.0.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-allopen-compiler-plugin-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
+                },
+                {
+                    "name": "org.jetbrains.kotlin:kotlin-annotation-processing-gradle",
+                    "url": "https://kotlinlang.org/",
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-build-common",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-build-tools-api",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-build-tools-impl",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-compiler-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-compiler-runner",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-daemon-client",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-daemon-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-klib-commonizer-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
-                },
-                {
-                    "name": "org.jetbrains.kotlin:kotlin-native-prebuilt",
-                    "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-reflect",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-script-runtime",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-scripting-common",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-scripting-jvm",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlin:kotlin-stdlib",
                     "url": "https://kotlinlang.org/",
-                    "version": "2.0.0"
+                    "version": "2.1.0"
                 },
                 {
                     "name": "org.jetbrains.kotlinx:kotlinx-coroutines-bom",
@@ -454,12 +487,12 @@
                 {
                     "name": "org.jetbrains:markdown-jvm",
                     "url": "https://github.com/JetBrains/markdown",
-                    "version": "0.5.2"
+                    "version": "0.7.3"
                 },
                 {
                     "name": "org.jetbrains:markdown",
                     "url": "https://github.com/JetBrains/markdown",
-                    "version": "0.5.2"
+                    "version": "0.7.3"
                 },
                 {
                     "name": "org.objenesis:objenesis",
@@ -474,107 +507,107 @@
                 {
                     "name": "org.skyscreamer:jsonassert",
                     "url": "https://github.com/skyscreamer/JSONassert",
-                    "version": "1.5.1"
+                    "version": "1.5.3"
                 },
                 {
                     "name": "org.springframework.amqp:spring-amqp",
                     "url": "https://github.com/spring-projects/spring-amqp",
-                    "version": "3.1.5"
+                    "version": "3.2.3"
                 },
                 {
                     "name": "org.springframework.amqp:spring-rabbit",
                     "url": "https://github.com/spring-projects/spring-amqp",
-                    "version": "3.1.5"
+                    "version": "3.2.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-actuator-autoconfigure",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-actuator",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-autoconfigure-processor",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-autoconfigure",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-configuration-processor",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-actuator",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-amqp",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-aop",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-jdbc",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-json",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-test",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter-web",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-starter",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-test-autoconfigure",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot-test",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.boot:spring-boot",
                     "url": "https://spring.io/projects/spring-boot",
-                    "version": "3.3.0"
+                    "version": "3.4.3"
                 },
                 {
                     "name": "org.springframework.retry:spring-retry",
-                    "url": "https://www.springsource.org",
-                    "version": "2.0.6"
+                    "url": "https://github.com/spring-projects/spring-retry",
+                    "version": "2.0.11"
                 },
                 {
                     "name": "org.springframework.security:spring-security-crypto",
                     "url": "https://spring.io/projects/spring-security",
-                    "version": "6.3.0"
+                    "version": "6.4.3"
                 },
                 {
                     "name": "org.springframework.security:spring-security-rsa",
@@ -584,107 +617,128 @@
                 {
                     "name": "org.springframework:spring-aop",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-beans",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-context",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-core",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-expression",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-jcl",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-jdbc",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-messaging",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-test",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-tx",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-web",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.springframework:spring-webmvc",
                     "url": "https://github.com/spring-projects/spring-framework",
-                    "version": "6.1.8"
+                    "version": "6.2.3"
                 },
                 {
                     "name": "org.web3j:abi",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.web3j:core",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.web3j:crypto",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.web3j:rlp",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.web3j:tuples",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.web3j:utils",
                     "url": "https://web3j.io",
-                    "version": "4.12.0"
+                    "version": "4.12.2"
                 },
                 {
                     "name": "org.xmlunit:xmlunit-core",
                     "url": "https://www.xmlunit.org/",
-                    "version": "2.9.1"
+                    "version": "2.10.0"
                 },
                 {
                     "name": "org.yaml:snakeyaml",
                     "url": "https://bitbucket.org/snakeyaml/snakeyaml",
-                    "version": "2.2"
-                },
+                    "version": "2.3"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "BSD License 3",
+                "uri": "http://opensource.org/licenses/BSD-3-Clause"
+            },
+            "modules": [
                 {
-                    "name": "tech.pegasys:jc-kzg-4844",
-                    "url": "http://github.com/Consensys/jc-kzg-4844",
-                    "version": "1.0.0"
+                    "name": "org.hamcrest:hamcrest",
+                    "url": "http://hamcrest.org/JavaHamcrest/",
+                    "version": "2.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "BSD-2-Clause",
+                "uri": "https://opensource.org/licenses/BSD-2-Clause"
+            },
+            "modules": [
+                {
+                    "name": "org.postgresql:postgresql",
+                    "url": "https://jdbc.postgresql.org/",
+                    "version": "42.7.5"
                 }
             ]
         },
@@ -722,7 +776,77 @@
                 {
                     "name": "org.ow2.asm:asm",
                     "url": "http://asm.ow2.org",
-                    "version": "9.6"
+                    "version": "9.7.1"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "Bouncy Castle Licence",
+                "uri": "https://www.bouncycastle.org/licence.html"
+            },
+            "modules": [
+                {
+                    "name": "org.bouncycastle:bcprov-jdk18on",
+                    "url": "https://www.bouncycastle.org/download/bouncy-castle-java/",
+                    "version": "1.80"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "CDDL + GPLv2 with classpath exception",
+                "uri": "https://github.com/javaee/javax.annotation/blob/master/LICENSE"
+            },
+            "modules": [
+                {
+                    "name": "javax.annotation:javax.annotation-api",
+                    "url": "https://javaee.github.io/glassfish",
+                    "version": "1.3.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "CDDL 1.0",
+                "uri": "http://www.sun.com/cddl/cddl.html"
+            },
+            "modules": [
+                {
+                    "name": "org.connid:framework-internal",
+                    "url": null,
+                    "version": "1.3.2"
+                },
+                {
+                    "name": "org.connid:framework",
+                    "url": null,
+                    "version": "1.3.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0",
+                "uri": "https://opensource.org/licenses/CDDL-1.0"
+            },
+            "modules": [
+                {
+                    "name": "javax.annotation:javax.annotation-api",
+                    "url": "https://javaee.github.io/glassfish",
+                    "version": "1.3.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "EDL 1.0",
+                "uri": "http://www.eclipse.org/org/documents/edl-v10.php"
+            },
+            "modules": [
+                {
+                    "name": "jakarta.activation:jakarta.activation-api",
+                    "url": "https://www.eclipse.org",
+                    "version": "2.1.3"
                 }
             ]
         },
@@ -733,29 +857,9 @@
             },
             "modules": [
                 {
-                    "name": "ch.qos.logback:logback-core",
-                    "url": null,
-                    "version": "1.5.6"
-                },
-                {
-                    "name": "com.github.jnr:jffi",
-                    "url": "http://github.com/jnr/jffi",
-                    "version": "1.3.13"
-                },
-                {
                     "name": "com.github.jnr:jnr-posix",
                     "url": null,
                     "version": "3.1.19"
-                },
-                {
-                    "name": "com.rabbitmq:amqp-client",
-                    "url": "https://www.rabbitmq.com",
-                    "version": "5.21.0"
-                },
-                {
-                    "name": "jakarta.activation:jakarta.activation-api",
-                    "url": "https://www.eclipse.org",
-                    "version": "2.1.3"
                 },
                 {
                     "name": "jakarta.annotation:jakarta.annotation-api",
@@ -773,94 +877,241 @@
                     "version": "4.0.2"
                 },
                 {
-                    "name": "javax.annotation:javax.annotation-api",
-                    "url": "https://javaee.github.io/glassfish",
-                    "version": "1.3.2"
-                },
-                {
                     "name": "org.aspectj:aspectjweaver",
                     "url": "https://www.eclipse.org/aspectj/",
-                    "version": "1.9.22"
-                },
-                {
-                    "name": "org.bouncycastle:bcprov-jdk18on",
-                    "url": "https://www.bouncycastle.org/java.html",
-                    "version": "1.78.1"
-                },
-                {
-                    "name": "org.codehaus.woodstox:stax2-api",
-                    "url": "http://github.com/FasterXML/stax2-api",
-                    "version": "4.2.2"
-                },
-                {
-                    "name": "org.connid:framework-internal",
-                    "url": null,
-                    "version": "1.3.2"
-                },
-                {
-                    "name": "org.connid:framework",
-                    "url": null,
-                    "version": "1.3.2"
-                },
-                {
-                    "name": "org.hamcrest:hamcrest",
-                    "url": "http://hamcrest.org/JavaHamcrest/",
-                    "version": "2.2"
-                },
-                {
-                    "name": "org.hdrhistogram:HdrHistogram",
-                    "url": "http://hdrhistogram.github.io/HdrHistogram/",
-                    "version": "2.2.1"
-                },
-                {
-                    "name": "org.jetbrains.intellij.deps:trove4j",
-                    "url": "https://github.com/JetBrains/intellij-deps-trove4j",
-                    "version": "1.0.20200330"
+                    "version": "1.9.22.1"
                 },
                 {
                     "name": "org.junit.jupiter:junit-jupiter-api",
                     "url": "https://junit.org/junit5/",
-                    "version": "5.10.2"
+                    "version": "5.11.4"
                 },
                 {
                     "name": "org.junit.jupiter:junit-jupiter-engine",
                     "url": "https://junit.org/junit5/",
-                    "version": "5.10.2"
+                    "version": "5.11.4"
                 },
                 {
                     "name": "org.junit.jupiter:junit-jupiter-params",
                     "url": "https://junit.org/junit5/",
-                    "version": "5.10.2"
+                    "version": "5.11.4"
                 },
                 {
                     "name": "org.junit.jupiter:junit-jupiter",
                     "url": "https://junit.org/junit5/",
-                    "version": "5.10.2"
+                    "version": "5.11.4"
                 },
                 {
                     "name": "org.junit.platform:junit-platform-commons",
                     "url": "https://junit.org/junit5/",
-                    "version": "1.10.2"
+                    "version": "1.11.4"
                 },
                 {
                     "name": "org.junit.platform:junit-platform-engine",
                     "url": "https://junit.org/junit5/",
-                    "version": "1.10.2"
+                    "version": "1.11.4"
+                },
+                {
+                    "name": "org.junit.platform:junit-platform-launcher",
+                    "url": "https://junit.org/junit5/",
+                    "version": "1.11.4"
                 },
                 {
                     "name": "org.junit:junit-bom",
                     "url": "https://junit.org/junit5/",
-                    "version": "5.10.2"
+                    "version": "5.11.4"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "Eclipse Distribution License - v 1.0",
+                "uri": "http://www.eclipse.org/org/documents/edl-v10.php"
+            },
+            "modules": [
+                {
+                    "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+                    "url": "https://www.eclipse.org",
+                    "version": "4.0.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "Eclipse Public License - v 1.0",
+                "uri": "http://www.eclipse.org/legal/epl-v10.html"
+            },
+            "modules": [
+                {
+                    "name": "ch.qos.logback:logback-core",
+                    "url": "http://www.qos.ch",
+                    "version": "1.5.16"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU General Public License Version 2",
+                "uri": "http://www.gnu.org/copyleft/gpl.html"
+            },
+            "modules": [
+                {
+                    "name": "com.github.jnr:jnr-posix",
+                    "url": null,
+                    "version": "3.1.19"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU General Public License, version 2 with the GNU Classpath Exception",
+                "uri": "https://www.gnu.org/software/classpath/license.html"
+            },
+            "modules": [
+                {
+                    "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+                    "url": "https://www.eclipse.org",
+                    "version": "4.0.2"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU LESSER GENERAL PUBLIC LICENSE 2.1",
+                "uri": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html"
+            },
+            "modules": [
+                {
+                    "name": "org.jetbrains.intellij.deps:trove4j",
+                    "url": "https://github.com/JetBrains/intellij-deps-trove4j",
+                    "version": "1.0.20200330"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU Lesser General Public License",
+                "uri": "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"
+            },
+            "modules": [
+                {
+                    "name": "ch.qos.logback:logback-core",
+                    "url": "http://www.qos.ch",
+                    "version": "1.5.16"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU Lesser General Public License Version 2.1",
+                "uri": "http://www.gnu.org/licenses/lgpl.html"
+            },
+            "modules": [
+                {
+                    "name": "com.github.jnr:jnr-posix",
+                    "url": null,
+                    "version": "3.1.19"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GNU Lesser General Public License version 3",
+                "uri": "https://www.gnu.org/licenses/lgpl-3.0.txt"
+            },
+            "modules": [
+                {
+                    "name": "com.github.jnr:jffi",
+                    "url": "http://github.com/jnr/jffi",
+                    "version": "1.3.13"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GPL v2",
+                "uri": "https://www.gnu.org/licenses/gpl-2.0.txt"
+            },
+            "modules": [
+                {
+                    "name": "com.rabbitmq:amqp-client",
+                    "url": "https://www.rabbitmq.com",
+                    "version": "5.22.0"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "GPL2 w/ CPE",
+                "uri": "https://www.gnu.org/software/classpath/license.html"
+            },
+            "modules": [
+                {
+                    "name": "jakarta.annotation:jakarta.annotation-api",
+                    "url": "https://www.eclipse.org",
+                    "version": "2.1.1"
+                },
+                {
+                    "name": "jakarta.servlet:jakarta.servlet-api",
+                    "url": "https://www.eclipse.org",
+                    "version": "6.0.0"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "Go License",
+                "uri": "https://golang.org/LICENSE"
+            },
+            "modules": [
+                {
+                    "name": "com.google.re2j:re2j",
+                    "url": "http://github.com/google/re2j",
+                    "version": "1.8"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "MPL 2.0",
+                "uri": "https://www.mozilla.org/en-US/MPL/2.0/"
+            },
+            "modules": [
+                {
+                    "name": "com.rabbitmq:amqp-client",
+                    "url": "https://www.rabbitmq.com",
+                    "version": "5.22.0"
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "Public Domain, per Creative Commons CC0",
+                "uri": "http://creativecommons.org/publicdomain/zero/1.0/"
+            },
+            "modules": [
+                {
+                    "name": "org.hdrhistogram:HdrHistogram",
+                    "url": "http://hdrhistogram.github.io/HdrHistogram/",
+                    "version": "2.2.2"
                 },
                 {
                     "name": "org.latencyutils:LatencyUtils",
                     "url": "http://latencyutils.github.io/LatencyUtils/",
                     "version": "2.0.3"
-                },
+                }
+            ]
+        },
+        {
+            "license": {
+                "name": "The BSD 2-Clause License",
+                "uri": "http://www.opensource.org/licenses/bsd-license.php"
+            },
+            "modules": [
                 {
-                    "name": "org.postgresql:postgresql",
-                    "url": "https://jdbc.postgresql.org/",
-                    "version": "42.7.3"
+                    "name": "org.codehaus.woodstox:stax2-api",
+                    "url": "http://github.com/FasterXML/stax2-api",
+                    "version": "4.2.2"
                 }
             ]
         },
@@ -891,6 +1142,16 @@
                     "version": "1.0.2"
                 },
                 {
+                    "name": "io.github.breninsul:http-logging-commons-2",
+                    "url": "https://github.com/BreninSul/http-logging-commons",
+                    "version": "2.1.1"
+                },
+                {
+                    "name": "io.github.breninsul:io-stream-commons",
+                    "url": "https://github.com/BreninSul/io-stream-commons",
+                    "version": "1.0.3"
+                },
+                {
                     "name": "io.github.breninsul:java-timer-scheduler-starter",
                     "url": "https://github.com/BreninSul/java-timer-scheduler-starter",
                     "version": "1.0.3"
@@ -898,22 +1159,47 @@
                 {
                     "name": "io.github.breninsul:jdbc-template-postgresql-types",
                     "url": "https://github.com/BreninSul/jdbc-template-postgresql-types",
-                    "version": "1.0.8"
+                    "version": "1.0.9"
                 },
                 {
                     "name": "io.github.breninsul:named-limited-virtual-thread-executor",
                     "url": "https://github.com/BreninSul/named-limited-virtual-thread-executor",
-                    "version": "1.0.0"
+                    "version": "1.0.3"
+                },
+                {
+                    "name": "io.github.breninsul:okhttp-logging-interceptor",
+                    "url": "https://github.com/BreninSul/okhttp-logging-starter",
+                    "version": "2.0.0"
+                },
+                {
+                    "name": "io.github.breninsul:rest-template-logging-interceptor",
+                    "url": "https://github.com/BreninSul/rest-template-logging-starter",
+                    "version": "2.0.0"
+                },
+                {
+                    "name": "io.github.breninsul:servlet-caching-request",
+                    "url": "https://github.com/BreninSul/servlet-logging-starter",
+                    "version": "1.1.3"
+                },
+                {
+                    "name": "io.github.breninsul:servlet-logging-starter",
+                    "url": "https://github.com/BreninSul/servlet-logging-starter",
+                    "version": "2.1.3"
+                },
+                {
+                    "name": "io.github.breninsul:spring-input-stream-response-converter",
+                    "url": "https://github.com/BreninSul/servlet-logging-starter",
+                    "version": "1.1.1"
                 },
                 {
                     "name": "io.github.breninsul:synchronization-starter",
                     "url": "https://github.com/BreninSul/synchronization-starter",
-                    "version": "1.0.1"
+                    "version": "1.0.3"
                 },
                 {
                     "name": "org.checkerframework:checker-qual",
                     "url": "https://checkerframework.org/",
-                    "version": "3.42.0"
+                    "version": "3.48.3"
                 },
                 {
                     "name": "org.java-websocket:Java-WebSocket",
@@ -933,7 +1219,7 @@
                 {
                     "name": "org.mockito:mockito-junit-jupiter",
                     "url": "https://github.com/mockito/mockito",
-                    "version": "5.11.0"
+                    "version": "5.14.2"
                 },
                 {
                     "name": "org.reactivestreams:reactive-streams",
@@ -943,7 +1229,7 @@
                 {
                     "name": "org.slf4j:slf4j-api",
                     "url": "http://www.slf4j.org",
-                    "version": "2.0.13"
+                    "version": "2.0.16"
                 }
             ]
         }

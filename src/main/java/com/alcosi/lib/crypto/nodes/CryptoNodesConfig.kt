@@ -72,21 +72,9 @@ class CryptoNodesConfig {
         headerHelper: HeaderHelper,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
-        val config = OkHttpLoggerConfiguration()
-        val requestMaskers =
-            listOf(
-                config.okHttpRequestRegexJsonBodyMasking(cryptoNodeProperties.logging.request.mask),
-                config.okHttpRequestFormUrlencodedBodyMasking(cryptoNodeProperties.logging.request.mask),
-            )
-        val responseMaskers =
-            listOf(
-                config.okHttpResponseRegexJsonBodyMasking(cryptoNodeProperties.logging.request.mask),
-                config.okHttpResponseFormUrlencodedBodyMasking(cryptoNodeProperties.logging.request.mask),
-            )
-        val uriMaskers = listOf(config.okHttpUriMaskingDelegate(cryptoNodeProperties.logging.request.mask))
         configureTimeouts(
             builder,
-            OKLoggingInterceptor(cryptoNodeProperties.logging, uriMaskers, requestMaskers, responseMaskers, headerHelper),
+            OKLoggingInterceptor(cryptoNodeProperties.logging, headerHelper),
             cryptoNodeProperties.nodesTimeout,
         )
         return builder.build()
