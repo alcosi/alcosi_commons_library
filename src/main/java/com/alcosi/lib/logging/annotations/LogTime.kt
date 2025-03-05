@@ -19,6 +19,7 @@ package com.alcosi.lib.logging.annotations
 
 import com.alcosi.lib.logging.JavaLoggingLevel
 
+
 /**
  * Annotation used to mark methods or classes for logging execution time.
  *
