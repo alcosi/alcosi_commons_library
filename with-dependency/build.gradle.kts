@@ -42,7 +42,7 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.4.3"
-val depVersion = "5.3.1"
+val depVersion = "5.3.2"
 val kotlinCoroutinesVersion = "1.10.1"
 
 val jacksonVersion = "2.18.2"
