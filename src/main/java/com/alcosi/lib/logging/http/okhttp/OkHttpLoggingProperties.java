@@ -17,10 +17,7 @@
 
 package com.alcosi.lib.logging.http.okhttp;
 
-import com.alcosi.lib.logging.JavaLoggingLevel;
-import com.alcosi.lib.logging.http.resttemplate.RestTemplateProperties;
 import io.github.breninsul.okhttp.logging.OkHttpLoggerProperties;
-import io.github.breninsul.rest.logging.RestTemplateLoggerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
