@@ -125,7 +125,7 @@ dependencies {
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.3")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
-    compileOnly("io.github.breninsul:rest-template-logging-interceptor:2.0.0")
+    compileOnly("io.github.breninsul:rest-template-logging-interceptor:2.0.2")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:2.0.0")
     compileOnly("io.github.breninsul:servlet-logging-starter:2.1.3")
     compileOnly("io.github.breninsul:spring-input-stream-response-converter:1.1.1")
