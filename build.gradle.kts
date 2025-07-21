@@ -14,12 +14,12 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
-    id("org.springframework.boot") version "3.4.3"
-    id("io.spring.dependency-management") version "1.1.5"
+    id("org.springframework.boot") version "3.5.3"
+    id("io.spring.dependency-management") version "1.1.7"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("com.github.jk1.dependency-license-report") version "2.9"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("org.jetbrains.dokka") version "2.0.0"
     id("org.jetbrains.kotlin.kapt") version kotlinVersion
 }
@@ -28,8 +28,8 @@ group = "com.alcosi"
 version = "5.3.2"
 val appName = "commons-library"
 
-val jacksonVersion = "2.18.2"
-val web3jVersion = "4.12.2"
+val jacksonVersion = "2.19.2"
+val web3jVersion = "4.14.0"
 val kotlinVersion = "2.1.0"
 val javaVersion = JavaVersion.VERSION_21
 
@@ -117,25 +117,25 @@ configurations {
 }
 
 dependencies {
-    compileOnly("jakarta.servlet:jakarta.servlet-api:6.0.0")
+    compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
     compileOnly("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
     compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
-    compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
-    compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
+    compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.12")
+    compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.4")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.3")
     compileOnly("io.github.breninsul:future-starter:1.0.2")
     compileOnly("io.github.breninsul:rest-template-logging-interceptor:2.0.2")
     compileOnly("io.github.breninsul:okhttp-logging-interceptor:2.0.0")
     compileOnly("io.github.breninsul:servlet-logging-starter:2.1.3")
-    compileOnly("io.github.breninsul:spring-input-stream-response-converter:1.1.1")
-    compileOnly("org.apache.commons:commons-lang3:3.17.0")
+    compileOnly("io.github.breninsul:spring-input-stream-response-converter:1.1.4")
+    compileOnly("org.apache.commons:commons-lang3:3.18.0")
     compileOnly("commons-codec:commons-codec:1.18.0")
-    compileOnly("org.apache.commons:commons-text:1.12.0")
-    compileOnly("commons-io:commons-io:2.18.0")
-    compileOnly("com.squareup.okhttp3:okhttp:4.12.0")
-    compileOnly("org.bouncycastle:bcprov-jdk18on:1.80")
-    compileOnly("org.postgresql:postgresql:42.7.5")
+    compileOnly("org.apache.commons:commons-text:1.13.1")
+    compileOnly("commons-io:commons-io:2.20.0")
+    compileOnly("com.squareup.okhttp3:okhttp:5.1.0")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.81")
+    compileOnly("org.postgresql:postgresql:42.7.7")
     compileOnly("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     compileOnly("org.web3j:crypto:$web3jVersion")
     compileOnly("org.web3j:core:$web3jVersion")
@@ -148,7 +148,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-aop")
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
     compileOnly("org.springframework.boot:spring-boot-starter-actuator")
-    compileOnly("org.springframework.security:spring-security-rsa:1.1.3")
+    compileOnly("org.springframework.security:spring-security-rsa:1.1.5")
     compileOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     compileOnly("org.apache.logging.log4j:log4j-core")
     annotationProcessor("org.apache.logging.log4j:log4j-core")
@@ -157,7 +157,7 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-autoconfigure-processor")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito:mockito-core:5.18.0")
 }
 
 configurations {

@@ -22,6 +22,7 @@ import io.github.breninsul.okhttp.logging.OkHttpLoggerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
  */
 @ConfigurationProperties("common-lib.crypto.node")
 public class CryptoNodeProperties {
-    private OkHttpLoggerProperties logging;
+    private OkHttpLoggerProperties logging = new OkHttpLoggerProperties();
 
     public OkHttpLoggerProperties getLogging() {
         return logging;
@@ -110,7 +111,7 @@ public class CryptoNodeProperties {
      *
      * Note: This documentation does not have an explicit author or version tag.
      */
-    private Map<Integer, String> url;
+    private Map<Integer, String> url = new HashMap<>();
     /**
      * The poolingInterval variable defines the duration between each poolin process.
      * By default, it is set to 15 seconds.

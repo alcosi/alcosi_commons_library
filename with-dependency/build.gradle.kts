@@ -28,25 +28,28 @@ buildscript {
 }
 
 plugins {
+    val kotlinVersion = "2.1.0"
     id("idea")
     id("java-library")
     id("maven-publish")
-    id("org.springframework.boot") version "3.4.3"
-    id("io.spring.dependency-management") version "1.1.5"
-    id("org.jetbrains.kotlin.jvm") version "2.1.0"
-    id("org.jetbrains.kotlin.plugin.spring") version "2.1.0"
-    id("com.github.jk1.dependency-license-report") version "2.9"
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
+    id("org.springframework.boot") version "3.5.3"
+    id("io.spring.dependency-management") version "1.1.7"
+    id("org.jetbrains.kotlin.jvm") version kotlinVersion
+    id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
+    id("com.github.jk1.dependency-license-report") version "2.9"
+    id("com.github.ben-manes.versions") version "0.52.0"
     id("org.jetbrains.dokka") version "2.0.0"
+    id("org.jetbrains.kotlin.kapt") version kotlinVersion
 }
 
 val appName = "commons-library-basic-dependency"
-val springVersion = "3.4.3"
+val springVersion = "3.5.3"
 val depVersion = "5.3.2"
 val kotlinCoroutinesVersion = "1.10.1"
 
-val jacksonVersion = "2.18.2"
-val web3jVersion = "4.12.2"
+val jacksonVersion = "2.19.2"
+val web3jVersion = "4.14.0"
 val kotlinVersion = "2.1.0"
 val javaVersion = JavaVersion.VERSION_21
 
@@ -137,25 +140,26 @@ dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
     api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
-    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.9")
-    api("io.github.breninsul:java-timer-scheduler-starter:1.0.3")
+    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.12")
+    api("io.github.breninsul:java-timer-scheduler-starter:1.0.4")
     api("io.github.breninsul:synchronization-starter:1.0.3")
     api("io.github.breninsul:future-starter:1.0.2")
     api("io.github.breninsul:rest-template-logging-interceptor:2.0.2")
     api("io.github.breninsul:okhttp-logging-interceptor:2.0.0")
     api("io.github.breninsul:servlet-logging-starter:2.1.3")
+    api("io.github.breninsul:spring-input-stream-response-converter:1.1.4")
     api("org.apache.logging.log4j:log4j-api-kotlin:1.5.0")
-    api("jakarta.servlet:jakarta.servlet-api:6.0.0")
+    api("jakarta.servlet:jakarta.servlet-api:6.1.0")
     api("javax.annotation:javax.annotation-api:1.3.2")
-    api("org.apache.httpcomponents.client5:httpclient5:5.4.2")
-    api("commons-io:commons-io:2.18.0")
-    api("org.apache.commons:commons-lang3:3.17.0")
+    api("org.apache.httpcomponents.client5:httpclient5:5.5")
+    api("commons-io:commons-io:2.20.0")
+    api("org.apache.commons:commons-lang3:3.18.0")
     api("commons-codec:commons-codec:1.18.0")
-    api("org.apache.commons:commons-text:1.12.0")
-    api("org.bouncycastle:bcprov-jdk18on:1.80")
-    api("org.postgresql:postgresql:42.7.5")
-    api("org.flywaydb:flyway-core:11.3.0")
-    api("org.flywaydb:flyway-database-postgresql:11.3.0")
+    api("org.apache.commons:commons-text:1.13.1")
+    api("org.bouncycastle:bcprov-jdk18on:1.81")
+    api("org.postgresql:postgresql:42.7.7")
+    api("org.flywaydb:flyway-core:11.10.3")
+    api("org.flywaydb:flyway-database-postgresql:11.10.3")
     api("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
