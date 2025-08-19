@@ -14,7 +14,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
-    id("org.springframework.boot") version "3.5.3"
+    id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
