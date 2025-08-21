@@ -9,7 +9,7 @@ buildscript {
     }
 }
 plugins {
-    val kotlinVersion = "2.1.0"
+    val kotlinVersion = "2.2.0"
     id("idea")
     id("java-library")
     id("maven-publish")
@@ -25,12 +25,12 @@ plugins {
 }
 
 group = "com.alcosi"
-version = "5.3.2"
+version = "5.3.3"
 val appName = "commons-library"
 
 val jacksonVersion = "2.19.2"
 val web3jVersion = "4.14.0"
-val kotlinVersion = "2.1.0"
+val kotlinVersion = "2.2.0"
 val javaVersion = JavaVersion.VERSION_21
 
 java {
@@ -121,7 +121,7 @@ dependencies {
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
     compileOnly("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
     compileOnly("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
-    compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.12")
+    compileOnly("io.github.breninsul:jdbc-template-postgresql-types:1.0.14")
     compileOnly("io.github.breninsul:java-timer-scheduler-starter:1.0.4")
     compileOnly("io.github.breninsul:synchronization-starter:1.0.3")
     compileOnly("io.github.breninsul:future-starter:1.0.2")

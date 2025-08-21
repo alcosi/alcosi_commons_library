@@ -28,7 +28,7 @@ buildscript {
 }
 
 plugins {
-    val kotlinVersion = "2.1.0"
+    val kotlinVersion = "2.2.0"
     id("idea")
     id("java-library")
     id("maven-publish")
@@ -45,12 +45,12 @@ plugins {
 
 val appName = "commons-library-basic-dependency"
 val springVersion = "3.5.4"
-val depVersion = "5.3.2"
+val depVersion = "5.3.3"
 val kotlinCoroutinesVersion = "1.10.1"
 
 val jacksonVersion = "2.19.2"
 val web3jVersion = "4.14.0"
-val kotlinVersion = "2.1.0"
+val kotlinVersion = "2.2.0"
 val javaVersion = JavaVersion.VERSION_21
 
 group = "com.alcosi"
@@ -140,7 +140,7 @@ dependencies {
     api("com.alcosi:commons-library-logging:$depVersion")
     api("io.github.breninsul:configurable-transaction-template-starter:1.0.2")
     api("io.github.breninsul:named-limited-virtual-thread-executor:1.0.3")
-    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.12")
+    api("io.github.breninsul:jdbc-template-postgresql-types:1.0.14")
     api("io.github.breninsul:java-timer-scheduler-starter:1.0.4")
     api("io.github.breninsul:synchronization-starter:1.0.3")
     api("io.github.breninsul:future-starter:1.0.2")
