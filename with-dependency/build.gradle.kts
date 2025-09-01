@@ -33,7 +33,7 @@ plugins {
     id("java-library")
     id("maven-publish")
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
@@ -44,7 +44,7 @@ plugins {
 }
 
 val appName = "commons-library-basic-dependency"
-val springVersion = "3.5.4"
+val springVersion = "3.5.5"
 val depVersion = "5.3.3"
 val kotlinCoroutinesVersion = "1.10.1"
 
